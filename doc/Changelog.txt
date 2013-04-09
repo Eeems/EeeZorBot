@@ -1,0 +1,6 @@
+Version 1.0
+	Major changes to start support for chat-server. Lots of fixes for crashing
+Version 0.1.1
+	Added support for ACTION statements to the logging script.
+Version 0.1
+	Initial release.

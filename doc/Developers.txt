@@ -1,0 +1,148 @@
+=== API ===
+hook(string type, function callback[, object options])
+	string type
+		'data'
+			callback is called every time data is recieved from the server.
+				function callback(match,data,replyTo,connection)
+					match
+						the match object ( uses regex.exec )
+					data
+						the data string.
+					replyTo
+						who send the data.
+					connection
+						irc connection object that it was sent from.
+				object options
+					regex
+						regex to compare the string to
+					once
+						if set to true, this will only be called once and then the hook will be removed.
+		'reply'
+			callback is called when a privmsg is sent
+				function callback(replyTo,msg,connection)
+					match
+						the match object ( uses regex.exec )
+					replyTo
+						who sent the privmsg
+					msg
+						what they sent
+					connection
+						irc connection object that it was sent from
+		'send'
+			callback is called when anything other then privmsg is sent to the server
+				function callback(match,msg,connection)
+					msg
+						what they sent
+					connection
+						irc connection object that it was sent from
+				object options
+					regex
+						regex to compare the string to
+					once
+						if set to true, this will only be called once and then the hook will be removed.
+		'load'
+			callback is called after scripts are loaded
+		'unload'
+			callback is called before scripts are unloaded.
+			Good for removing more complex hooks made by scripts that don't follow the api spec.
+reply_listen(function callback);
+	shortcut for creating a reply hook
+		function callback(replyTo,msg,connection);
+			replyTo:
+				who sent the privmsg
+			msg:
+				what they sent
+			connection:
+				irc connection object that it was sent from
+send_listen(regex dataRegex, function callback[, bool once]);
+	shortcut for creating a send hook
+		regex dataRegex:
+			regex to compare the data to.
+		function callback(msg,connection);
+			msg:
+				what they sent
+			connection:
+				irc connection object that it was sent from
+		bool once:
+			if set to true, this will only be called once and then the hook will be removed.
+listen(regex dataRegex, function callback[, bool once]);
+	shortcut for creating a data hook.
+		regex dataRegex:
+			regex to compare the data to.
+		function callback(match,data,replyTo,connection);
+			match:
+				the match object ( uses regex.exec )
+			data:
+				the data string.
+			replyTo:
+				who send the data.
+			connection:
+				irc connection object that it was sent from.
+		bool once:
+			if set to true, this will only be called once and then the hook will be removed.
+disp
+	console display and logging.
+	disp.alert()
+		pass any arguments to this and it will show an alert in the console for each of them
+	disp.error()
+		pass any arguments to this and it will show them in the console and log them to the error logs.
+	disp.out()
+		give an out message for each argument.
+	disp.in()
+		give an in message for each argument.
+	disp.log(string msg[, bool log])
+		display on the console and log
+			string msg:
+				the string to display
+			bool log
+				if set to true the data will be stored in the error logs.
+rCommand(string name[,bool isArgs])
+	Returns the RegExp for a command
+		string name
+			command name to be used
+		bool isArgs
+			if set to true the command will also look for args.
+irc
+	object to store a connection as well as associated functions and data.
+		irc.config
+			configuration for the connection
+				irc.config.host
+					hostname of the connection
+				irc.config.port
+					port to connect on
+				irc.config.nickserv
+					nickserv password to send.
+				irc.config.nick
+					nick to use on the connection
+				irc.config.username
+					username to use
+				irc.config.name
+					name to use
+		irc.quit()
+			close the connection and handle removal of objects
+		irc.send(data)
+			send the data to the server
+		irc.reply(to,msg)
+			reply to a privmsg on the server
+				to
+					Name of the user or channel to reply to
+				msg:
+					What to reply with
+config
+	object to store user configuration of the bot
+		config.prefix
+			Default command prefix to use. It is best practice to use this instead of hard coding it into your commands.
+		config.name
+			Default name this bot will use.
+		config.nick
+			Default nick this bot will use.
+		config.username
+			Default username this bot will use.
+exit()
+	close all connections and exit the bot
+regHelp(name,help)
+	register a command in the help block so that information can be displayed.
+		name
+			name of the command
+		help
+			the help message to display
