@@ -4,7 +4,7 @@ if(!fs.exists('data/templates/chatlog.html')){
     var template = '<html>\n\t<head>\n\t\t<title>\n\t\t\t{Title}\n\t\t</title>\n\t</head>\n\t<body>\n\t\t{Item(\n\t\t\t<a href="{Link}" name="{Anchor}">\n\t\t\t\t{timestamp}\n\t\t\t</a>\n\t\t\t{Text}\n\t\t\t<br/>\n\t\t)}\n\t\t<a name="end"></a>\n\t</body>\n</html>';
     fs.writeFile('data/templates/chatlog.html',template,function(err) {
         if(err) {
-			disp.error(err);
+    		disp.error(err);
 		}else{
 			disp.log("No chat log template found. Creating default.");
 		}
@@ -266,8 +266,11 @@ var count = 0,
                                 case 'privmsg':
                                     m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
                                     break;
+                                case 'action':
+                                    m = '<strong>* '+e.user+' '+e.msg+'</strong>';
+                                    break;
                                 default:
-                                m = 'error!';
+                                    m = 'error! '+e.type;
                             }
                             td = new Date(e.date);
                             res.write("\t<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>\n");
