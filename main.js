@@ -37,23 +37,23 @@ var config = global.config = require('./config.js'),
 	disp = global.disp,
 	http = require('http'),
 	path = require('path');
-fs.mkdirParent = function(dirPath, mode, callback){
-	//Call the standard fs.mkdir
-	fs.mkdir(dirPath, mode, function(error) {
-		//When it fail in this way, do the custom steps
-		if (error && error.errno === 34) {
-			//Create all the parents recursively
-			fs.mkdirParent(path.dirname(dirPath), mode, callback);
-			//And then the directory
-			fs.mkdirParent(dirPath, mode, callback);
+fs.mkdirParent = function(dirPath,mode){
+	dirPath = path.normalize(dirPath);
+	var dirs = dirPath.split(path.sep).reverse(),
+		dir = '.';
+	(function mkdir(dirs,dir){
+		if(dirs.length){
+			dir = dir+'/'+dirs.pop();
+			try{
+				fs.mkdirSync(dir,mode);
+			}catch(e){}
+			mkdir(dirs,dir);
 		}
-		//Manually run the callback since we used our own callback to do all these
-		callback && callback(error);
-	});
+	})(dirs,dir);
 };
 // Setup Filesystem
-fs.mkdir("scripts");
-fs.mkdirParent("data/logs");
+fs.mkdir('scripts');
+fs.mkdirParent('data/logs');
 disp = {
 	alert: function(){
 		for(var i in arguments){
