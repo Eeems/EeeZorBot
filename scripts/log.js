@@ -208,7 +208,7 @@ var count = 0,
 										logfiles = logfiles.sort(function(a, b){
 											return (new Date(path.basename(a,ext))).getTime()-(new Date(path.basename(b,ext))).getTime();
 										});
-										res.write('\n\t\t\t<li>\n\t\t\t\t<h2 onclick="$(this).next().children().toggle()" style="cursor:pointer;">'+logdirs[j]+'</h2>\n\t\t\t\t<ul style="display:none;">');
+										res.write('\n\t\t\t<li>\n\t\t\t\t<h2 onclick="$(this).next().toggle()" style="cursor:pointer;">'+logdirs[j]+'</h2>\n\t\t\t\t<ul style="display:none;">');
 										for (f = 0; f < logfiles.length; f++){
 											if(path.extname(logfiles[f]) == ext){
 												var c = path.basename(logfiles[f],ext);
