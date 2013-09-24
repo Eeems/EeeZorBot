@@ -188,7 +188,7 @@ var count = 0,
 		disp.log("Serving "+req.url+" to: "+ip);
 		if(req.url == '/'){
 			res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-			res.write("<!doctype html>\n<html>\n\t<head>\n\t\t<link rel='icon' type='image/x-icon' href='favicon.ico' />\n\t\t<title>Logs</title>\n\t</head>\n\t<body>");
+			res.write("<!doctype html>\n<html>\n\t<head>\n\t\t<link rel='icon' type='image/x-icon' href='favicon.ico' />\n\t\t<title>Logs</title>\n\t\t<script src='http://code.jquery.com/jquery-1.10.2.min.js'></script>\n\t</head>\n\t<body>");
 			var logs = fs.readdirSync('data/logs/');
 			if(logs){
 				var i,j,f;
@@ -196,7 +196,7 @@ var count = 0,
 					if(check('data/logs/'+logs[i])){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
 						if(logdirs){
-							res.write('\n\t\t<h1>'+logs[i]+'</h1>\n\t\t<ul>');
+							res.write('\n\t\t<h1 onclick="$(this).next().toggle();">'+logs[i]+'</h1>\n\t\t<ul style="display:none;">');
 							for (j = 0; j < logdirs.length; j++){
 								if(
 									check('data/logs/'+logs[i]+'/'+logdirs[j])
@@ -205,7 +205,7 @@ var count = 0,
 								){
 									var logfiles = fs.readdirSync('data/logs/'+logs[i]+'/'+logdirs[j]);
 									if(logfiles){
-										logfiles = logfiles.sort(function(a, b) {
+										logfiles = logfiles.sort(function(a, b){
 											return (new Date(path.basename(a,ext))).getTime()-(new Date(path.basename(b,ext))).getTime();
 										});
 										res.write('\n\t\t\t<li>\n\t\t\t\t<h2><a href="?server='+logs[i]+'&channel='+logdirs[j].substr(1,logdirs[j].length-1)+'&date=today#end">'+logdirs[j]+'</a></h2>\n\t\t\t\t<ul>');
