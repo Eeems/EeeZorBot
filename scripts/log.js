@@ -206,6 +206,7 @@ var count = 0,
 									var logfiles = fs.readdirSync('data/logs/'+logs[i]+'/'+logdirs[j]);
 									if(logfiles){
 										logfiles = logfiles.sort(function(a, b){
+											// TODO change to using timestamps
 											return (new Date(path.basename(a,ext))).getTime()-(new Date(path.basename(b,ext))).getTime();
 										});
 										res.write('\n\t\t\t<li>\n\t\t\t\t<h2 onclick="$(this).next().toggle()" style="cursor:pointer;">'+logdirs[j]+'</h2>\n\t\t\t\t<ul style="display:none;">');
