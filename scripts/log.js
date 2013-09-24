@@ -196,7 +196,7 @@ var count = 0,
 					if(check('data/logs/'+logs[i])){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
 						if(logdirs){
-							res.write('\n\t\t<h1 onclick="$(this).next().toggle();">'+logs[i]+'</h1>\n\t\t<ul style="display:none;">');
+							res.write('\n\t\t<h1 onclick="$(this).next().toggle();" style="cursor:pointer;">'+logs[i]+'</h1>\n\t\t<ul style="display:none;">');
 							for (j = 0; j < logdirs.length; j++){
 								if(
 									check('data/logs/'+logs[i]+'/'+logdirs[j])
@@ -208,7 +208,7 @@ var count = 0,
 										logfiles = logfiles.sort(function(a, b){
 											return (new Date(path.basename(a,ext))).getTime()-(new Date(path.basename(b,ext))).getTime();
 										});
-										res.write('\n\t\t\t<li>\n\t\t\t\t<h2><a href="?server='+logs[i]+'&channel='+logdirs[j].substr(1,logdirs[j].length-1)+'&date=today#end">'+logdirs[j]+'</a></h2>\n\t\t\t\t<ul>');
+										res.write('\n\t\t\t<li>\n\t\t\t\t<h2><span onclick="$(this).next().children().toggle()" style="cursor:pointer;">'+logdirs[j]+'</span></h2>\n\t\t\t\t<ul style="display:none;">');
 										for (f = 0; f < logfiles.length; f++){
 											if(path.extname(logfiles[f]) == ext){
 												var c = path.basename(logfiles[f],ext);
