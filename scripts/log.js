@@ -268,7 +268,7 @@ var count = 0,
                             res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
                         }
 					}
-					res.end('<a name="end"></a><button value="<- Back" onclick="location=location.host;"><- Back</button></body></html>');
+					res.end('<a name="end"></a><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button></body></html>');
 				break;
 				case 'txt': default:
 					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
