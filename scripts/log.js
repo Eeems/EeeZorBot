@@ -189,7 +189,7 @@ var count = 0,
 		if(req.url == '/'){
 			res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
 			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script>\<script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
-			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy'}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
+			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy',maxDate: new Date}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
 			res.write("</head><body><div class='accordion'>");
 			var logs = fs.readdirSync('data/logs/');
 			if(logs){
