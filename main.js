@@ -52,7 +52,9 @@ fs.mkdirParent = function(dirPath,mode){
 	})(dirs,dir);
 };
 // Setup Filesystem
-fs.mkdir('scripts');
+try{
+	fs.mkdirSync('scripts');
+}catch(e){}
 fs.mkdirParent('data/logs');
 disp = {
 	alert: function(){

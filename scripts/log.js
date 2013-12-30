@@ -1,7 +1,7 @@
 fs.mkdirParent("data/logs/");
 fs.mkdirParent('data/templates/');
 if(!fs.exists('data/templates/chatlog.html')){
-    var template = '<html>\n\t<head>\n\t\t<title>\n\t\t\t{Title}\n\t\t</title>\n\t</head>\n\t<body>\n\t\t{Item(\n\t\t\t<a href="{Link}" name="{Anchor}">\n\t\t\t\t{timestamp}\n\t\t\t</a>\n\t\t\t{Text}\n\t\t\t<br/>\n\t\t)}\n\t\t<a name="end"></a>\n\t</body>\n</html>';
+    var template = '<html><head><title>{Title}</title></head><body>{Item(<a href="{Link}" name="{Anchor}">{timestamp}</a>{Text}<br/>)}<a name="end"></a></body></html>';
     fs.writeFile('data/templates/chatlog.html',template,function(err) {
         if(err) {
     		disp.error(err);
@@ -188,49 +188,37 @@ var count = 0,
 		disp.log("Serving "+req.url+" to: "+ip);
 		if(req.url == '/'){
 			res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-			res.write("<!doctype html>\n<html>\n\t<head>\n\t\t<link rel='icon' type='image/x-icon' href='favicon.ico' />\n\t\t<title>Logs</title>\n\t\t<script src='http://code.jquery.com/jquery-1.10.2.min.js'></script>\n\t</head>\n\t<body>");
+			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script>\<script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
+			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy'}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
+			res.write("</head><body><div class='accordion'>");
 			var logs = fs.readdirSync('data/logs/');
 			if(logs){
 				var i,j,f;
 				for (i = 0; i < logs.length; i++){
 					if(check('data/logs/'+logs[i])){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
-						if(logdirs){
-							res.write('\n\t\t<h1 onclick="$(this).next().toggle();" style="cursor:pointer;">'+logs[i]+'</h1>\n\t\t<ul style="display:none;">');
+						if(logdirs && (logdirs.length != 1 || logdirs[0] != '- server -')){
+							res.write('<h3>'+logs[i]+'</h3><div><input type="hidden" value="'+logs[i]+'"/><select>');
 							for (j = 0; j < logdirs.length; j++){
 								if(
 									check('data/logs/'+logs[i]+'/'+logdirs[j])
 									&& logdirs[j] != '- server -'
 									&& logdirs[j].substr(0,1) == '#'
 								){
-									var logfiles = fs.readdirSync('data/logs/'+logs[i]+'/'+logdirs[j]);
-									if(logfiles){
-										logfiles = logfiles.sort(function(a, b){
-											// TODO change to using timestamps
-											return (new Date(path.basename(a,ext))).getTime()-(new Date(path.basename(b,ext))).getTime();
-										});
-										res.write('\n\t\t\t<li>\n\t\t\t\t<h2 onclick="$(this).next().toggle()" style="cursor:pointer;">'+logdirs[j]+'</h2>\n\t\t\t\t<ul style="display:none;">');
-										for (f = 0; f < logfiles.length; f++){
-											if(path.extname(logfiles[f]) == ext){
-												var c = path.basename(logfiles[f],ext);
-												res.write('\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href="?server='+logs[i]+'&channel='+logdirs[j].substr(1,logfiles[f].length-1)+'&date='+c+'">'+c+'</a>\n\t\t\t\t\t</li>');
-											}
-										}
-										res.write('\n\t\t\t\t</ul>\n\t\t\t</li>');
-									}
+									res.write('<option value="'+logdirs[j]+'">'+logdirs[j]+'</option>');
 								}
 							}
-							res.write('\n\t\t</ul>');
+							res.write('</select><input class="datepicker"/><button class="open" value="Open">Open</button></div>');
 						}
 					}
 				}
 			}
-			res.end("\n\t</body>\n</html>");
+			res.end("</div></body></html>");
 		}else if(req.url == '/favicon.ico'){
 			fs.readFile('data/favicon.ico', "binary", function (err,file) {
 				if (err) {
 					res.writeHead(500, {'Content-Type':'image/x-icon','Server':'NodeBot/Logs'});
-					res.write(err+"\n");
+					res.write(err+"");
 					res.end();
 					return;
 				}
@@ -249,7 +237,7 @@ var count = 0,
 				case 'listdb':
 					res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
 					l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body>');
+					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><br/>');
 					for(i in l){
                         try{
                             e = JSON.parse(l[i]);
@@ -274,13 +262,13 @@ var count = 0,
                                     m = 'error! '+e.type;
                             }
                             td = new Date(e.date);
-                            res.write("\t<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>\n");
+                            res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
                         }catch(e){
                             disp.log("Invalid character in log");
-                            res.write("\t*Please contact the owner of this bot. The logs have invalid characters*<br/>\n");
+                            res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
                         }
 					}
-					res.end('<a name="end"></a></body></html>');
+					res.end('<a name="end"></a><button value="<- Back" onclick="location=location.host;"><- Back</button></body></html>');
 				break;
 				case 'txt': default:
 					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
