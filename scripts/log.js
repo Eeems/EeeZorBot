@@ -237,7 +237,7 @@ var count = 0,
 				case 'listdb':
 					res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
 					l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><br/>');
+					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
 					for(i in l){
                         try{
                             e = JSON.parse(l[i]);
@@ -268,7 +268,7 @@ var count = 0,
                             res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
                         }
 					}
-					res.end('<a name="end"></a><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button></body></html>');
+					res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a></body></html>');
 				break;
 				case 'txt': default:
 					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
