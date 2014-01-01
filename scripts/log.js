@@ -237,7 +237,8 @@ var count = 0,
 				case 'listdb':
 					res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
 					l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
+					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
+					res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
 					for(i in l){
                         try{
                             e = JSON.parse(l[i]);
