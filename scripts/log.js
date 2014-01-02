@@ -279,7 +279,6 @@ var count = 0,
 										}
 									break;
 								}
-								console.log(JSON.stringify(m),colour,background);
 								if(type == "\x03"){
 									var getColour = function(num,def){
 										var c=def;
