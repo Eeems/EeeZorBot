@@ -1,17 +1,17 @@
 fs.mkdirParent("data/logs/");
 fs.mkdirParent('data/templates/');
 if(!fs.exists('data/templates/chatlog.html')){
-    var template = '<html><head><title>{Title}</title></head><body>{Item(<a href="{Link}" name="{Anchor}">{timestamp}</a>{Text}<br/>)}<a name="end"></a></body></html>';
-    fs.writeFile('data/templates/chatlog.html',template,function(err) {
-        if(err) {
-    		disp.error(err);
+	var template = '<html><head><title>{Title}</title></head><body>{Item(<a href="{Link}" name="{Anchor}">{timestamp}</a>{Text}<br/>)}<a name="end"></a></body></html>';
+	fs.writeFile('data/templates/chatlog.html',template,function(err) {
+		if(err) {
+			disp.error(err);
 		}else{
 			disp.log("No chat log template found. Creating default.");
 		}
 	});
 }
 var Settings = regSettings('logServer',{
-    // Port to run the server on
+	// Port to run the server on
 	port: 9002,
 	// How quickly to check if the port is in use
 	check_interval: 1000,
@@ -35,7 +35,7 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 					
 				}
 			}
-            replyTo = replyTo.trim().toLowerCase();
+			replyTo = replyTo.trim().toLowerCase();
 		}catch(e){
 			disp.error(e)
 			disp.log("Defaulting to '- server -' replyTo");
@@ -240,34 +240,74 @@ var count = 0,
 					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
 					res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
 					for(i in l){
-                        try{
-                            e = JSON.parse(l[i]);
-                            e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
-                                return '<a href="'+url+'">'+url+'</a>';
-                            }).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,"");
-                            e.user = htmlEntities(e.user);
-                            switch(e.type){
-                                case 'join':
-                                    m = '<strong>*'+e.user+' joined the channel</strong>';
-                                    break;
-                                case 'part':
-                                    m = '<strong>*'+e.user+' left the channel</strong>';
-                                    break;
-                                case 'privmsg':
-                                    m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
-                                    break;
-                                case 'action':
-                                    m = '<strong>* '+e.user+' '+e.msg+'</strong>';
-                                    break;
-                                default:
-                                    m = 'error! '+e.type;
-                            }
-                            td = new Date(e.date);
-                            res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
-                        }catch(e){
-                            disp.log("Invalid character in log");
-                            res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
-                        }
+						try{
+							e = JSON.parse(l[i]);
+							var end = '';
+							e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
+								return '<a href="'+url+'">'+url+'</a>';
+							}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m,p1,offset,string){
+								var c = 'black';
+								end += '</span>';
+								// Reference: http://www.mirc.com/colors.html
+								switch(parseInt(p1)){
+									// 0 white
+									case 0:c='white';break;
+									// 1 black
+									// 2 blue (navy)
+									case 2:c='blue';break;
+									// 3 green
+									case 3:c='green';break;
+									// 4 red
+									case 4:c='red';break;
+									// 5 brown (maroon)
+									case 5:c='brown';break;
+									// 6 purple
+									case 6:c='purple';break;
+									// 7 orange (olive)
+									case 7:c='orange';break;
+									// 8 yellow
+									case 8:c='yellow';break;
+									// 9 light green (lime)
+									case 9:c='lime';break;
+									// 10 teal (a green/blue cyan)
+									case 10:c='teal';break;
+									// 11 light cyan (cyan) (aqua)
+									case 11:c='aqua';break;
+									// 12 light blue (royal)
+									case 12:c='royalblue';break;
+									// 13 pink (light purple) (fuchsia)
+									case 13:c='fuchsia';break;
+									// 14 grey
+									case 14:c='grey';break;
+									// 15 light grey (silver)
+									case 15:c='silver';break;
+								}
+								return "<span style='color:"+c+";'>";
+							});
+							e.msg += end;
+							e.user = htmlEntities(e.user);
+							switch(e.type){
+								case 'join':
+									m = '<strong>*'+e.user+' joined the channel</strong>';
+									break;
+								case 'part':
+									m = '<strong>*'+e.user+' left the channel</strong>';
+									break;
+								case 'privmsg':
+									m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
+									break;
+								case 'action':
+									m = '<strong>* '+e.user+' '+e.msg+'</strong>';
+									break;
+								default:
+									m = 'error! '+e.type;
+							}
+							td = new Date(e.date);
+							res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
+						}catch(e){
+							disp.log("Invalid character in log");
+							res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
+						}
 					}
 					res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a></body></html>');
 				break;
