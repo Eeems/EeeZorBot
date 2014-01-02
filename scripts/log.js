@@ -32,7 +32,6 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 					data = data2[2].trim();
 				}else if((data2 = (/\([#O]\).? *(.+) has quit .+$/).exec(data)) != null){
 					console.log(data2);
-					
 				}
 			}
 			replyTo = replyTo.trim().toLowerCase();
@@ -245,44 +244,80 @@ var count = 0,
 							var end = '';
 							e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
 								return '<a href="'+url+'">'+url+'</a>';
-							}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m,p1,offset,string){
-								var c = 'black';
-								end += '</span>';
-								// Reference: http://www.mirc.com/colors.html
-								switch(parseInt(p1)){
-									// 0 white
-									case 0:c='white';break;
-									// 1 black
-									// 2 blue (navy)
-									case 2:c='blue';break;
-									// 3 green
-									case 3:c='green';break;
-									// 4 red
-									case 4:c='red';break;
-									// 5 brown (maroon)
-									case 5:c='brown';break;
-									// 6 purple
-									case 6:c='purple';break;
-									// 7 orange (olive)
-									case 7:c='orange';break;
-									// 8 yellow
-									case 8:c='yellow';break;
-									// 9 light green (lime)
-									case 9:c='lime';break;
-									// 10 teal (a green/blue cyan)
-									case 10:c='teal';break;
-									// 11 light cyan (cyan) (aqua)
-									case 11:c='aqua';break;
-									// 12 light blue (royal)
-									case 12:c='royalblue';break;
-									// 13 pink (light purple) (fuchsia)
-									case 13:c='fuchsia';break;
-									// 14 grey
-									case 14:c='grey';break;
-									// 15 light grey (silver)
-									case 15:c='silver';break;
+							}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
+								var style="",colour,background,type=m[0];
+								switch(type){
+									case "\x0f":
+										type = "\x03";
+										style="text-decoration:none;";
+										colour=1; // black
+										background=0; //white
+									break;
+									case "\x1f":
+										type = "\x03";
+										style="text-decoration:underline;font-weight:normal;";
+									break;
+									case "\x02":
+										type="\x03";
+										style="font-weight:bold;";
+									break;
+									case "\x03":
+										colour=m[1];
+										if(/\d/.test(m[2])){
+											colour+=m[2];
+										}else if(m[2] == ','){
+											background = m[3];
+											if(/\d/.test(m[4])){
+												background+=m[4];
+											}
+										}
+									break;
 								}
-								return "<span style='color:"+c+";'>";
+								console.log(JSON.stringify(m),colour,background);
+								if(type == "\x03"){
+									var getColour = function(num,def){
+										var c=def;
+										// Reference: http://www.mirc.com/colors.html
+										switch(parseInt(num)){
+											// 0 white
+											case 0:c='white';break;
+											// 1 black
+											case 1:c='black';break;
+											// 2 blue (navy)
+											case 2:c='blue';break;
+											// 3 green
+											case 3:c='green';break;
+											// 4 red
+											case 4:c='red';break;
+											// 5 brown (maroon)
+											case 5:c='brown';break;
+											// 6 purple
+											case 6:c='purple';break;
+											// 7 orange (olive)
+											case 7:c='orange';break;
+											// 8 yellow
+											case 8:c='yellow';break;
+											// 9 light green (lime)
+											case 9:c='lime';break;
+											// 10 teal (a green/blue cyan)
+											case 10:c='teal';break;
+											// 11 light cyan (cyan) (aqua)
+											case 11:c='aqua';break;
+											// 12 light blue (royal)
+											case 12:c='royalblue';break;
+											// 13 pink (light purple) (fuchsia)
+											case 13:c='fuchsia';break;
+											// 14 grey
+											case 14:c='grey';break;
+											// 15 light grey (silver)
+											case 15:c='silver';break;
+										}
+										return c;
+									};
+									end += '</span>';
+									return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";"+style+"'>";
+								}
+								return '';
 							});
 							e.msg += end;
 							e.user = htmlEntities(e.user);
@@ -305,7 +340,7 @@ var count = 0,
 							td = new Date(e.date);
 							res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
 						}catch(e){
-							disp.log("Invalid character in log");
+							disp.log("Invalid character in log "+e);
 							res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
 						}
 					}
