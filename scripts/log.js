@@ -321,7 +321,7 @@ var count = 0,
 										return c;
 									};
 									end += '</span>';
-									return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";"+style+"'>";
+									return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";display:inline-block;"+style+"'>";
 								}
 								return '';
 							});
