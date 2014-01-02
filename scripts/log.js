@@ -249,13 +249,13 @@ var count = 0,
 								switch(type){
 									case "\x0f":
 										type = "\x03";
-										style="text-decoration:none;";
+										style="text-decoration:none;font-weight:normal;text-decoration:none;";
 										colour=1; // black
 										background=0; //white
 									break;
 									case "\x1f":
 										type = "\x03";
-										style="text-decoration:underline;font-weight:normal;";
+										style="text-decoration:underline;";
 									break;
 									case "\x02":
 										type="\x03";
