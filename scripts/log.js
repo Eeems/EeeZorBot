@@ -265,6 +265,12 @@ var count = 0,
 										colour=m[1];
 										if(/\d/.test(m[2])){
 											colour+=m[2];
+											if(m[3] == ','){
+												background = m[4];
+												if(/\d/.test(m[5])){
+													background+=m[5];
+												}
+											}
 										}else if(m[2] == ','){
 											background = m[3];
 											if(/\d/.test(m[4])){
