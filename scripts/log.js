@@ -176,7 +176,7 @@ function save(log,o){
 	}
 }
 function htmlEntities(str){
-	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,'&nbsp;');
 }
 var count = 0,
 	server = global.logServer = http.createServer(function (req, res) {
