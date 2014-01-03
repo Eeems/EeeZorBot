@@ -87,6 +87,16 @@ listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
 		user: match[1]
 	});
 });
+listen(/^:([^!]+).*KICK \#(\w+) (\w+) :([^ ]+)$/i,function(match,data,replyTo,connection){
+	replyTo = match[2].trim().toLowerCase();
+	var d = new Date();
+	save(connection.config.host+" "+connection.config.port+"/#"+replyTo+"/"+d.toDateString(),{
+		type: 'kick',
+		user: match[3],
+		op: match[1],
+		msg: match[4]
+	});
+});
 reply_listen(function(replyTo,msg,connection){
 	if(replyTo===null){
 		replyTo = "- server -";
@@ -148,6 +158,9 @@ function save(log,o){
 	}
 	if(typeof o.msg !== 'undefined'){
 		n.msg = o.msg;
+	}
+	if(typeof o.op !== 'undefined'){
+		n.op = o.op;
 	}
 	n.date = d.getTime()+d.getTimezoneOffset()*60*1000;
 	switch(config.logtype){
@@ -349,6 +362,9 @@ var count = 0,
 									break;
 								case 'action':
 									m = '<strong>* '+e.user+' '+e.msg+'</strong>';
+									break;
+								case 'kick':
+									m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
 									break;
 								default:
 									m = 'error! '+e.type;
