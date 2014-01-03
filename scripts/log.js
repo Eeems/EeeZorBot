@@ -19,7 +19,9 @@ var Settings = regSettings('logServer',{
 	check_timeout: 10
 });
 listen(/^.+/i,function(match,data,replyTo,connection){
-	var nick,data2;
+	var nick,
+		data2,
+		d = new Date();
 	if(replyTo===null){
 		replyTo = "- server -";
 	}else{
@@ -27,11 +29,21 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 			nick = (/^:([^!]+)!.*PRIVMSG ([^ ]+) :(.+)$/i).exec(data)[1];
 			data = (/^:([^!]+)!.*PRIVMSG ([^ ]+) :(.+)$/i).exec(data)[3];
 			if(nick.toLowerCase() == 'omnomirc'){
-				if((data2 = (/\([#O]\).?<(\w+)>(.+)$/).exec(data)) !== null){
+				if((data2 = (/\([#O]\).?<(.+)>(.+)$/).exec(data)) !== null){
 					nick = data2[1];
 					data = data2[2].trim();
-				}else if((data2 = (/\([#O]\).? *(.+) has quit .+$/).exec(data)) != null){
-					console.log(data2);
+				}else if((data2 = (/\([#O]\).? *(.+) has left .+$/).exec(data)) != null){
+					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
+						user: data2[1],
+						type: 'part'
+					});
+					return;
+				}else if((data2 = (/\([#O]\).? *(.+) has joined .+$/).exec(data)) != null){
+					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
+						user: data2[1],
+						type: 'join'
+					});
+					return;
 				}
 			}
 			replyTo = replyTo.trim().toLowerCase();
@@ -41,7 +53,6 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 			replyTo = "- server -";
 		}
 	}
-	var d = new Date();
 	var p = connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString();
 	if(replyTo == "- server -" && (new RegExp("^:(.+) 372 "+connection.config.nick+" :(.+)$")).exec(data) === null){
 		save(p,{
