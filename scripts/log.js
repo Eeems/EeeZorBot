@@ -21,13 +21,19 @@ var Settings = regSettings('logServer',{
 listen(/^.+/i,function(match,data,replyTo,connection){
 	var nick,
 		data2,
+		type='privmsg',
 		d = new Date();
-	if(replyTo===null){
+	if(replyTo===null&&!/^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.test(data)){
 		replyTo = "- server -";
 	}else{
 		try{
-			nick = (/^:([^!]+)!.*PRIVMSG ([^ ]+) :(.+)$/i).exec(data)[1];
-			data = (/^:([^!]+)!.*PRIVMSG ([^ ]+) :(.+)$/i).exec(data)[3];
+			data2 = /^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.exec(data);
+			nick = data2[1];
+			type = data2[2].toLowerCase();
+			if(type=='notice'){
+				replyTo = data2[3].trim().toLowerCase();
+			}
+			data = data2[4];
 			if(nick.toLowerCase() == 'omnomirc'){
 				if((data2 = (/\([#O]\).?<(.+)>(.+)$/).exec(data)) !== null){
 					nick = data2[1];
@@ -65,7 +71,8 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 	var p = connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString();
 	if(replyTo == "- server -" && (new RegExp("^:(.+) 372 "+connection.config.nick+" :(.+)$")).exec(data) === null){
 		save(p,{
-			msg: ">>>	"+data
+			msg: ">>>	"+data,
+			type: type
 		});
 	}else if(data.indexOf("\x01ACTION ")!=-1){
 		save(p,{
@@ -76,7 +83,8 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 	}else{
 		save(p,{
 			msg: data,
-			user: nick
+			user: nick,
+			type: type
 		});
 	}
 });
@@ -362,19 +370,22 @@ var count = 0,
 							switch(e.type){
 								case 'join':
 									m = '<strong>*'+e.user+' joined the channel</strong>';
-									break;
+								break;
 								case 'part':
 									m = '<strong>*'+e.user+' left the channel</strong>';
-									break;
+								break;
 								case 'privmsg':
 									m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
-									break;
+								break;
+								case 'notice':
+									m = '<em>&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg+'</em>';
+								break;
 								case 'action':
 									m = '<strong>* '+e.user+' '+e.msg+'</strong>';
-									break;
+								break;
 								case 'kick':
 									m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
-									break;
+								break;
 								default:
 									m = 'error! '+e.type;
 							}
