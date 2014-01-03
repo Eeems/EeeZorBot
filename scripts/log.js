@@ -44,6 +44,15 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 						type: 'join'
 					});
 					return;
+				}else if((data2 = (/\([#O]\).+\*(.+)$/).exec(data)) !== null){
+					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
+						msg: data2[1],
+						type: 'action',
+						user: ''
+					});
+					return;
+				}else{
+					console.log('Invalid OmnomIRC Catch: ',JSON.stringify(data2));
 				}
 			}
 			replyTo = replyTo.trim().toLowerCase();
