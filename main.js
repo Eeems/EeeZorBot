@@ -314,11 +314,24 @@ function irc(host,port,nick,username,name,nickservP,channels){
 			this.reply(replyTo,r.substr(0,r.length-2));
 		}else if((new RegExp('^:([^!]+).*'+config.prefix+'scripts$','i')).exec(data.trim())){
 			this.reply(replyTo,"Scripts:");
-			var scripts = fs.readdirSync('scripts');
-			if(scripts){
-				for (i = 0; i < scripts.length; i++){
-					if(scripts[i].substr(-3) == '.js'){
-						this.reply(replyTo," "+scripts[i]);
+			var d_scripts = fs.readdirSync('scripts'),enabled;
+			if(d_scripts){
+				for (i = 0; i < d_scripts.length; i++){
+					if(d_scripts[i].substr(-3) == '.js'){
+							c = 0;
+							h = 0;
+							for(j in global.hooks){
+								if(global.hooks[j].script == d_scripts[i]){
+									c++;
+								}
+							}
+							for(j in global.helpdb){
+								if(global.helpdb[j].script == d_scripts[i]){
+									h++;
+								}
+							}
+							enabled = inArray(d_scripts[i],global.scripts.getAll());
+							this.reply(replyTo,"[\x03"+(enabled?"3E":"4D")+"\x0f] Name: "+d_scripts[i]+' ('+c+':'+h+')');
 					}
 				}
 			}
@@ -327,11 +340,14 @@ function irc(host,port,nick,username,name,nickservP,channels){
 			this.reply(replyTo,"Scripts reloaded");
 		}else if((new RegExp('^:([^!]+).*'+config.prefix+'enable (.*)$','i')).exec(data.trim())){
 			match = (new RegExp('^:([^!]+).*'+config.prefix+'enable (.*)$','i')).exec(data.trim());
-			loadScript(match[2]);
-			this.reply(replyTo,"Script "+match[2]+" enabled");
+			if(loadScript(match[2],true)){
+				this.reply(replyTo,"Script "+match[2]+" enabled");
+			}else{
+				this.reply(replyTo,"Script "+match[2]+" could not be enabled.");
+			}
 		}else if((new RegExp('^:([^!]+).*'+config.prefix+'disable (.*)$','i')).exec(data.trim())){
 			match = (new RegExp('^:([^!]+).*'+config.prefix+'disable (.*)$','i')).exec(data.trim());
-			unloadScript(match[2]);
+			unloadScript(match[2],true);
 			this.reply(replyTo,"Script "+match[2]+" disabled");
 		}else if((new RegExp('^:([^!]+).*'+config.prefix+'help (.*)$','i')).exec(data)){
 			var f = false;
@@ -496,9 +512,6 @@ var loadScripts = global.loadScripts = function(){
 },
 loadScript = global.loadScript = function(scriptName,add){
 	disp.log("Loading script "+scriptName+"...");
-	if(add && !inArray(scriptName,global.scripts.getAll())){
-		global.scripts.add(scriptName);
-	}
 	var script = fs.readFileSync('scripts/' + scriptName);
 	if(script){
 		try{
@@ -595,6 +608,10 @@ loadScript = global.loadScript = function(scriptName,add){
 					return config[name];
 				}
 			},scriptName);
+			if(add && !inArray(scriptName,global.scripts.getAll())){
+				global.scripts.add(scriptName);
+			}
+			return true;
 		}catch(err){
 			disp.trace();
 			disp.log("Error in script "+scriptName+': '+err,true);
@@ -616,7 +633,10 @@ loadScript = global.loadScript = function(scriptName,add){
 					j--;
 				}
 			}
+			return false;
 		}
+	}else{
+		return false;
 	}
 },
 unloadScripts = global.unloadScripts = function(){
@@ -673,7 +693,7 @@ inputConsole = function(data){
 					" Script: "+h.script
 				]);
 			}
-			break;
+		break;
 		case 'SCRIPTS':
 			disp.log('Installed Scripts:');
 			var d_scripts = fs.readdirSync('scripts');
@@ -701,19 +721,19 @@ inputConsole = function(data){
 					}
 				}
 			}
-			break;
+		break;
 		case 'HELP':
 			disp.log([
 				"Available Commands:",
 				"ADD-CHANNEL, ADD-SERVER, DEBUG, DISABLE, DISABLE-SCRIPT, DISABLE-SCRIPTS, ENABLE, ENABLE-SCRIPT, ENABLE-SCRIPTS, EXIT, HELP, HOOKS, JOIN, LIST, MSG, QUIT, RAW, RELOAD, REMOVE-CHANNEL, REMOVE-SERVER, RUN, SAY, SCRIPTS"
 			]);
-			break;
+		break;
 		case 'RELOAD':
 			reloadScripts();
-			break;
+		break;
 		case 'DISABLE':
 			unloadScripts();
-			break;
+		break;
 		case 'DISABLE-SCRIPT':case 'DISABLE-SCRIPTS':
 			if(data.length >= 1){
 				for(i in data){
@@ -722,7 +742,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" not enough arguements");
 			}
-			break;
+		break;
 		case 'ENABLE':
 			loadScripts();
 			break;
@@ -734,7 +754,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" not enough arguements");
 			}
-			break;
+		break;
 		case 'EXIT':
 			exit();
 			break;
@@ -749,7 +769,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" not enough arguements");
 			}
-			break;
+		break;
 		case 'ADD-SERVER':
 			if(data.length >= 2){
 				if(data[2]!==undefined){
@@ -764,7 +784,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" not enough arguements");
 			}
-			break;
+		break;
 		case 'REMOVE-CHANNEL':
 			if(data.length == 2){
 				if(typeof connections[data[0]] !== 'undefined'){
@@ -800,7 +820,7 @@ inputConsole = function(data){
 			}else{
 				disp.error("Not enough arguements");
 			}
-			break;
+		break;
 		case 'ADD-CHANNEL':
 			if(data.length == 2){
 				if(connections[data[0]]!==undefined){
@@ -835,7 +855,7 @@ inputConsole = function(data){
 			}else{
 				disp.error("Not enough arguements");
 			}
-			break;
+		break;
 		case 'REMOVE-SERVER':
 			if(data.length == 1){
 				if(connections[data[0]]!==undefined){
@@ -856,7 +876,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" too many arguements");
 			}
-			break;
+		break;
 		case 'QUIT':
 			if(data.length == 1){
 				if(connections[data[0]]!==undefined){
@@ -875,7 +895,7 @@ inputConsole = function(data){
 					disp.log(i+" "+connections[i].config.host+":"+connections[i].config.port);
 				}
 			}
-			break;
+		break;
 		case 'DEBUG':
 			stdin.removeListener('data',inputConsole);
 			repl.start('>').on('exit',function(){
@@ -883,7 +903,7 @@ inputConsole = function(data){
 				disp.log('');
 				stdin.resume();
 			});
-			break;
+		break;
 		case 'RAW':
 			if(data.length >= 2){
 				connections[data.splice(0,1)].send(data.join(' '));
@@ -897,7 +917,7 @@ inputConsole = function(data){
 			}else{
 				disp.error(" Not enough perameters");
 			}
-			break;
+		break;
 		case 'RUN':
 			try{
 				eval(data.join(' '));
@@ -907,7 +927,6 @@ inputConsole = function(data){
 			break;
 		default:
 			disp.error(" unknown command "+op);
-			break;
 	}
 };
 stdin.on('data',inputConsole);
