@@ -366,7 +366,7 @@ function irc(host,port,nick,username,name,nickservP,channels){
 				match = hooks[i].options.regex.exec(data);
 				if(match){
 					try{
-						hooks[i].callback(match, data, replyTo,this);
+						hooks[i].callback(match,data,replyTo,this);
 					}catch(err){
 						disp.trace();
 						disp.error("caught error in script "+hooks[i].script+": "+err);
