@@ -35,22 +35,22 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 			}
 			data = data2[4];
 			if(nick.toLowerCase() == 'omnomirc'){
-				if((data2 = (/\([#O]\).?<(.+)>(.+)$/).exec(data)) !== null){
+				if((data2 = (/\([#OC]\).?<(.+)>(.+)$/).exec(data)) !== null){
 					nick = data2[1];
 					data = data2[2].trim();
-				}else if((data2 = (/\([#O]\).? *(.+) has left .+$/).exec(data)) != null){
+				}else if((data2 = (/\([#OC]\).? *(.+) has left .+$/).exec(data)) != null){
 					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
 						user: data2[1],
 						type: 'part'
 					});
 					return;
-				}else if((data2 = (/\([#O]\).? *(.+) has joined .+$/).exec(data)) != null){
+				}else if((data2 = (/\([#OC]\).? *(.+) has joined .+$/).exec(data)) != null){
 					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
 						user: data2[1],
 						type: 'join'
 					});
 					return;
-				}else if((data2 = (/\([#O]\).+\*(.+)$/).exec(data)) !== null){
+				}else if((data2 = (/\([#OC]\).+\*(.+)$/).exec(data)) !== null){
 					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
 						msg: data2[1],
 						type: 'action',
