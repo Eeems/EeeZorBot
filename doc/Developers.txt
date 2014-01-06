@@ -102,6 +102,35 @@ rCommand(string name[,bool isArgs])
 			command name to be used
 		bool isArgs
 			if set to true the command will also look for args.
+getUser(string nick)
+	Returns the user object for the specified nick
+addUser(string nick[,string flags,array hosts])
+	Adds a new user to the database.
+		nick
+			Nickname of the user to add
+		flags
+			flags to give the user. format is:
+				o - op
+				v - voice
+				b - ban
+		hosts
+			Hosts other then the one the user currently has (If the user exists on any of the servers).
+
+user
+	object with all information pertaining to a user
+		user.nick
+			the nick of the user
+		user.flags
+			The users flags. Can be treated like a string
+				user.flags
+					user.flags.op
+						flag for if the user should be opped
+					user.flags.voice
+						flag for if the user should be voiced
+					user.flags.ban
+						flag for if the user should be banned
+		user.hosts
+			An array of all the valid hosts masks for the user (can be either a string or regex)
 irc
 	object to store a connection as well as associated functions and data.
 		irc.config

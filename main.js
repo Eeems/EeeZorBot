@@ -34,6 +34,7 @@ var config = global.config = require('./config.js'),
 	],
 	servers = global.servers = listdb.getDB('servers'),
 	scripts = global.scripts = listdb.getDB('scripts'),
+	users = scripts = global.scripts = listdb.getDB('users'),
 	disp = global.disp,
 	http = require('http'),
 	path = require('path');
@@ -510,6 +511,27 @@ var loadScripts = global.loadScripts = function(){
 		}catch(err){}
 	}
 },
+getUser = global.getUser = function(nick){
+	var i,
+		users = users.getAll();
+	for(i in users){
+		if(users[i].nick == nick){
+			return users[i];
+		}
+	}
+	return {
+		nick: nick,
+		flags: {
+			op: false,
+			voice: true,
+			ban: false
+		},
+		hosts: []
+	};
+},
+validUser = global.validUser = function(nick,host){
+	
+},
 loadScript = global.loadScript = function(scriptName,add){
 	disp.log("Loading script "+scriptName+"...");
 	var script = fs.readFileSync('scripts/' + scriptName);
@@ -535,7 +557,7 @@ loadScript = global.loadScript = function(scriptName,add){
 				process: process,
 				disp:disp,
 				inArray:inArray,
-				global:global,
+				global: global,
 				regHelp: function(name,help){
 					helpdb.push({
 						name: name,
