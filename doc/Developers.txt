@@ -115,7 +115,8 @@ addUser(string nick[,string flags,array hosts])
 				b - ban
 		hosts
 			Hosts other then the one the user currently has (If the user exists on any of the servers).
-
+removeUser(string nick)
+	Removes the user with the specified nick.
 user
 	object with all information pertaining to a user
 		user.nick

@@ -511,9 +511,37 @@ var loadScripts = global.loadScripts = function(){
 		}catch(err){}
 	}
 },
+addUser = global.addUser = function(nick,flags,handles){
+	var i,
+		users = global.users.getAll();
+	for(i in users){
+		if(users[i].nick == nick){
+			return false;
+		}
+	}
+	global.users.add({
+		nick: nick,
+		flags: {
+			op: flags.indexOf('o')!=-1,
+			voice: flags.indexOf('v')!=-1,
+			ban: flags.indexOf('b')!=-1
+		},
+		handles: handles
+	});
+	return true;
+},
+removeUser = global.removeuser = function(nick){
+	var i,
+		users = global.users.getAll();
+	for(i in users){
+		if(users[i].nick == nick){
+			global.users.remove(users[i]);
+		}
+	}
+},
 getUser = global.getUser = function(nick){
 	var i,
-		users = users.getAll();
+		users = global.users.getAll();
 	for(i in users){
 		if(users[i].nick == nick){
 			return users[i];
@@ -528,6 +556,9 @@ getUser = global.getUser = function(nick){
 		},
 		hosts: []
 	};
+},
+saveUser = global.saveUser = function(user){
+	
 },
 validUser = global.validUser = function(nick,host){
 	
