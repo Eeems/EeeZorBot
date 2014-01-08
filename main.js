@@ -165,7 +165,8 @@ function irc(host,port,nick,username,name,nickservP,channels){
 		port: port || 6667,
 		nick: nick,
 		username: username,
-		name: name
+		name: name,
+		reconnect_attempts: 10
 	};
 	if(nickservP!=='' && nickservP!==undefined){
 		this.config.nickserv = nickservP;
@@ -209,23 +210,28 @@ function irc(host,port,nick,username,name,nickservP,channels){
 	this.reconnect = function(){
 		try{
 			this.send("QUIT");
-			this.socket.end();
+			this.socket.destroy();
 		}catch(e){
 			disp.alert(this.config.host+":"+this.config.port+" already disconnected");
 		}
-		this.socket.connect(this.config.port, this.config.host, function (){
-			this.parent.send('NICK ' + sanitize(this.config.nick));
-			this.parent.send('USER ' + sanitize(this.config.username) + ' localhost * ' + sanitize(this.config.name));
-		});
-		if(!inArray(this,connections)){
-			connections.push(this);
-		}
-		for(var i in hooks){
-			if(hooks[i].type == 'reconnect'){
-				hooks[i].callback.call(this);
+		try{
+			this.socket = this.createSocket();
+			this.socket.connect(this.config.port, this.config.host, function (){
+				this.parent.reconnect.attempts = 0;
+				this.parent.send('NICK ' + sanitize(this.config.nick));
+				this.parent.send('USER ' + sanitize(this.config.username) + ' localhost * ' + sanitize(this.config.name));
+			});
+			if(!inArray(this,connections)){
+				connections.push(this);
 			}
-		}
+			for(var i in hooks){
+				if(hooks[i].type == 'reconnect'){
+					hooks[i].callback.call(this);
+				}
+			}
+		}catch(e){}
 	};
+	this.reconnect.attempts = 0;
 	this.send = function(data,hook){
 		hook = (typeof hook == 'undefined') ? true : hook;
 		if(!data || data.length === 0){
@@ -412,13 +418,17 @@ function irc(host,port,nick,username,name,nickservP,channels){
 				hooks[i].callback.call(this.parent,e);
 			}
 		}
-		disp.alert('Reconnecting.');
-		if(this.parent.config != undefined && this.config.parent.channels != undefined){
-			for(var i in this.parent.config.channels){
-				this.send('PART '+this.parent.config.channels[i]);
-			}
+		if(++this.parent.reconnect.attempts <= this.parent.config.reconnect_attempts){
+			disp.alert('Reconnecting (Attempt '+this.parent.reconnect.attempts+'/'+this.parent.config.reconnect_attempts+')');
+			try{
+				if(this.parent.config != undefined && this.config.parent.channels != undefined){
+					for(var i in this.parent.config.channels){
+						this.send('PART '+this.parent.config.channels[i]);
+					}
+				}
+			}catch(e){}
+			this.parent.reconnect();
 		}
-		this.parent.reconnect();
 	});
 	this.socket.on('timeout',function(){
 		disp.error("Connection to "+this.parent.config.host+":"+this.parent.config.port+" timed out.");

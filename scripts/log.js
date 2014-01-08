@@ -275,128 +275,137 @@ var count = 0,
 			}
 			switch(config.logtype){
 				case 'listdb':
-					res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-					l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-					res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
-					res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
-					for(i in l){
+					if(log.type == 'json'){
+						res.writeHead(200, {'Content-Type': 'application/json;','Server': 'NodeBot/Logs'});
 						try{
-							e = JSON.parse(l[i]);
-							var end = '';
-							e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
-								return '<a href="'+url+'">'+url+'</a>';
-							}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
-								var style="",colour,background,type=m[0];
-								switch(type){
-									case "\x0f":
-										type = "\x03";
-										style="text-decoration:none;font-weight:normal;text-decoration:none;";
-										colour=1; // black
-										background=0; //white
-									break;
-									case "\x1f":
-										type = "\x03";
-										style="text-decoration:underline;";
-									break;
-									case "\x02":
-										type="\x03";
-										style="font-weight:bold;";
-									break;
-									case "\x03":
-										colour=m[1];
-										if(/\d/.test(m[2])){
-											colour+=m[2];
-											if(m[3] == ','){
-												background = m[4];
-												if(/\d/.test(m[5])){
-													background+=m[5];
+							res.end(fs.readFileSync('data/logs/'+log.server+'/#'+log.channel+'/'+n+ext,'ascii'));
+						}catch(e){
+							res.end("\"Error opening log: "+log.server+'/#'+log.channel+'/'+n+ext+'"');
+						}
+					}else{
+						res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
+						l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
+						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
+						res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
+						for(i in l){
+							try{
+								e = JSON.parse(l[i]);
+								var end = '';
+								e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
+									return '<a href="'+url+'">'+url+'</a>';
+								}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
+									var style="",colour,background,type=m[0];
+									switch(type){
+										case "\x0f":
+											type = "\x03";
+											style="text-decoration:none;font-weight:normal;text-decoration:none;";
+											colour=1; // black
+											background=0; //white
+										break;
+										case "\x1f":
+											type = "\x03";
+											style="text-decoration:underline;";
+										break;
+										case "\x02":
+											type="\x03";
+											style="font-weight:bold;";
+										break;
+										case "\x03":
+											colour=m[1];
+											if(/\d/.test(m[2])){
+												colour+=m[2];
+												if(m[3] == ','){
+													background = m[4];
+													if(/\d/.test(m[5])){
+														background+=m[5];
+													}
+												}
+											}else if(m[2] == ','){
+												background = m[3];
+												if(/\d/.test(m[4])){
+													background+=m[4];
 												}
 											}
-										}else if(m[2] == ','){
-											background = m[3];
-											if(/\d/.test(m[4])){
-												background+=m[4];
+										break;
+									}
+									if(type == "\x03"){
+										var getColour = function(num,def){
+											var c=def;
+											// Reference: http://www.mirc.com/colors.html
+											switch(parseInt(num)){
+												// 0 white
+												case 0:c='white';break;
+												// 1 black
+												case 1:c='black';break;
+												// 2 blue (navy)
+												case 2:c='blue';break;
+												// 3 green
+												case 3:c='green';break;
+												// 4 red
+												case 4:c='red';break;
+												// 5 brown (maroon)
+												case 5:c='brown';break;
+												// 6 purple
+												case 6:c='purple';break;
+												// 7 orange (olive)
+												case 7:c='orange';break;
+												// 8 yellow
+												case 8:c='yellow';break;
+												// 9 light green (lime)
+												case 9:c='lime';break;
+												// 10 teal (a green/blue cyan)
+												case 10:c='teal';break;
+												// 11 light cyan (cyan) (aqua)
+												case 11:c='aqua';break;
+												// 12 light blue (royal)
+												case 12:c='royalblue';break;
+												// 13 pink (light purple) (fuchsia)
+												case 13:c='fuchsia';break;
+												// 14 grey
+												case 14:c='grey';break;
+												// 15 light grey (silver)
+												case 15:c='silver';break;
 											}
-										}
+											return c;
+										};
+										end += '</span>';
+										return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";display:inline-block;"+style+"'>";
+									}
+									return '';
+								}).trim();
+								e.msg += end;
+								e.user = htmlEntities(e.user);
+								switch(e.type){
+									case 'join':
+										m = '<strong>*'+e.user+' joined the channel</strong>';
 									break;
+									case 'part':
+										m = '<strong>*'+e.user+' left the channel</strong>';
+									break;
+									case 'privmsg':
+										m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
+									break;
+									case 'notice':
+										m = '<em>&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg+'</em>';
+									break;
+									case 'action':
+										m = '<strong>*'+(' '+e.user+' '+e.msg).trim()+'</strong>';
+									break;
+									case 'kick':
+										m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
+									break;
+									default:
+										m = 'error! '+e.type;
 								}
-								if(type == "\x03"){
-									var getColour = function(num,def){
-										var c=def;
-										// Reference: http://www.mirc.com/colors.html
-										switch(parseInt(num)){
-											// 0 white
-											case 0:c='white';break;
-											// 1 black
-											case 1:c='black';break;
-											// 2 blue (navy)
-											case 2:c='blue';break;
-											// 3 green
-											case 3:c='green';break;
-											// 4 red
-											case 4:c='red';break;
-											// 5 brown (maroon)
-											case 5:c='brown';break;
-											// 6 purple
-											case 6:c='purple';break;
-											// 7 orange (olive)
-											case 7:c='orange';break;
-											// 8 yellow
-											case 8:c='yellow';break;
-											// 9 light green (lime)
-											case 9:c='lime';break;
-											// 10 teal (a green/blue cyan)
-											case 10:c='teal';break;
-											// 11 light cyan (cyan) (aqua)
-											case 11:c='aqua';break;
-											// 12 light blue (royal)
-											case 12:c='royalblue';break;
-											// 13 pink (light purple) (fuchsia)
-											case 13:c='fuchsia';break;
-											// 14 grey
-											case 14:c='grey';break;
-											// 15 light grey (silver)
-											case 15:c='silver';break;
-										}
-										return c;
-									};
-									end += '</span>';
-									return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";display:inline-block;"+style+"'>";
-								}
-								return '';
-							});
-							e.msg += end;
-							e.user = htmlEntities(e.user);
-							switch(e.type){
-								case 'join':
-									m = '<strong>*'+e.user+' joined the channel</strong>';
-								break;
-								case 'part':
-									m = '<strong>*'+e.user+' left the channel</strong>';
-								break;
-								case 'privmsg':
-									m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
-								break;
-								case 'notice':
-									m = '<em>&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg+'</em>';
-								break;
-								case 'action':
-									m = '<strong>* '+e.user+' '+e.msg+'</strong>';
-								break;
-								case 'kick':
-									m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
-								break;
-								default:
-									m = 'error! '+e.type;
+								td = new Date(e.date);
+								res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
+							}catch(e){
+								disp.log("Invalid character in log "+e);
+								res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
 							}
-							td = new Date(e.date);
-							res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
-						}catch(e){
-							disp.log("Invalid character in log "+e);
-							res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
 						}
+						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a></body></html>');
 					}
-					res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a></body></html>');
 				break;
 				case 'txt': default:
 					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
