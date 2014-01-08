@@ -174,10 +174,77 @@ function irc(host,port,nick,username,name,nickservP,channels){
 	if(channels!==undefined){
 		this.config.channels = channels;
 	}
-	this.socket = new net.Socket();
-	this.socket.setNoDelay(true);
-	this.socket.setEncoding('ascii');
-	this.socket.parent = this;
+	this.createSocket = function(){
+		if(this.socket != undefined){
+			this.send("QUIT");
+			this.socket.end();
+			this.socket.destroy();
+			delete this.socket;
+			this.createSocket();
+		}
+		this.socket = new net.Socket();
+		this.socket.setNoDelay(true);
+		this.socket.setEncoding('ascii');
+		this.socket.parent = this;
+		this.socket.on('data',function(data){
+			var newlineIdx,buff;
+			if(this.buffer!==undefined){
+				buff = this.buffer;
+			}else if(this.parent.buffer!=undefined){
+				buff = this.parent.buffer;
+			}else{
+				disp.error(" Can't handle data from socket. Invalid scope");
+				return
+			}
+			data = data.replace('\r', '');
+			while ((newlineIdx = data.indexOf('\n')) > -1){
+				if(buff.size > 0){
+					data = buff.b.toString('ascii', 0,buff.size) + data;
+					newlineIdx += buff.size;
+					buff.size = 0;
+				}
+				this.parent.handle(data.substr(0, newlineIdx));
+				data = data.slice(newlineIdx + 1);
+			}
+			if(data.length > 0){
+				buff.b.write(data, buff.size, 'ascii');
+				buff.size += data.length;
+			}
+		});
+		this.socket.on('error',function(e){
+			disp.error("Connection error: "+e);
+			for(var i in hooks){
+				if(hooks[i].type == 'error'){
+					hooks[i].callback.call(this.parent,e);
+				}
+			}
+			if(!this.parent.reconnecting && ++this.parent.reconnect.attempts <= this.parent.config.reconnect_attempts){
+				disp.alert('Reconnecting (Attempt '+this.parent.reconnect.attempts+'/'+this.parent.config.reconnect_attempts+')');
+				try{
+					if(this.parent.config != undefined && this.config.parent.channels != undefined){
+						for(var i in this.parent.config.channels){
+							this.send('PART '+this.parent.config.channels[i]);
+						}
+					}
+				}catch(e){}
+				this.parent.reconnect();
+			}
+		});
+		this.socket.on('timeout',function(){
+			disp.error("Connection to "+this.parent.config.host+":"+this.parent.config.port+" timed out.");
+			for(var i in hooks){
+				if(hooks[i].type == 'timeout'){
+					hooks[i].callback.call(this.parent);
+				}
+			}
+			this.parent.reconnect();
+		});
+		this.socket.on('end',function(){
+			disp.error(this.parent.config.host+":"+this.parent.config.port+" closed connection");
+			this.parent.quit();
+		});
+	};
+	this.createSocket();
 	this.quit = function(){
 		for(var i in hooks){
 			if(hooks[i].type == 'quit'){
@@ -208,14 +275,13 @@ function irc(host,port,nick,username,name,nickservP,channels){
 		}
 	};
 	this.reconnect = function(){
+		this.reconnecting = true;
+		this.send("QUIT");
+		this.socket.end();
+		this.socket.destroy();
+		delete this.socket;
 		try{
-			this.send("QUIT");
-			this.socket.destroy();
-		}catch(e){
-			disp.alert(this.config.host+":"+this.config.port+" already disconnected");
-		}
-		try{
-			this.socket = this.createSocket();
+			this.createSocket();
 			this.socket.connect(this.config.port, this.config.host, function (){
 				this.parent.reconnect.attempts = 0;
 				this.parent.send('NICK ' + sanitize(this.config.nick));
@@ -230,8 +296,10 @@ function irc(host,port,nick,username,name,nickservP,channels){
 				}
 			}
 		}catch(e){}
+		this.reconnecting = false;
 	};
 	this.reconnect.attempts = 0;
+	this.reconnecting = false;
 	this.send = function(data,hook){
 		hook = (typeof hook == 'undefined') ? true : hook;
 		if(!data || data.length === 0){
@@ -386,63 +454,6 @@ function irc(host,port,nick,username,name,nickservP,channels){
 			}
         }
 	};
-	this.socket.on('data',function(data){
-		var newlineIdx,buff;
-		if(this.buffer!==undefined){
-			buff = this.buffer;
-		}else if(this.parent.buffer!=undefined){
-			buff = this.parent.buffer;
-		}else{
-			disp.error(" Can't handle data from socket. Invalid scope");
-			return
-		}
-		data = data.replace('\r', '');
-		while ((newlineIdx = data.indexOf('\n')) > -1){
-			if(buff.size > 0){
-				data = buff.b.toString('ascii', 0,buff.size) + data;
-				newlineIdx += buff.size;
-				buff.size = 0;
-			}
-			this.parent.handle(data.substr(0, newlineIdx));
-			data = data.slice(newlineIdx + 1);
-		}
-		if(data.length > 0){
-			buff.b.write(data, buff.size, 'ascii');
-			buff.size += data.length;
-		}
-	});
-	this.socket.on('error',function(e){
-		disp.error("Connection error: "+e);
-		for(var i in hooks){
-			if(hooks[i].type == 'error'){
-				hooks[i].callback.call(this.parent,e);
-			}
-		}
-		if(++this.parent.reconnect.attempts <= this.parent.config.reconnect_attempts){
-			disp.alert('Reconnecting (Attempt '+this.parent.reconnect.attempts+'/'+this.parent.config.reconnect_attempts+')');
-			try{
-				if(this.parent.config != undefined && this.config.parent.channels != undefined){
-					for(var i in this.parent.config.channels){
-						this.send('PART '+this.parent.config.channels[i]);
-					}
-				}
-			}catch(e){}
-			this.parent.reconnect();
-		}
-	});
-	this.socket.on('timeout',function(){
-		disp.error("Connection to "+this.parent.config.host+":"+this.parent.config.port+" timed out.");
-		for(var i in hooks){
-			if(hooks[i].type == 'timeout'){
-				hooks[i].callback.call(this.parent);
-			}
-		}
-		this.parent.reconnect();
-	});
-	this.socket.on('end',function(){
-		disp.error(this.parent.config.host+":"+this.parent.config.port+" closed connection");
-		this.parent.quit();
-	});
 	this.reply = function(replyTo,msg){
 		this.send("PRIVMSG "+replyTo+" :"+msg,false);
 		for(var i in hooks){
