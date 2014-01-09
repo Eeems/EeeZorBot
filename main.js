@@ -34,7 +34,7 @@ var config = global.config = require('./config.js'),
 	],
 	servers = global.servers = listdb.getDB('servers'),
 	scripts = global.scripts = listdb.getDB('scripts'),
-	users = scripts = global.scripts = listdb.getDB('users'),
+	users = global.users = listdb.getDB('users'),
 	disp = global.disp,
 	http = require('http'),
 	path = require('path');
@@ -552,7 +552,7 @@ addUser = global.addUser = function(nick,flags,handles){
 	}));
 	return true;
 },
-removeUser = global.removeuser = function(nick){
+removeUser = global.removeUser = function(nick){
 	var i,
 		user,
 		users = global.users.getAll();
@@ -596,21 +596,22 @@ saveUser = global.saveUser = function(nick,changes){
 			break;
 		}
 	}
-	if(flag){
-		for(i in changes){
-			switch(i){
-				case 'flags':
-					for(ii in changes[i]){
-						user[i][ii] = changes[i][ii];
-					}
-				break;
-				default:
-					user[i] = changes[i];
-			}
-		}
-		global.users.add(JSON.stringify(user));
+	if(!flag){
+		user = getUser(nick);
 	}
-	return false;
+	for(i in changes){
+		switch(i){
+			case 'flags':
+				for(ii in changes[i]){
+					user[i][ii] = changes[i][ii];
+				}
+			break;
+			default:
+				user[i] = changes[i];
+		}
+	}
+	global.users.add(JSON.stringify(user));
+	return true;
 },
 validUser = global.validUser = function(nick,host){
 	var user,i;
@@ -652,7 +653,11 @@ loadScript = global.loadScript = function(scriptName,add){
 				exit: exit,
 				process: process,
 				disp:disp,
-				inArray:inArray,
+				inArray: inArray,
+				getUser: getUser,
+				validUser: validUser,
+				saveUser: saveUser,
+				removeUser: removeUser,
 				global: global,
 				regHelp: function(name,help){
 					helpdb.push({

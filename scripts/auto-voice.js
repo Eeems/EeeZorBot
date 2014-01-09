@@ -1,12 +1,5 @@
-function hasVoice(nick,host){
-	var user = getUser(nick);
-	if(user.flags.voice && validUser(nick,host)){
-		return true;
-	}
-	if(user.hosts.length == 0){
-		return true;
-	}
-	return false;
+function hasVoice(nick){
+	return getUser(nick).flags.voice;
 }
 listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
 	var user = match[1].trim();
@@ -16,32 +9,29 @@ listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
 });
 listen(rCommand('voice-ignore',true),function(match,data,replyTo,connection){
 	var user = match[2].trim();
-	if(!hasVoice(user)){
-		connection.reply(replyTo,"ignoring "+user);
-		saveUser(user,{
-			flags:{
-				voice: false
-			}
-		});
-	}else{
-		connection.reply(replyTo,"already ignoring");
-	}
+	connection.reply(replyTo,"ignoring "+user);
+	saveUser(user,{
+		flags:{
+			voice: false
+		}
+	});
 });
 listen(rCommand('voice-unignore',true),function(match,data,replyTo,connection){
 	var user = match[2].trim();
-	if(hasVoice(user)){
-		connection.reply(replyTo,"automatically voicing "+user);
-		saveUser(user,{
-			flags: {
-				voice: true
-			}
-		});
-	}else{
-		connection.reply(replyTo,"already voicing");
-	}
+	connection.reply(replyTo,"automatically voicing "+user);
+	saveUser(user,{
+		flags: {
+			voice: true
+		}
+	});
+});
+listen(rCommand('voice-status',true),function(match,data,replyTo,connection){
+	var user = match[2].trim();
+	connection.reply(replyTo,"Status of user "+user+" is: "+(hasVoice(user)?'voiced':'mute'));
 });
 hook('unload',function(){
 	delete hasVoice;
 });
 regHelp('voice-ignore','Do not automatically voice this user');
-regHelp('voice-unignore','automatically voice this user');
+regHelp('voice-unignore','Automatically voice this user');
+regHelp('voice-status','Displays the status of the user');
