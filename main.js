@@ -155,7 +155,7 @@ function exit(){
 	disp.log("Exiting.");
 	process.exit();
 }
-function irc(host,port,nick,username,name,nickservP,channels){
+var irc = global.irc = function(host,port,nick,username,name,nickservP,channels){
 	this.buffer = {
 		b: new Buffer(4096),
 		size: 0
@@ -339,10 +339,11 @@ function irc(host,port,nick,username,name,nickservP,channels){
 		}
 		disp.in(data);
 		if((/^PING :(.+)/i).exec(data)){
-			if((r = (/^PING :(.+)$/i).exec(data)) != null){
+			if((r = /^PING :(.+)/i.exec(data)) != null){
 				r = r[1];
-			}else{
-				r = this.config.server;
+			}
+			if(typeof r == 'undefined'){
+				r = this.config.host;
 			}
 			this.send("PONG :"+r);
 			for (i = 0; i < hooks.length; i++){
