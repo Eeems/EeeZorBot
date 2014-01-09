@@ -541,7 +541,7 @@ addUser = global.addUser = function(nick,flags,handles){
 			return false;
 		}
 	}
-	global.users.add({
+	global.users.add(JSON.stringify({
 		nick: nick,
 		flags: {
 			op: flags.indexOf('o')!=-1,
@@ -549,24 +549,28 @@ addUser = global.addUser = function(nick,flags,handles){
 			ban: flags.indexOf('b')!=-1
 		},
 		handles: handles
-	});
+	}));
 	return true;
 },
 removeUser = global.removeuser = function(nick){
 	var i,
+		user,
 		users = global.users.getAll();
 	for(i in users){
-		if(users[i].nick == nick){
+		user = JSON.parse(users[i]);
+		if(user.nick == nick){
 			global.users.remove(users[i]);
 		}
 	}
 },
 getUser = global.getUser = function(nick){
 	var i,
+		user,
 		users = global.users.getAll();
 	for(i in users){
-		if(users[i].nick == nick){
-			return users[i];
+		user = JSON.parse(users[i]);
+		if(user.nick == nick){
+			return user;
 		}
 	}
 	return {
@@ -579,11 +583,42 @@ getUser = global.getUser = function(nick){
 		hosts: []
 	};
 },
-saveUser = global.saveUser = function(user){
-	
+saveUser = global.saveUser = function(nick,changes){
+	var i,
+		user,
+		users = global.users.getAll(),
+		flag = false;
+	for(i in users){
+		user = JSON.parse(users[i]);
+		if(user.nick == nick){
+			flag = true;
+			global.users.remove(users[i]);
+			break;
+		}
+	}
+	if(flag){
+		for(i in changes){
+			user[i] = changes[i];
+		}
+		global.users.add(JSON.stringify(user));
+	}
+	return false;
 },
 validUser = global.validUser = function(nick,host){
-	
+	var user,i;
+	if(user = getUser(nick)){
+		if(!inArray(host,user.hosts)){
+			for(i in user.hosts){
+				if(users.hosts[i] instanceof RegExp && users.hosts[i].exec(host)!==null){
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	}else{
+		return false;
+	}
 },
 loadScript = global.loadScript = function(scriptName,add){
 	disp.log("Loading script "+scriptName+"...");
