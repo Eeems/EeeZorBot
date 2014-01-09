@@ -584,7 +584,7 @@ getUser = global.getUser = function(nick){
 	};
 },
 saveUser = global.saveUser = function(nick,changes){
-	var i,
+	var i,ii,
 		user,
 		users = global.users.getAll(),
 		flag = false;
@@ -598,7 +598,15 @@ saveUser = global.saveUser = function(nick,changes){
 	}
 	if(flag){
 		for(i in changes){
-			user[i] = changes[i];
+			switch(i){
+				case 'flags':
+					for(ii in changes[i]){
+						user[i][ii] = changes[i][ii];
+					}
+				break;
+				default:
+					user[i] = changes[i];
+			}
 		}
 		global.users.add(JSON.stringify(user));
 	}
