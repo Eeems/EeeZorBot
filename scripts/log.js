@@ -389,7 +389,7 @@ var count = 0,
 										m = '<em>&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg+'</em>';
 									break;
 									case 'action':
-										m = '<strong>*'+(' '+e.user+' '+e.msg).trim()+'</strong>';
+										m = '<strong>*'+(' '+e.user+' '+e.msg).replace('&nbsp;',' ').trim().replace(' ','&nbsp;')+'</strong>';
 									break;
 									case 'kick':
 										m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
