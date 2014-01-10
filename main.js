@@ -482,17 +482,6 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 		}
 	}
 }
-function inArray(needle, haystack, returnkey){
-	for(var key in haystack){
-		if(needle === haystack[key]){
-			if(returnkey!==undefined){
-				return key;
-			}
-			return true;
-		}
-	}
-	return false;
-}
 function sanitize(data){
 	if(!data){
 		return data;
@@ -533,103 +522,189 @@ var loadScripts = global.loadScripts = function(){
 		}catch(err){}
 	}
 },
-addUser = global.addUser = function(nick,flags,handles){
-	var i,
-		users = global.users.getAll();
-	for(i in users){
-		if(users[i].nick == nick){
+api = {
+	_scriptName: '',
+	addUser: global.addUser = function(nick,flags,handles){
+		var i,
+			users = global.users.getAll();
+		for(i in users){
+			if(users[i].nick == nick){
+				return false;
+			}
+		}
+		global.users.add(JSON.stringify({
+			nick: nick,
+			flags: {
+				op: flags.indexOf('o')!=-1,
+				voice: flags.indexOf('v')!=-1,
+				ban: flags.indexOf('b')!=-1
+			},
+			handles: handles
+		}));
+		return true;
+	},
+	removeUser: global.removeUser = function(nick){
+		var i,
+			user,
+			users = global.users.getAll();
+		for(i in users){
+			user = JSON.parse(users[i]);
+			if(user.nick == nick){
+				global.users.remove(users[i]);
+			}
+		}
+	},
+	getUser: global.getUser = function(nick){
+		var i,
+			user,
+			users = global.users.getAll();
+		for(i in users){
+			user = JSON.parse(users[i]);
+			if(user.nick == nick){
+				return user;
+			}
+		}
+		return {
+			nick: nick,
+			flags: {
+				op: false,
+				voice: true,
+				ban: false
+			},
+			hosts: []
+		};
+	},
+	saveUser: global.saveUser = function(nick,changes){
+		var i,ii,
+			user,
+			users = global.users.getAll(),
+			flag = false;
+		for(i in users){
+			user = JSON.parse(users[i]);
+			if(user.nick == nick){
+				flag = true;
+				global.users.remove(users[i]);
+				break;
+			}
+		}
+		if(!flag){
+			user = getUser(nick);
+		}
+		for(i in changes){
+			switch(i){
+				case 'flags':
+					for(ii in changes[i]){
+						user[i][ii] = changes[i][ii];
+					}
+				break;
+				default:
+					user[i] = changes[i];
+			}
+		}
+		global.users.add(JSON.stringify(user));
+		return true;
+	},
+	validUser: global.validUser = function(nick,host){
+		var user,i;
+		if(user = getUser(nick)){
+			if(!inArray(host,user.hosts)){
+				for(i in user.hosts){
+					if(users.hosts[i] instanceof RegExp && users.hosts[i].exec(host)!==null){
+						return true;
+					}
+				}
+				return false;
+			}
+			return true;
+		}else{
 			return false;
 		}
-	}
-	global.users.add(JSON.stringify({
-		nick: nick,
-		flags: {
-			op: flags.indexOf('o')!=-1,
-			voice: flags.indexOf('v')!=-1,
-			ban: flags.indexOf('b')!=-1
-		},
-		handles: handles
-	}));
-	return true;
-},
-removeUser = global.removeUser = function(nick){
-	var i,
-		user,
-		users = global.users.getAll();
-	for(i in users){
-		user = JSON.parse(users[i]);
-		if(user.nick == nick){
-			global.users.remove(users[i]);
+	},
+	regHelp: function(name,help){
+		helpdb.push({
+			name: name,
+			help: help,
+			script: api._scriptName
+		});
+	},
+	listen: function(regex,callback,once){
+		once = once || false;
+		hooks.push({
+			type: 'data',
+			callback: callback,
+			script: api._scriptName,
+			options:{
+				once: once,
+				regex: regex
+			}
+		});
+	},
+	send_listen: function(regex,callback,once){
+		once = once || false;
+		hooks.push({
+			type: 'send',
+			callback: callback,
+			script: api._scriptName,
+			options:{
+				once: once,
+				regex: regex
+			}
+		});
+	},
+	reply_listen: function(callback,once){
+		once = once || false;
+		hooks.push({
+			type: 'reply',
+			callback: callback,
+			script: api._scriptName,
+			options: {
+				once: once
+			}
+		});
+	},
+	hook: function(type,callback,options){
+		hooks.push({
+			type: type,
+			callback: callback,
+			script: api._scriptName,
+			options: options
+		});
+	},
+	rCommand: function(name,isArgs){
+		if(typeof isArgs!='undefined'){
+			return new RegExp('^:([^!]+).*'+config.prefix+name+' (.*)$','i');
+		}else{
+			return new RegExp('^:([^!]+).*'+config.prefix+name+'$','i');
 		}
-	}
-},
-getUser = global.getUser = function(nick){
-	var i,
-		user,
-		users = global.users.getAll();
-	for(i in users){
-		user = JSON.parse(users[i]);
-		if(user.nick == nick){
-			return user;
-		}
-	}
-	return {
-		nick: nick,
-		flags: {
-			op: false,
-			voice: true,
-			ban: false
-		},
-		hosts: []
-	};
-},
-saveUser = global.saveUser = function(nick,changes){
-	var i,ii,
-		user,
-		users = global.users.getAll(),
-		flag = false;
-	for(i in users){
-		user = JSON.parse(users[i]);
-		if(user.nick == nick){
-			flag = true;
-			global.users.remove(users[i]);
-			break;
-		}
-	}
-	if(!flag){
-		user = getUser(nick);
-	}
-	for(i in changes){
-		switch(i){
-			case 'flags':
-				for(ii in changes[i]){
-					user[i][ii] = changes[i][ii];
-				}
-			break;
-			default:
-				user[i] = changes[i];
-		}
-	}
-	global.users.add(JSON.stringify(user));
-	return true;
-},
-validUser = global.validUser = function(nick,host){
-	var user,i;
-	if(user = getUser(nick)){
-		if(!inArray(host,user.hosts)){
-			for(i in user.hosts){
-				if(users.hosts[i] instanceof RegExp && users.hosts[i].exec(host)!==null){
-					return true;
+	},
+	regSettings: function(name,settings){
+		if(typeof config[name] == "undefined"){
+			disp.log('Using Defaults for setting group: '+name);
+			config[name] = settings;
+		}else{
+			for(var i in settings){
+				if(typeof config[name][i] == 'undefined'){
+					disp.log('Using default for setting: '+name+'['+i+']');
+					config[name][i] = settings[i];
 				}
 			}
-			return false;
 		}
-		return true;
-	}else{
+		return config[name];
+	},
+	inArray: global.inArray = function(needle, haystack, returnkey){
+		for(var key in haystack){
+			if(needle === haystack[key]){
+				if(returnkey!==undefined){
+					return key;
+				}
+				return true;
+			}
+		}
 		return false;
 	}
-},
+}
 loadScript = global.loadScript = function(scriptName,add){
+	api._scriptName = scriptName;
 	disp.log("Loading script "+scriptName+"...");
 	var script = fs.readFileSync('scripts/' + scriptName);
 	if(script){
@@ -652,84 +727,20 @@ loadScript = global.loadScript = function(scriptName,add){
 				connections: connections,
 				exit: exit,
 				process: process,
-				disp:disp,
-				inArray: inArray,
-				getUser: getUser,
-				validUser: validUser,
-				saveUser: saveUser,
-				removeUser: removeUser,
-				global: global,
-				regHelp: function(name,help){
-					helpdb.push({
-						name: name,
-						help: help,
-						script: scriptName
-					});
-				},
-				listen: function(regex,callback,once){
-					once = once || false;
-					hooks.push({
-						type: 'data',
-						callback: callback,
-						script: scriptName,
-						options:{
-							once: once,
-							regex: regex
-						}
-					});
-				},
-				send_listen: function(regex,callback,once){
-					once = once || false;
-					hooks.push({
-						type: 'send',
-						callback: callback,
-						script: scriptName,
-						options:{
-							once: once,
-							regex: regex
-						}
-					});
-				},
-				reply_listen: function(callback,once){
-					once = once || false;
-					hooks.push({
-						type: 'reply',
-						callback: callback,
-						script: scriptName,
-						options: {
-							once: once
-						}
-					});
-				},
-				hook: function(type,callback,options){
-					hooks.push({
-						type: type,
-						callback: callback,
-						script: scriptName,
-						options: options
-					});
-				},
-				rCommand: function(name,isArgs){
-					if(typeof isArgs!='undefined'){
-						return new RegExp('^:([^!]+).*'+config.prefix+name+' (.*)$','i');
-					}else{
-						return new RegExp('^:([^!]+).*'+config.prefix+name+'$','i');
-					}
-				},
-				regSettings: function(name,settings){
-					if(typeof config[name] == "undefined"){
-						disp.log('Using Defaults for setting group: '+name);
-						config[name] = settings;
-					}else{
-						for(var i in settings){
-							if(typeof config[name][i] == 'undefined'){
-								disp.log('Using default for setting: '+name+'['+i+']');
-								config[name][i] = settings[i];
-							}
-						}
-					}
-					return config[name];
-				}
+				disp: disp,
+				inArray: api.inArray,
+				getUser: api.getUser,
+				validUser: api.validUser,
+				saveUser: api.saveUser,
+				removeUser: api.removeUser,
+				regHelp: api.regHelp,
+				listen: api.listen,
+				send_listen: api.send_listen,
+				reply_listen: api.reply_listen,
+				hook: api.hook,
+				rCommand: api.rCommand,
+				regSettings: api.regSettings,
+				global: exports
 			},scriptName);
 			if(add && !inArray(scriptName,global.scripts.getAll())){
 				global.scripts.add(scriptName);
