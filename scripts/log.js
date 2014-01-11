@@ -285,15 +285,13 @@ var count = 0,
 					}else{
 						res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
 						l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
+						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title><script src="http://code.jquery.com/jquery-1.10.2.min.js"></script></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
 						res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
 						for(i in l){
 							try{
 								e = JSON.parse(l[i]);
 								var end = '';
-								e.msg = htmlEntities(e.msg).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
-									return '<a href="'+url+'">'+url+'</a>';
-								}).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
+								e.msg = htmlEntities((typeof e.msg != 'undefined'?e.msg:'')).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
 									var style="",colour,background,type=m[0];
 									switch(type){
 										case "\x0f":
@@ -398,13 +396,13 @@ var count = 0,
 										m = 'error! '+e.type;
 								}
 								td = new Date(e.date);
-								res.write("<a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"<br/>");
+								res.write("<div class='log-entry'><a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"</div>");
 							}catch(e){
 								disp.log("Invalid character in log "+e);
 								res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
 							}
 						}
-						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a></body></html>');
+						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a>'+"\n"+'<script>$(".log-entry").each(function(){this.innerHTML = this.innerHTML.replace("&nbsp;"," ").replace(/(\\b(https?|ftps?|file|irc):\\/\\/[-A-Z0-9+&@#\\/%?=~_|!:,.;]*[-A-Z0-9+&@#\\/%=~_|])/ig,"<a href='+"'$1'"+'>$1</a>").replace(" ","&nbsp;");});</script></body></html>');
 					}
 				break;
 				case 'txt': default:
