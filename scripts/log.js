@@ -23,6 +23,7 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 		data2,
 		type='privmsg',
 		d = new Date();
+	replyTo = replyTo.toLowerCase();
 	if(replyTo===null&&!/^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.test(data)){
 		replyTo = "- server -";
 	}else{
