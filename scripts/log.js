@@ -206,7 +206,7 @@ function save(log,o){
 	}
 }
 function htmlEntities(str){
-	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,'&nbsp;');
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,"\u00a0");
 }
 var count = 0,
 	server = global.logServer = http.createServer(function (req, res) {
@@ -402,7 +402,7 @@ var count = 0,
 								res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
 							}
 						}
-						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a>'+"\n"+'<script>$(".log-entry").each(function(){this.innerHTML = this.innerHTML.replace("&nbsp;"," ").replace(/(\\b(https?|ftps?|file|irc):\\/\\/[-A-Z0-9+&@#\\/%?=~_|!:,.;]*[-A-Z0-9+&@#\\/%=~_|])/ig,"<a href='+"'$1'"+'>$1</a>").replace(" ","&nbsp;");});</script></body></html>');
+						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a>'+"\n"+'<script>$(".log-entry").each(function(){$(this).html($(this).html().replace(/(\\b(https?|ftps?|file|irc):\\/\\/[-A-Z0-9+&@#\\/%?=~_|!:,.;]*[-A-Z0-9+&@#\\/%=~_|])/ig,"<a href='+"'$1'"+'>$1</a>"));});</script></body></html>');
 					}
 				break;
 				case 'txt': default:
