@@ -267,7 +267,7 @@ var count = 0,
 			var log = url.query,
 				e,m,l,td,
 				d = new Date(),
-				n = log.date == 'today'?log.date:d.toDateString(),
+				n = log.date == 'today'?d.toDateString():log.date,
 				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n;
 			if(fs.existsSync('data/'+file_path+ext)){
 				var file_size = (function(fileSizeInBytes){
