@@ -218,7 +218,7 @@ var count = 0,
 				return false;
 			}
 		}
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress, ext,url = require('url').parse(req.url,true);
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,i,ext,url = require('url').parse(req.url,true);
 		switch(config.logtype){
 			case 'listdb':
 				ext = '.db';
@@ -234,7 +234,7 @@ var count = 0,
 			res.write("</head><body><div class='accordion'>");
 			var logs = fs.readdirSync('data/logs/');
 			if(logs){
-				var i,j,f;
+				var j,f;
 				for (i = 0; i < logs.length; i++){
 					if(check('data/logs/'+logs[i])){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
@@ -264,25 +264,36 @@ var count = 0,
 				res.end();
 			});
 		}else{
-			var log = url.query,e,m,i,l,n,td,d = new Date();
-			if(log.date == 'today'){
-				n = d.toDateString();
+			var log = url.query,
+				e,m,l,td,
+				d = new Date(),
+				n = log.date == 'today'?log.date:d.toDateString(),
+				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n;
+			if(fs.existsSync('data/'+file_path+ext)){
+				var file_size = (function(fileSizeInBytes){
+					var i = -1,
+					units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+					do{
+						fileSizeInBytes = fileSizeInBytes / 1024;i++;
+					}while(fileSizeInBytes > 1024);
+					return Math.max(fileSizeInBytes, 0.1).toFixed(1) + units[i];
+				})(fs.statSync('data/'+file_path+ext).size);
 			}else{
-				n = log.date;
+
 			}
 			switch(config.logtype){
 				case 'listdb':
 					if(log.type == 'json'){
 						res.writeHead(200, {'Content-Type': 'application/json;','Server': 'NodeBot/Logs'});
 						try{
-							res.end(fs.readFileSync('data/logs/'+log.server+'/#'+log.channel+'/'+n+ext,'ascii'));
+							res.end(fs.readFileSync('data/'+file_path+ext,'ascii'));
 						}catch(e){
 							res.end("\"Error opening log: "+log.server+'/#'+log.channel+'/'+n+ext+'"');
 						}
 					}else{
 						res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-						l = listdb.getDB('logs/'+log.server+'/#'+log.channel+'/'+n).getAll();
-						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title><script src="http://code.jquery.com/jquery-1.10.2.min.js"></script></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3>');
+						l = listdb.getDB(file_path).getAll();
+						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title><script src="http://code.jquery.com/jquery-1.10.2.min.js"></script></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3><h3>Size: '+file_size+'</h3>');
 						res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
 						for(i in l){
 							try{
@@ -405,7 +416,7 @@ var count = 0,
 				case 'txt': default:
 					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
 					try{
-						res.end(fs.readFileSync('data/logs/'+log.server+'/#'+log.channel+'/'+n+ext,'ascii'));
+						res.end(fs.readFileSync('data/'+file_path+ext,'ascii'));
 					}catch(e){
 						res.end("Error opening log: "+log.server+'/#'+log.channel+'/'+n+ext);
 					}
