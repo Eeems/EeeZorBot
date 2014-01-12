@@ -27,7 +27,7 @@ listen(rCommand('voice-status',true),function(match,data,replyTo,connection){
 	connection.reply(replyTo,"Status of user "+user+" is: "+(getUser(user).flags.voice?'voiced':'mute'));
 });
 hook('unload',function(){
-	delete hasVoice;
+	hasVoice = null;
 });
 regHelp('voice-ignore','Do not automatically voice this user');
 regHelp('voice-unignore','Automatically voice this user');

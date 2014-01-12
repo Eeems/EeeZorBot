@@ -526,11 +526,12 @@ var loadScripts = global.loadScripts = function(){
 },
 api = {
 	_scriptName: '',
-	addUser: global.addUser = function(nick,flags,handles){
+	addUser: function(nick,flags,handles){
 		var i,
 			users = global.users.getAll();
+		nick = nick.toLowerCase();
 		for(i in users){
-			if(users[i].nick == nick){
+			if(users[i].nick.toLowerCase() == nick){
 				return false;
 			}
 		}
@@ -545,24 +546,26 @@ api = {
 		}));
 		return true;
 	},
-	removeUser: global.removeUser = function(nick){
+	removeUser: function(nick){
 		var i,
 			user,
 			users = global.users.getAll();
+		nick = nick.toLowerCase();
 		for(i in users){
 			user = JSON.parse(users[i]);
-			if(user.nick == nick){
+			if(user.nick.toLowerCase() == nick){
 				global.users.remove(users[i]);
 			}
 		}
 	},
-	getUser: global.getUser = function(nick){
+	getUser: function(nick){
 		var i,
 			user,
 			users = global.users.getAll();
+		nick = nick.toLowerCase();
 		for(i in users){
 			user = JSON.parse(users[i]);
-			if(user.nick == nick){
+			if(user.nick.toLowerCase() == nick){
 				return user;
 			}
 		}
@@ -576,14 +579,15 @@ api = {
 			hosts: []
 		};
 	},
-	saveUser: global.saveUser = function(nick,changes){
+	saveUser: function(nick,changes){
 		var i,ii,
 			user,
 			users = global.users.getAll(),
 			flag = false;
+		nick = nick.toLowerCase();
 		for(i in users){
 			user = JSON.parse(users[i]);
-			if(user.nick == nick){
+			if(user.nick.toLowerCase() == nick){
 				flag = true;
 				global.users.remove(users[i]);
 				break;
@@ -606,8 +610,9 @@ api = {
 		global.users.add(JSON.stringify(user));
 		return true;
 	},
-	validUser: global.validUser = function(nick,host){
+	validUser: function(nick,host){
 		var user,i;
+		nick = nick.toLowerCase();
 		if(user = getUser(nick)){
 			if(!inArray(host,user.hosts)){
 				for(i in user.hosts){
