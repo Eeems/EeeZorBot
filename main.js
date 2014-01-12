@@ -131,7 +131,7 @@ disp = {
 			msg = [msg];
 		}
 		for(var i in msg){
-			if(!isNaN(parseInt(i))){
+			if(!isNaN(parseInt(i,10))){
 				disp.save(d.toDateString(),msg[i]);
 				if(error){
 					console.error(msg[i]);
@@ -175,7 +175,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 		this.config.channels = channels;
 	}
 	this.createSocket = function(){
-		if(this.socket != undefined){
+		if(this.socket !== undefined){
 			this.send("QUIT");
 			this.socket.end();
 			this.socket.destroy();
@@ -190,11 +190,11 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 			var newlineIdx,buff;
 			if(this.buffer!==undefined){
 				buff = this.buffer;
-			}else if(this.parent.buffer!=undefined){
+			}else if(this.parent.buffer!==undefined){
 				buff = this.parent.buffer;
 			}else{
 				disp.error(" Can't handle data from socket. Invalid scope");
-				return
+				return;
 			}
 			data = data.replace('\r', '');
 			while ((newlineIdx = data.indexOf('\n')) > -1){
@@ -212,8 +212,9 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 			}
 		});
 		this.socket.on('error',function(e){
+			var i;
 			disp.error("Connection error: "+e);
-			for(var i in hooks){
+			for(i in hooks){
 				if(hooks[i].type == 'error'){
 					hooks[i].callback.call(this.parent,e);
 				}
@@ -221,8 +222,8 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 			if(!this.parent.reconnecting && ++this.parent.reconnect.attempts <= this.parent.config.reconnect_attempts){
 				disp.alert('Reconnecting (Attempt '+this.parent.reconnect.attempts+'/'+this.parent.config.reconnect_attempts+')');
 				try{
-					if(this.parent.config != undefined && this.config.parent.channels != undefined){
-						for(var i in this.parent.config.channels){
+					if(this.parent.config !== undefined && this.config.parent.channels !== undefined){
+						for(i in this.parent.config.channels){
 							this.send('PART '+this.parent.config.channels[i]);
 						}
 					}
@@ -246,7 +247,8 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 	};
 	this.createSocket();
 	this.quit = function(){
-		for(var i in hooks){
+		var i;
+		for(i in hooks){
 			if(hooks[i].type == 'quit'){
 				try{
 					hooks[i].callback.call(this);
@@ -329,7 +331,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 						}
 					}
 				}
-	        }
+			}
 		}
 	};
 	this.handle = function(data){
@@ -339,7 +341,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 		}
 		disp.in(data);
 		if((/^PING :(.+)/i).exec(data)){
-			if((r = /^PING :(.+)/i.exec(data)) != null){
+			if((r = /^PING :(.+)/i.exec(data)) !== null){
 				r = r[1];
 			}
 			if(typeof r == 'undefined'){
@@ -359,7 +361,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 						i--;
 					}
 				}
-	        }
+			}
 		}
 		user = (/^:([^!]+)!/i).exec(data);
 		if(user){
@@ -383,7 +385,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 				}
 			}
 		}else if((new RegExp('^:([^!]+).*'+config.prefix+'help$','i')).exec(data.trim())){
-			var r='';
+			r='';
 			for(i in helpdb){
 				r += helpdb[i].name+", ";
 			}
@@ -481,7 +483,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 			hooks[i].callback.call(this);
 		}
 	}
-}
+};
 function sanitize(data){
 	if(!data){
 		return data;
@@ -702,7 +704,7 @@ api = {
 		}
 		return false;
 	}
-}
+};
 loadScript = global.loadScript = function(scriptName,add){
 	api._scriptName = scriptName;
 	disp.log("Loading script "+scriptName+"...");
@@ -910,7 +912,6 @@ inputConsole = function(data){
 					nickS = data[2];
 					nickSs = ",\"nickserv\":\""+nickS+"\"";
 				}else{
-					nickS;
 					nickSs = '';
 				}
 				connections.push(new irc(data[0],data[1],config.nick,config.username,config.name),nickS);
@@ -932,7 +933,6 @@ inputConsole = function(data){
 				}
 				c = connections[data[0]].config;
 				s = servers.getAll();
-				sc;
 				for(i in s){
 					sc = JSON.parse(s[i]);
 					if(sc.host==c.host && sc.port==c.port && sc.nickserv==c.nickserv){
@@ -965,7 +965,6 @@ inputConsole = function(data){
 					connections[data[0]].send("JOIN "+data[1]);
 					c = connections[data[0]].config;
 					s = servers.getAll();
-					sc;
 					for(i in s){
 						sc = JSON.parse(s[i]);
 						if(sc.host==c.host && sc.port==c.port && sc.nickserv==c.nickserv){
@@ -995,7 +994,6 @@ inputConsole = function(data){
 				if(connections[data[0]]!==undefined){
 					c = connections[data[0]].config;
 					s = servers.getAll();
-					sc;
 					for(i in s){
 						sc = JSON.parse(s[i]);
 						if(sc.host==c.host && sc.port==c.port && sc.nickserv==c.nickserv){

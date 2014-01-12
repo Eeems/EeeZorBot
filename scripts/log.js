@@ -23,10 +23,10 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 		data2,
 		type='privmsg',
 		d = new Date();
-	replyTo = replyTo.toLowerCase();
 	if(replyTo===null&&!/^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.test(data)){
 		replyTo = "- server -";
 	}else{
+		replyTo = replyTo.toLowerCase();
 		try{
 			data2 = /^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.exec(data);
 			nick = data2[1];
@@ -39,13 +39,13 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 				if((data2 = (/\([#OC]\)[\W0-9]*<(.+)>(.+)$/).exec(data)) !== null){
 					nick = data2[1];
 					data = data2[2].trim();
-				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has left .+$/).exec(data)) != null){
+				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has left .+$/).exec(data)) !== null){
 					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
 						user: data2[1],
 						type: 'part'
 					});
 					return;
-				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has joined .+$/).exec(data)) != null){
+				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has joined .+$/).exec(data)) !== null){
 					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
 						user: data2[1],
 						type: 'join'
@@ -64,7 +64,7 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 			}
 			replyTo = replyTo.trim().toLowerCase();
 		}catch(e){
-			disp.error(e)
+			disp.error(e);
 			disp.log("Defaulting to '- server -' replyTo");
 			replyTo = "- server -";
 		}
@@ -222,14 +222,14 @@ var count = 0,
 		switch(config.logtype){
 			case 'listdb':
 				ext = '.db';
-				break;
+			break;
 			case 'txt': default:
 				ext = '.log';
 		}
 		disp.log("Serving "+req.url+" to: "+ip);
 		if(req.url == '/'){
 			res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script>\<script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
+			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script><script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
 			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy',maxDate: new Date}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
 			res.write("</head><body><div class='accordion'>");
 			var logs = fs.readdirSync('data/logs/');
@@ -241,11 +241,7 @@ var count = 0,
 						if(logdirs && (logdirs.length != 1 || logdirs[0] != '- server -')){
 							res.write('<h3>'+logs[i]+'</h3><div><input type="hidden" value="'+logs[i]+'"/><select>');
 							for (j = 0; j < logdirs.length; j++){
-								if(
-									check('data/logs/'+logs[i]+'/'+logdirs[j])
-									&& logdirs[j] != '- server -'
-									&& logdirs[j].substr(0,1) == '#'
-								){
+								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '- server -' && logdirs[j].substr(0,1) == '#'){
 									res.write('<option value="'+logdirs[j]+'">'+logdirs[j]+'</option>');
 								}
 							}
@@ -331,7 +327,7 @@ var count = 0,
 										var getColour = function(num,def){
 											var c=def;
 											// Reference: http://www.mirc.com/colors.html
-											switch(parseInt(num)){
+											switch(parseInt(num,10)){
 												// 0 white
 												case 0:c='white';break;
 												// 1 black
