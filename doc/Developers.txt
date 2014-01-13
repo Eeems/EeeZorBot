@@ -117,6 +117,10 @@ addUser(string nick[,string flags,array hosts])
 			Hosts other then the one the user currently has (If the user exists on any of the servers).
 removeUser(string nick)
 	Removes the user with the specified nick.
+validUser(string nick, string host)
+	returns true if the nick matches the host
+isOp(string nick)
+	returns true if the user is opped
 user
 	object with all information pertaining to a user
 		user.nick

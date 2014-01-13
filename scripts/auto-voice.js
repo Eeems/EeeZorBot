@@ -5,30 +5,29 @@ listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
 	}
 });
 listen(rCommand('voice-ignore',true),function(match,data,replyTo,connection){
-	var user = match[2].trim();
-	connection.reply(replyTo,"ignoring "+user);
-	saveUser(user,{
-		flags:{
-			voice: false
-		}
-	});
+	if(validUser(match[2],match[1])&&isOp(match[2])){
+		var user = match[3].trim();
+		connection.reply(replyTo,"ignoring "+user);
+		saveUser(user,{
+			flags:{
+				voice: false
+			}
+		});
+	}
 });
 listen(rCommand('voice-unignore',true),function(match,data,replyTo,connection){
-	var user = match[2].trim();
-	connection.reply(replyTo,"automatically voicing "+user);
-	saveUser(user,{
-		flags: {
-			voice: true
-		}
-	});
-});
-listen(rCommand('voice-status',true),function(match,data,replyTo,connection){
-	var user = match[2].trim();
-	connection.reply(replyTo,"Status of user "+user+" is: "+(getUser(user).flags.voice?'voiced':'mute'));
+	if(validUser(match[2],match[1])&&isOp(match[2])){
+		var user = match[3].trim();
+		connection.reply(replyTo,"automatically voicing "+user);
+		saveUser(user,{
+			flags: {
+				voice: true
+			}
+		});
+	}
 });
 hook('unload',function(){
 	hasVoice = null;
 });
 regHelp('voice-ignore','Do not automatically voice this user');
 regHelp('voice-unignore','Automatically voice this user');
-regHelp('voice-status','Displays the status of the user');

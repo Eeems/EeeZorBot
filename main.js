@@ -9,29 +9,7 @@ var config = global.config = require('./config.js'),
 	listdb = require('listdb'),
 	connections = global.connections = [],
 	hooks = global.hooks = [],
-	helpdb = global.helpdb = [
-		{
-			name: 'help',
-			help: 'lists all commands, or displays the help on commands',
-			script: ''
-		},{
-			name: 'enable',
-			help: 'enables a script',
-			script: ''
-		},{
-			name: 'disable',
-			help: 'disables a script',
-			script: ''
-		},{
-			name: 'reload',
-			help: 'reloads all the scripts',
-			script: ''
-		},{
-			name: 'scripts',
-			help: 'lists all the scripts in the scripts/ folder',
-			script: ''
-		}
-	],
+	helpdb = global.helpdb = [],
 	servers = global.servers = listdb.getDB('servers'),
 	scripts = global.scripts = listdb.getDB('scripts'),
 	users = global.users = listdb.getDB('users'),
@@ -335,108 +313,23 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 		}
 	};
 	this.handle = function(data){
-		var dest, i, r, user, replyTo, match;
+		var dest,
+			i,
+			replyTo = null,
+			match;
 		if(!inArray(this,global.connections)){
 			global.connections.push(this);
 		}
 		disp.in(data);
-		if((/^PING :(.+)/i).exec(data)){
-			if((r = /^PING :(.+)/i.exec(data)) !== null){
-				r = r[1];
-			}
-			if(typeof r == 'undefined'){
-				r = this.config.host;
-			}
-			this.send("PONG :"+r);
-			for (i = 0; i < hooks.length; i++){
-				if(hooks[i].type == 'ping'){
-					try{
-						hooks[i].callback(data,this);
-					}catch(err){
-						disp.trace();
-						disp.error("caught error in script "+hooks[i].script+": "+err);
-					}
-					if(hooks[i].options.once){
-						hooks.splice(i, 1);
-						i--;
-					}
-				}
-			}
-		}
 		user = (/^:([^!]+)!/i).exec(data);
-		if(user){
-			user = user[1];
-		}
-		replyTo = null;
 		if(data.indexOf('PRIVMSG') > -1){
 			dest = (/^:([^!]+)!.*PRIVMSG ([^ ]+) /i).exec(data);
 			if(dest){
-				if(dest[2].toUpperCase() == config.nick.toUpperCase()){
+				if(dest[2].toLowerCase() == config.nick.toLowerCase()){
 					replyTo = dest[1];
 				}else{
 					replyTo = dest[2];
 				}
-			}
-		}
-		if((/^:([^!]+).*:End of \/MOTD command.$/i).exec(data.trim())){
-			if(this.config.channels!==undefined){
-				for(i in this.config.channels){
-					this.send("JOIN "+this.config.channels[i]);
-				}
-			}
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'help$','i')).exec(data.trim())){
-			r='';
-			for(i in helpdb){
-				r += helpdb[i].name+", ";
-			}
-			this.reply(replyTo,r.substr(0,r.length-2));
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'scripts$','i')).exec(data.trim())){
-			this.reply(replyTo,"Scripts:");
-			var d_scripts = fs.readdirSync('scripts'),enabled;
-			if(d_scripts){
-				for (i = 0; i < d_scripts.length; i++){
-					if(d_scripts[i].substr(-3) == '.js'){
-							c = 0;
-							h = 0;
-							for(j in global.hooks){
-								if(global.hooks[j].script == d_scripts[i]){
-									c++;
-								}
-							}
-							for(j in global.helpdb){
-								if(global.helpdb[j].script == d_scripts[i]){
-									h++;
-								}
-							}
-							enabled = inArray(d_scripts[i],global.scripts.getAll());
-							this.reply(replyTo,"[\x03"+(enabled?"3E":"4D")+"\x0f] Name: "+d_scripts[i]+' ('+c+':'+h+')');
-					}
-				}
-			}
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'reload$','i')).exec(data.trim())){
-			reloadScripts();
-			this.reply(replyTo,"Scripts reloaded");
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'enable (.*)$','i')).exec(data.trim())){
-			match = (new RegExp('^:([^!]+).*'+config.prefix+'enable (.*)$','i')).exec(data.trim());
-			if(loadScript(match[2],true)){
-				this.reply(replyTo,"Script "+match[2]+" enabled");
-			}else{
-				this.reply(replyTo,"Script "+match[2]+" could not be enabled.");
-			}
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'disable (.*)$','i')).exec(data.trim())){
-			match = (new RegExp('^:([^!]+).*'+config.prefix+'disable (.*)$','i')).exec(data.trim());
-			unloadScript(match[2],true);
-			this.reply(replyTo,"Script "+match[2]+" disabled");
-		}else if((new RegExp('^:([^!]+).*'+config.prefix+'help (.*)$','i')).exec(data)){
-			var f = false;
-			for(i in helpdb){
-				if(helpdb[i].name==(new RegExp('^:([^!]+).*'+config.prefix+'help (.*)$','i')).exec(data)[2]){
-					this.reply(replyTo,helpdb[i].name+": "+helpdb[i].help);
-					f = true;
-				}
-			}
-			if(!f){
-				this.reply(replyTo,"Command not found.");
 			}
 		}
 		for (i = 0; i < hooks.length; i++){
@@ -524,7 +417,7 @@ var loadScripts = global.loadScripts = function(){
 		}catch(err){}
 	}
 },
-api = {
+api = global.api = {
 	_scriptName: '',
 	addUser: function(nick,flags,handles){
 		var i,
@@ -576,7 +469,7 @@ api = {
 				voice: true,
 				ban: false
 			},
-			hosts: []
+			hosts: ['*']
 		};
 	},
 	saveUser: function(nick,changes){
@@ -594,7 +487,7 @@ api = {
 			}
 		}
 		if(!flag){
-			user = getUser(nick);
+			user = api.getUser(nick);
 		}
 		for(i in changes){
 			switch(i){
@@ -613,10 +506,10 @@ api = {
 	validUser: function(nick,host){
 		var user,i;
 		nick = nick.toLowerCase();
-		if(user = getUser(nick)){
+		if(user = api.getUser(nick)){
 			if(!inArray(host,user.hosts)){
 				for(i in user.hosts){
-					if(users.hosts[i] instanceof RegExp && users.hosts[i].exec(host)!==null){
+					if(RegExp(user.hosts[i].replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g,"\\$&").replace('*','.*')).exec(host)!==null){
 						return true;
 					}
 				}
@@ -633,6 +526,9 @@ api = {
 			help: help,
 			script: api._scriptName
 		});
+	},
+	isOp: function(nick){
+		return api.getUser(nick.toLowerCase()).flags.op;
 	},
 	listen: function(regex,callback,once){
 		once = once || false;
@@ -679,9 +575,9 @@ api = {
 	},
 	rCommand: function(name,isArgs){
 		if(typeof isArgs!='undefined'){
-			return new RegExp('^:([^!]+).*'+config.prefix+name+' (.*)$','i');
+			return new RegExp("^(:(\\w+)!.+)\\sPRIVMSG\\s\\#?\\w+\\s:?"+config.prefix+name+"(.+)$",'i');
 		}else{
-			return new RegExp('^:([^!]+).*'+config.prefix+name+'$','i');
+			return new RegExp("^(:(\\w+)!.+)\\sPRIVMSG\\s\\#?\\w+\\s:?"+config.prefix+name+"\\s*$",'i');
 		}
 	},
 	regSettings: function(name,settings){
@@ -740,6 +636,7 @@ loadScript = global.loadScript = function(scriptName,add){
 				validUser: api.validUser,
 				saveUser: api.saveUser,
 				removeUser: api.removeUser,
+				isOp: api.isOp,
 				regHelp: api.regHelp,
 				listen: api.listen,
 				send_listen: api.send_listen,
@@ -1066,6 +963,128 @@ inputConsole = function(data){
 			disp.error(" unknown command "+op);
 	}
 };
+// Built in hooks
+with(api){
+	listen(/^PING :(.+)/i,function(match,data,replyTo,connection){
+		connection.send("PONG :"+(typeof match[1] == 'undefined'?connection.config.host:match[1]));
+		for (i = 0; i < hooks.length; i++){
+			if(hooks[i].type == 'ping'){
+				try{
+					hooks[i].callback(data,this);
+				}catch(err){
+					disp.trace();
+					disp.error("caught error in script "+hooks[i].script+": "+err);
+				}
+				if(hooks[i].options.once){
+					hooks.splice(i, 1);
+					i--;
+				}
+			}
+		}
+	});
+	listen(rCommand('help',true),function(match,data,replyTo,connection){
+		var f = false,i;
+		for(i in helpdb){
+			if(helpdb[i].name==(new RegExp('^:([^!]+).*'+config.prefix+'help (.*)$','i')).exec(data)[2]){
+				connection.reply(replyTo,helpdb[i].name+": "+helpdb[i].help);
+				f = true;
+			}
+		}
+		if(!f){
+			connection.reply(replyTo,"Command not found.");
+		}
+	});
+	regHelp('help','lists all commands, or displays the help on a specific command');
+	listen(rCommand('help'),function(match,data,replyTo,connection){
+		var r='',i;
+		for(i in helpdb){
+			r += helpdb[i].name+", ";
+		}
+		connection.reply(replyTo,r.substr(0,r.length-2));
+	});
+	listen(/^:([^!]+).*:End of \/MOTD command.\r/i,function(match,data,replyTo,connection){
+		if(connection.config.channels!==undefined){
+			for(i in connection.config.channels){
+				connection.send("JOIN "+connection.config.channels[i]);
+			}
+		}
+	});
+	listen(rCommand('scripts'),function(match,data,replyTo,connection){
+		if(validUser(match[2],match[1])&&isOp(match[2])){
+			connection.reply(replyTo,"Scripts:");
+			var d_scripts = fs.readdirSync('scripts'),enabled,j,i;
+			if(d_scripts){
+				for (i = 0; i < d_scripts.length; i++){
+					if(d_scripts[i].substr(-3) == '.js'){
+							c = 0;
+							h = 0;
+							for(j in global.hooks){
+								if(global.hooks[j].script == d_scripts[i]){
+									c++;
+								}
+							}
+							for(j in global.helpdb){
+								if(global.helpdb[j].script == d_scripts[i]){
+									h++;
+								}
+							}
+							enabled = inArray(d_scripts[i],global.scripts.getAll());
+							connection.reply(replyTo,"[\x03"+(enabled?"3E":"4D")+"\x0f] Name: "+d_scripts[i]+' ('+c+':'+h+')');
+					}
+				}
+			}
+		}
+	});
+	regHelp('scripts','Shows the status of all the scripts.');
+	listen(rCommand('reload'),function(match,data,replyTo,connection){
+		if(validUser(match[2],match[1])&&isOp(match[2])){
+			reloadScripts();
+			connection.reply(replyTo,"Scripts reloaded");
+		}
+	});
+	regHelp('reload','Reloads all enabled scripts');
+	listen(rCommand('enable',true),function(match,data,replyTo,connection){
+		if(validUser(match[2],match[1])&&isOp(match[2])){
+			var script = match[3].trim();
+			if(loadScript(script,true)){
+				connection.reply(replyTo,"Script "+script+" enabled");
+			}else{
+				connection.reply(replyTo,"Script "+script+" could not be enabled.");
+			}
+		}
+	});
+	regHelp('enable','enables a script');
+	listen(rCommand('disable',true),function(match,data,replyTo,connection){
+		if(validUser(match[2],match[1])&&isOp(match[2])){
+			var script = match[3].trim();
+			unloadScript(script,true);
+			connection.reply(replyTo,"Script "+script+" disabled");
+		}
+	});
+	regHelp('disable','disables a script');
+	listen(rCommand('user',true),function(match,data,replyTo,connection){
+		var user = getUser(match[3].trim());
+			f = (function(f){
+				var r = '',i;
+				for(i in f){
+					if(f[i]){
+						r = '+'+r+i.substr(0,1);
+					}
+				}
+				return r;
+			})(user.flags);
+		connection.reply(match[2],user.nick+" "+f);
+		if(validUser(match[2],match[1])&&isOp(match[2])){
+			connection.reply(match[2],'Hosts: '+JSON.stringify(user.hosts));
+		}
+	});
+	regHelp('user','Returns information on a user');
+	// listen(rCommand(''),function(match,data,replyTo,connection){
+
+	// });
+	// regHelp('','');
+}
+
 stdin.on('data',inputConsole);
 stdin.resume();
 stdin.setEncoding('utf8');

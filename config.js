@@ -8,4 +8,4 @@ exports.username = 'nodebot';
 exports.prefix = '`';
 // Default log file type
 // Options: txt, listdb
-exports.logtype = 'listdb'
+exports.logtype = 'listdb';
