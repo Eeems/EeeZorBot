@@ -176,3 +176,19 @@ regHelp(name,help)
 			name of the command
 		help
 			the help message to display
+listdb
+	Used to store data
+		listdb.getDB(string name)
+			Returns a db object
+db
+	object used for getting and storing data
+		db.getName()
+			returns the name of the database
+		db.getAll()
+			returns all the values in the database as an array
+		db.hasValue(string value)
+			returns true or false if the value exists in the database
+		db.add(string value)
+			adds a value to the database
+		db.remove(string value)
+			remove a value from the database
