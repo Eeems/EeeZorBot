@@ -269,9 +269,10 @@ var count = 0,
 				e,m,l,td,
 				d = new Date(),
 				n = log.date == 'today'?d.toDateString():log.date,
-				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n;
+				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n,
+				file_size = '0 b';
 			if(fs.existsSync('data/'+file_path+ext)){
-				var file_size = (function(fileSizeInBytes){
+				file_size = (function(fileSizeInBytes){
 					var i = -1,
 					units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
 					do{
@@ -279,8 +280,6 @@ var count = 0,
 					}while(fileSizeInBytes > 1024);
 					return Math.max(fileSizeInBytes, 0.1).toFixed(1) + units[i];
 				})(fs.statSync('data/'+file_path+ext).size);
-			}else{
-
 			}
 			switch(config.logtype){
 				case 'listdb':
