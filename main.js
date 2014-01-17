@@ -1002,7 +1002,7 @@ with(api){
 		}
 		connection.reply(replyTo,r.substr(0,r.length-2));
 	});
-	listen(/^:([^!]+).*:End of \/MOTD command.\r/i,function(match,data,replyTo,connection){
+	listen(/^:([^!]+).*:(End of \/MOTD command.|MOTD File is missing)\r/i,function(match,data,replyTo,connection){
 		if(connection.config.channels!==undefined){
 			for(i in connection.config.channels){
 				connection.send("JOIN "+connection.config.channels[i]);
