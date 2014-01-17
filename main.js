@@ -1008,6 +1008,9 @@ with(api){
 				connection.send("JOIN "+connection.config.channels[i]);
 			}
 		}
+		if(connection.config.nickserv!==undefined){
+			connection.send("NICKSERV IDENTIFY "+connection.config.nickserv);
+		}
 	});
 	listen(rCommand('scripts'),function(match,data,replyTo,connection){
 		if(validUser(match[2],match[1])&&isOp(match[2])){
