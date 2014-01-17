@@ -1096,16 +1096,20 @@ loadScripts();
 var s,n,c,srvs = servers.getAll();
 disp.log("Connecting to saved servers");
 for(var i in srvs){
-	s = JSON.parse(srvs[i]);
-	if(s.nickserv!==undefined){
-		n = s.nickserv;
-	}else{
-		n = undefined;
+	try{
+		s = JSON.parse(srvs[i]);
+		if(s.nickserv!==undefined){
+			n = s.nickserv;
+		}else{
+			n = undefined;
+		}
+		if(s.channels!==undefined){
+			c = s.channels;
+		}else{
+			c = undefined;
+		}
+		connections.push(new irc(s.host,s.port,config.nick,config.username,config.name,n,c));
+	}catch(e){
+		console.log('Invalid saved server: "'+srvs[i]+'"');
 	}
-	if(s.channels!==undefined){
-		c = s.channels;
-	}else{
-		c = undefined;
-	}
-	connections.push(new irc(s.host,s.port,config.nick,config.username,config.name,n,c));
 }
