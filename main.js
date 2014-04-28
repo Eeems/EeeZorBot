@@ -1004,7 +1004,7 @@ with(api){
 	});
 	listen(/^:([^!]+).*:(End of \/MOTD command.|MOTD File is missing)\r/i,function(match,data,replyTo,connection){
 		if(connection.config.channels!==undefined){
-			for(i in connection.config.channels){
+			for(var i in connection.config.channels){
 				connection.send("JOIN "+connection.config.channels[i]);
 			}
 		}
