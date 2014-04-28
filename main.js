@@ -1009,6 +1009,7 @@ with(api){
 			}
 		}
 		if(connection.config.nickserv!==undefined){
+			console.info('Registering with Nickserv');
 			connection.send("NICKSERV IDENTIFY "+connection.config.nickserv);
 		}
 	});
