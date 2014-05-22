@@ -1,4 +1,4 @@
-[![build](https://travis-ci.org/Eeems/EeeZorBot.svg)](https://github.com/Eeems/EeeZorBot)
+[![build](https://travis-ci.org/Eeems/EeeZorBot.svg)](https://travis-ci.org/Eeems/EeeZorBot)
 EeeZorBot
 =========
 Version:
