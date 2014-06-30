@@ -25,7 +25,7 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 		d = new Date();
 	replyTo=replyTo===null?'':replyTo;
 	if(replyTo===''&&!/^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.test(data)){
-		replyTo = "- server -";
+		replyTo = ". server .";
 	}else{
 		replyTo = replyTo.toLowerCase();
 		try{
@@ -66,12 +66,12 @@ listen(/^.+/i,function(match,data,replyTo,connection){
 			replyTo = replyTo.trim().toLowerCase();
 		}catch(e){
 			disp.error(e);
-			disp.log("Defaulting to '- server -' replyTo");
-			replyTo = "- server -";
+			disp.log("Defaulting to '. server .' replyTo");
+			replyTo = ". server .";
 		}
 	}
 	var p = connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString();
-	if(replyTo == "- server -" && (new RegExp("^:(.+) 372 "+connection.config.nick+" :(.+)$")).exec(data) === null){
+	if(replyTo == ". server ." && (new RegExp("^:(.+) 372 "+connection.config.nick+" :(.+)$")).exec(data) === null){
 		save(p,{
 			msg: ">>>	"+data,
 			type: type
@@ -118,7 +118,7 @@ listen(/^:([^!]+).*KICK \#(\w+) (\w+) :([^ ]+)$/i,function(match,data,replyTo,co
 });
 reply_listen(function(replyTo,msg,connection){
 	if(replyTo===null){
-		replyTo = "- server -";
+		replyTo = ". server .";
 	}else{
 		replyTo = replyTo.trim().toLowerCase();
 	}
@@ -130,31 +130,31 @@ reply_listen(function(replyTo,msg,connection){
 });
 send_listen(/^.+/i,function(match,msg,connection){
 	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/- server -/"+d.toDateString(),{
+	save(connection.config.host+" "+connection.config.port+"/. server ./"+d.toDateString(),{
 		msg: "<<<	"+msg
 	});
 });
 hook('quit',function(){
 	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/- server -/"+d.toDateString(),{
+	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
 		msg: "*Connection Quit*"
 	});
 });
 hook('reconnect',function(){
 	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/- server -/"+d.toDateString(),{
+	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
 		msg: "*Reconnected*"
 	});
 });
 hook('connect',function(){
 	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/- server -/"+d.toDateString(),{
+	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
 		msg: "*Connected*"
 	});
 });
 hook('timeout',function(){
 	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/- server -/"+d.toDateString(),{
+	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
 		msg: "*Connection Timeout*"
 	});
 });
@@ -171,7 +171,7 @@ function save(log,o){
 		n.type = o.type;
 	}
 	if(typeof o.user === 'undefined'){
-		n.user = '- server -';
+		n.user = '. server .';
 	}else{
 		n.user = o.user;
 	}
@@ -270,10 +270,10 @@ var count = 0,
 				for (i = 0; i < logs.length; i++){
 					if(check('data/logs/'+logs[i]) && ){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
-						if(logdirs && (logdirs.length != 1 || logdirs[0] != '- server -')){
+						if(logdirs && (logdirs.length != 1 || logdirs[0] != '. server .')){
 							res.write('<h3>'+logs[i]+'</h3><div><input type="hidden" value="'+logs[i]+'"/><select>');
 							for (j = 0; j < logdirs.length; j++){
-								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '- server -' && logdirs[j].substr(0,1) == '#' && logdirs[j].length > 1){
+								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '. server .' && logdirs[j].substr(0,1) == '#' && logdirs[j].length > 1){
 									res.write('<option value="'+logdirs[j]+'">'+logdirs[j]+'</option>');
 								}
 							}
