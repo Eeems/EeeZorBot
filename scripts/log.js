@@ -252,13 +252,36 @@ var count = 0,
 			var j,
 				f,
 				log,
-				channel;
+				channel,
+				folder_size = function(){
+					var size =  function(file){
+							var size;
+							try{
+								size = fs.statSync('data/'+log.name+'/'+channel+'/'+file).size;
+							}catch(e){}
+							return size|0;
+						},
+						total = 0,
+						ii,
+						i = -1,
+						files = fs.readdirSync('data/logs/'+log.name+'/'+channel+'/');
+					if(files){
+						for(ii=0;ii<files.length;ii++){
+							total += size(files[ii]);
+						}
+					}
+					units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+					do{
+						total = total / 1024;i++;
+					}while(total > 1024);
+					return Math.max(total, 0.1).toFixed(1) + units[i];
+				};
 			for(i=0;i<logs.length;i++){
 				log = logs[i];
 				res.write('<h3>'+log.name+'</h3><div><input type="hidden" value="'+log.name+'"/><select>');
 				for(j=0;j<log.channels.length;j++){
 					channel = log.channels[j];
-					res.write('<option value="'+channel+'">'+channel+'</option>');
+					res.write('<option value="'+channel+'">'+channel+' ('+folder_size()+')</option>');
 				}
 				// Need to expand to allow for limiting the dates on the datepicker.
 				res.write('</select><input class="datepicker"/><button class="open" value="Open">Open</button></div>');
