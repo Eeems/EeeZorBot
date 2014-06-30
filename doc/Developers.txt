@@ -196,3 +196,5 @@ db
 			adds a value to the database
 		db.remove(string value)
 			remove a value from the database
+connections
+	An array of all the irc connection objects
