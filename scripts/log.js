@@ -257,20 +257,20 @@ var count = 0,
 					var size =  function(file){
 							var size;
 							try{
-								size = fs.statSync('data/'+log.name+'/'+channel+'/'+file).size;
-							}catch(e){}
+								size = fs.statSync('data/logs/'+log.name+'/'+channel+'/'+file).size;
+							}catch(e){console.log(e);}
 							return size|0;
 						},
 						total = 0,
 						ii,
 						i = -1,
-						files = fs.readdirSync('data/logs/'+log.name+'/'+channel+'/');
+						files = fs.readdirSync('data/logs/'+log.name+'/'+channel+'/'),
+						units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
 					if(files){
 						for(ii=0;ii<files.length;ii++){
 							total += size(files[ii]);
 						}
 					}
-					units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
 					do{
 						total = total / 1024;i++;
 					}while(total > 1024);
