@@ -376,6 +376,7 @@ var irc = global.irc = function(host,port,nick,username,name,nickservP,channels)
 			hooks[i].callback.call(this);
 		}
 	}
+	return this;
 };
 function sanitize(data){
 	if(!data){

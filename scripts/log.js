@@ -219,7 +219,22 @@ var count = 0,
 				return false;
 			}
 		}
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,i,ext,url = require('url').parse(req.url,true);
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,i,ext,url = require('url').parse(req.url,true),
+			logs = (function(){
+				var ret = [],
+					i,
+					c;
+				for(i=0;i<connections.length;i++){
+					try{
+						c = connections[i].config;
+						ret.push({
+							name: c.host+' '+c.port,
+							channels: c.channels
+						});
+					}catch(e){}
+				}
+				return ret;
+			})();
 		switch(config.logtype){
 			case 'listdb':
 				ext = '.db';
@@ -233,16 +248,32 @@ var count = 0,
 			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script><script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
 			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy',maxDate: new Date}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
 			res.write("</head><body><div class='accordion'>");
+			// New Method to only show active channels. Will need to add the option to show old logs here.
+			var j,
+				f,
+				log,
+				channel;
+			for(i=0;i<logs.length;i++){
+				log = logs[i];
+				res.write('<h3>'+log.name+'</h3><div><input type="hidden" value="'+log.name+'"/><select>');
+				for(j=0;j<log.channels.length;j++){
+					channel = log.channels[j];
+					res.write('<option value="'+channel+'">'+channel+'</option>');
+				}
+				// Need to expand to allow for limiting the dates on the datepicker.
+				res.write('</select><input class="datepicker"/><button class="open" value="Open">Open</button></div>');
+			}
+			/* // Old method that shows all logs in the directory, including invalid ones
 			var logs = fs.readdirSync('data/logs/');
 			if(logs){
 				var j,f;
 				for (i = 0; i < logs.length; i++){
-					if(check('data/logs/'+logs[i])){
+					if(check('data/logs/'+logs[i]) && ){
 						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
 						if(logdirs && (logdirs.length != 1 || logdirs[0] != '- server -')){
 							res.write('<h3>'+logs[i]+'</h3><div><input type="hidden" value="'+logs[i]+'"/><select>');
 							for (j = 0; j < logdirs.length; j++){
-								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '- server -' && logdirs[j].substr(0,1) == '#'){
+								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '- server -' && logdirs[j].substr(0,1) == '#' && logdirs[j].length > 1){
 									res.write('<option value="'+logdirs[j]+'">'+logdirs[j]+'</option>');
 								}
 							}
@@ -250,7 +281,7 @@ var count = 0,
 						}
 					}
 				}
-			}
+			}*/
 			res.end("</div></body></html>");
 		}else if(req.url == '/favicon.ico'){
 			fs.readFile('data/favicon.ico', "binary", function (err,file) {
@@ -271,6 +302,22 @@ var count = 0,
 				n = log.date == 'today'?d.toDateString():log.date,
 				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n,
 				file_size = '0 b';
+			if((function(){
+				var i,ii;
+				for(i in logs){
+					if(log.server == logs[i].name){
+						for(ii in logs[i].channels){
+							if('#'+log.channel == logs[i].channels[ii]){
+								return false;
+							}
+						}
+					}
+				}
+				return true;
+			})()){
+				res.end("\"You aren't allowed to open this log\"");
+				return;
+			}
 			if(fs.existsSync('data/'+file_path+ext)){
 				file_size = (function(fileSizeInBytes){
 					var i = -1,
