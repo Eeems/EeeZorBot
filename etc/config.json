@@ -1,5 +1,5 @@
 {
-	"host": "irc.omnimaga.org",
+	"host": "localhost",
 	"name": "NodeBotServe3.0",
 	"nick": "nodebot",
 	"username": "nodebot",
