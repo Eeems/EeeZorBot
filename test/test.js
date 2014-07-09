@@ -1,5 +1,5 @@
 var test = require('tape'),
-	main = require(__dirname+'/../main.js');
+	main = require(__dirname+'/../lib/main.js');
 
 test('todo',function(t){
 	t.ok(true,'todo');
