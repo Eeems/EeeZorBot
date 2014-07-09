@@ -1,0 +1,7 @@
+{
+	"name": "NodeBotServe3.0",
+	"nick": "nodebot",
+	"username": "nodebot",
+	"prefix": "`",
+	"logtype": "listdb"
+}
