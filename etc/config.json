@@ -1,7 +1,15 @@
 {
+	"host": "irc.omnimaga.org",
 	"name": "NodeBotServe3.0",
 	"nick": "nodebot",
 	"username": "nodebot",
 	"prefix": "`",
-	"logtype": "listdb"
+	"logtype": "listdb",
+	"nickserv": {
+		"nick": "nodebot",
+		"password": "password"
+	},
+	"channels": [
+		"#irp"
+	]
 }
