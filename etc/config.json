@@ -1,15 +1,22 @@
 {
-	"host": "localhost",
-	"name": "NodeBotServe3.0",
-	"nick": "nodebot",
-	"username": "nodebot",
-	"prefix": "`",
 	"logtype": "listdb",
-	"nickserv": {
-		"nick": "nodebot",
-		"password": "password"
-	},
-	"channels": [
-		"#irp"
+	"servers": [
+		{
+			"host": "localhost",
+			"name": "NodeBotServe3.0",
+			"nick": "nodebot",
+			"username": "nodebot",
+			"prefix": "`",
+			"nickserv": {
+				"nick": "nodebot",
+				"password": "password"
+			},
+			"channels": [
+				"#irp"
+			],
+			"scripts": [
+				"scripts/test.js"
+			]
+		}
 	]
 }

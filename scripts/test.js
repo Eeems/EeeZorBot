@@ -1,4 +1,8 @@
-hook('data',function(match,data,replyTo,connection){
+server.on('data',function(){
+	debug.log('test');
+});
+
+/*hook('data',function(match,data,replyTo,connection){
 	disp.log("Test Command Recieved");
 	connection.reply(replyTo,"Test Command Recieved");
 },{
@@ -9,4 +13,4 @@ listen(rCommand('timeout'),function(match,data,replyTo,connection){
 });
 regHelp('timeout','simulate a timeout.');
 regHelp("test","lets you know if scripts are currently working.");
-disp.alert('test script finished');
+disp.alert('test script finished');*/
