@@ -17,6 +17,23 @@
 			"scripts": [
 				"scripts/test.js"
 			]
+		},
+		{
+			"host": "irc.omnimaga.org",
+			"name": "NodeBotServe3.0",
+			"nick": "nodebot",
+			"username": "nodebot",
+			"prefix": "`",
+			"nickserv": {
+				"nick": "nodebot",
+				"password": "password"
+			},
+			"channels": [
+				"#irp"
+			],
+			"scripts": [
+				"scripts/test.js"
+			]
 		}
 	]
 }
