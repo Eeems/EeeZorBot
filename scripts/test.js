@@ -1,5 +1,5 @@
 server.on('data',function(){
-	debug.log('test');
+	//debug.log('test');
 });
 
 /*hook('data',function(match,data,replyTo,connection){
