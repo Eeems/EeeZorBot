@@ -1,14 +1,16 @@
 {
 	"logs": {
 		"levels": {
-			"in": false,
-			"out": false
+			"in": true,
+			"out": true
 		},
 		"type": "listdb"
 	},
 	"stdin": {
 		"console": true,
-		"write": true
+		"levels": {
+			"debug": true
+		}
 	},
 	"servers": [
 		{
