@@ -41,9 +41,23 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/api.html">api</a></li>
+            
                 <li><a href="../classes/Channel.html">Channel</a></li>
             
+                <li><a href="../classes/debug.html">debug</a></li>
+            
+                <li><a href="../classes/Listdb.html">Listdb</a></li>
+            
+                <li><a href="../classes/log.html">log</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
+            
+                <li><a href="../classes/server.html">server</a></li>
+            
+                <li><a href="../classes/stdin.html">stdin</a></li>
+            
+                <li><a href="../classes/tools.html">tools</a></li>
             
                 <li><a href="../classes/User.html">User</a></li>
             
@@ -51,9 +65,23 @@
 
             <ul id="api-modules" class="apis modules">
             
+                <li><a href="../modules/api.html">api</a></li>
+            
                 <li><a href="../modules/channel.html">channel</a></li>
             
+                <li><a href="../modules/debug.html">debug</a></li>
+            
+                <li><a href="../modules/listdb.html">listdb</a></li>
+            
+                <li><a href="../modules/log.html">log</a></li>
+            
                 <li><a href="../modules/script.html">script</a></li>
+            
+                <li><a href="../modules/server.html">server</a></li>
+            
+                <li><a href="../modules/stdin.html">stdin</a></li>
+            
+                <li><a href="../modules/tools.html">tools</a></li>
             
                 <li><a href="../modules/user.html">user</a></li>
             
@@ -99,10 +127,15 @@
 var path = require(&#x27;path&#x27;),
 	fs = require(&#x27;fs&#x27;);
 /**
- * Description
+ * @module tools
+ * @class tools
+ * @static
+ */
+/**
+ * Sanitizes a string for sending to an IRC server
  * @method sanitize
- * @param {} d
- * @return CallExpression
+ * @param {string} d
+ * @return {string} sanitized string
  */
 exports.sanitize = function(d){
 	if(!d){
@@ -119,11 +152,10 @@ exports.sanitize = function(d){
 	return d.replace(/\n/g, &quot;\\n&quot;).replace(/\r/g, &quot;\\r&quot;).replace(/[^\x02|\x0b|\x16|\x20-\x7e]/g,&quot;&quot;);
 };
 /**
- * Description
+ * Recursive mkdir
  * @method mkdirParent
- * @param {} dirPath
- * @param {} mode
- * @return 
+ * @param {string} dirPath path to create directory structure for
+ * @param {string} mode mode to create new directories with
  */
 exports.mkdirParent = function(dirPath,mode){
 	dirPath = path.normalize(dirPath);
@@ -140,10 +172,10 @@ exports.mkdirParent = function(dirPath,mode){
 	})(dirs,dir);
 };
 /**
- * Description
+ * Makes a string safe for use in RegExp
  * @method regexString
- * @param {} str
- * @return CallExpression
+ * @param {string} str
+ * @return {string} RegExp safe string
  */
 exports.regexString = function(str){
 	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, &quot;\\$&amp;&quot;);

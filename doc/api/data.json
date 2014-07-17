@@ -7,6 +7,17 @@
         "tabtospace": 4
     },
     "files": {
+        "lib\\api.js": {
+            "name": "lib\\api.js",
+            "modules": {
+                "api": 1
+            },
+            "classes": {
+                "api": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "lib\\channel.js": {
             "name": "lib\\channel.js",
             "modules": {
@@ -20,22 +31,34 @@
         },
         "lib\\debug.js": {
             "name": "lib\\debug.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "debug": 1
+            },
+            "classes": {
+                "debug": 1
+            },
             "fors": {},
             "namespaces": {}
         },
         "lib\\listdb.js": {
             "name": "lib\\listdb.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "listdb": 1
+            },
+            "classes": {
+                "Listdb": 1
+            },
             "fors": {},
             "namespaces": {}
         },
         "lib\\log.js": {
             "name": "lib\\log.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "log": 1
+            },
+            "classes": {
+                "log": 1
+            },
             "fors": {},
             "namespaces": {}
         },
@@ -52,22 +75,34 @@
         },
         "lib\\server.js": {
             "name": "lib\\server.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "server": 1
+            },
+            "classes": {
+                "server": 1
+            },
             "fors": {},
             "namespaces": {}
         },
         "lib\\stdin.js": {
             "name": "lib\\stdin.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "stdin": 1
+            },
+            "classes": {
+                "stdin": 1
+            },
             "fors": {},
             "namespaces": {}
         },
         "lib\\tools.js": {
             "name": "lib\\tools.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "tools": 1
+            },
+            "classes": {
+                "tools": 1
+            },
             "fors": {},
             "namespaces": {}
         },
@@ -84,6 +119,20 @@
         }
     },
     "modules": {
+        "api": {
+            "name": "api",
+            "submodules": {},
+            "classes": {
+                "api": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\api.js",
+            "line": 1,
+            "description": "API class, contains references to all important modules",
+            "static": 1
+        },
         "channel": {
             "name": "channel",
             "submodules": {},
@@ -96,6 +145,7 @@
             "file": "lib\\channel.js",
             "line": 4,
             "description": "Channel class",
+            "itemtype": "main",
             "params": [
                 {
                     "name": "server",
@@ -110,6 +160,50 @@
             ],
             "is_constructor": 1
         },
+        "debug": {
+            "name": "debug",
+            "submodules": {},
+            "classes": {
+                "debug": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\debug.js",
+            "line": 2,
+            "description": "Debug functions",
+            "static": 1,
+            "itemtype": "main"
+        },
+        "listdb": {
+            "name": "listdb",
+            "submodules": {},
+            "classes": {
+                "Listdb": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\listdb.js",
+            "line": 4,
+            "description": "listdb class",
+            "is_constructor": 1
+        },
+        "log": {
+            "name": "log",
+            "submodules": {},
+            "classes": {
+                "log": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\log.js",
+            "line": 5,
+            "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
+            "itemtype": "main",
+            "static": 1
+        },
         "script": {
             "name": "script",
             "submodules": {},
@@ -122,6 +216,54 @@
             "file": "lib\\script.js",
             "line": 5,
             "description": "Provides a script object that allows a server to handle the loaded script"
+        },
+        "server": {
+            "name": "server",
+            "submodules": {},
+            "classes": {
+                "server": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\server.js",
+            "line": 13,
+            "description": "IRC Server object",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "config",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "stdin": {
+            "name": "stdin",
+            "submodules": {},
+            "classes": {
+                "stdin": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\stdin.js",
+            "line": 1,
+            "description": "stdin control",
+            "static": 1
+        },
+        "tools": {
+            "name": "tools",
+            "submodules": {},
+            "classes": {
+                "tools": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\tools.js",
+            "line": 3,
+            "static": 1
         },
         "user": {
             "name": "user",
@@ -138,6 +280,20 @@
         }
     },
     "classes": {
+        "api": {
+            "name": "api",
+            "shortname": "api",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "api",
+            "namespace": "",
+            "file": "lib\\api.js",
+            "line": 1,
+            "description": "API class, contains references to all important modules"
+        },
         "Channel": {
             "name": "Channel",
             "shortname": "Channel",
@@ -150,7 +306,57 @@
             "namespace": "",
             "file": "lib\\channel.js",
             "line": 4,
-            "description": "Channel class"
+            "description": "Channel class",
+            "mainName": "",
+            "tag": "main",
+            "itemtype": "main",
+            "_main": true
+        },
+        "debug": {
+            "name": "debug",
+            "shortname": "debug",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "debug",
+            "namespace": "",
+            "file": "lib\\debug.js",
+            "line": 2,
+            "description": "Debug functions"
+        },
+        "Listdb": {
+            "name": "Listdb",
+            "shortname": "Listdb",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "listdb",
+            "namespace": "",
+            "file": "lib\\listdb.js",
+            "line": 4,
+            "description": "listdb class"
+        },
+        "log": {
+            "name": "log",
+            "shortname": "log",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "log",
+            "namespace": "",
+            "file": "lib\\log.js",
+            "line": 5,
+            "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
+            "mainName": "",
+            "tag": "main",
+            "itemtype": "main",
+            "_main": true
         },
         "Script": {
             "name": "Script",
@@ -184,6 +390,47 @@
             ],
             "is_constructor": 1
         },
+        "server": {
+            "name": "server",
+            "shortname": "server",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "server",
+            "namespace": "",
+            "file": "lib\\server.js",
+            "line": 13,
+            "description": "IRC Server object"
+        },
+        "stdin": {
+            "name": "stdin",
+            "shortname": "stdin",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "stdin",
+            "namespace": "",
+            "file": "lib\\stdin.js",
+            "line": 1,
+            "description": "stdin control"
+        },
+        "tools": {
+            "name": "tools",
+            "shortname": "tools",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tools",
+            "namespace": "",
+            "file": "lib\\tools.js",
+            "line": 3
+        },
         "User": {
             "name": "User",
             "shortname": "User",
@@ -197,6 +444,10 @@
             "file": "lib\\user.js",
             "line": 1,
             "description": "User object constructor",
+            "mainName": "",
+            "tag": "main",
+            "itemtype": "main",
+            "_main": true,
             "params": [
                 {
                     "name": "nick",
@@ -225,7 +476,7 @@
     "classitems": [
         {
             "file": "lib\\channel.js",
-            "line": 14,
+            "line": 15,
             "description": "Name of the channel",
             "type": "{string}",
             "itemtype": "property",
@@ -235,7 +486,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 20,
+            "line": 21,
             "description": "Channel modes",
             "type": "{Object}",
             "itemtype": "property",
@@ -245,7 +496,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 26,
+            "line": 27,
             "description": "Parent server",
             "type": "{Server}",
             "itemtype": "property",
@@ -255,7 +506,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 32,
+            "line": 33,
             "description": "Runs a /who on the channel, refreshing user data",
             "itemtype": "method",
             "name": "who",
@@ -265,7 +516,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 47,
+            "line": 48,
             "description": "Returns an array of all the users in the channel",
             "itemtype": "method",
             "name": "users",
@@ -278,7 +529,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 64,
+            "line": 65,
             "description": "Sets the mode of the channel, or users in the channel",
             "itemtype": "method",
             "name": "mode",
@@ -301,7 +552,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 88,
+            "line": 89,
             "description": "Set or get the topic of the channel (It will trigger a topic event)",
             "itemtype": "method",
             "name": "topic",
@@ -319,7 +570,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 102,
+            "line": 103,
             "description": "Leave the channel",
             "itemtype": "method",
             "name": "part",
@@ -329,7 +580,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 111,
+            "line": 112,
             "description": "Join the channel",
             "itemtype": "method",
             "name": "join",
@@ -339,243 +590,259 @@
         },
         {
             "file": "lib\\debug.js",
-            "line": 3,
-            "description": "Description",
+            "line": 10,
+            "description": "Outputs a debug log (\"DEBUG: \"+JSON.stringify(message))",
             "itemtype": "method",
             "name": "log",
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "Script",
-            "module": "channel"
-        },
-        {
-            "file": "lib\\listdb.js",
-            "line": 4,
-            "description": "Description",
-            "itemtype": "method",
-            "name": "get",
             "params": [
                 {
-                    "name": "dbName",
-                    "description": ""
+                    "name": "message",
+                    "description": "messages to output",
+                    "optional": true,
+                    "multiple": true
                 }
             ],
-            "return": {
-                "description": "db"
-            },
-            "class": "Script",
-            "module": "channel"
+            "chainable": 1,
+            "class": "debug",
+            "module": "debug"
         },
         {
             "file": "lib\\listdb.js",
             "line": 16,
-            "description": "Description",
+            "description": "Returnst the name of the listdb",
             "itemtype": "method",
             "name": "name",
             "return": {
-                "description": "dbName"
+                "description": "Name of the listdb",
+                "type": "String"
             },
-            "class": "Script",
-            "module": "channel"
+            "class": "Listdb",
+            "module": "listdb"
         },
         {
             "file": "lib\\listdb.js",
             "line": 24,
-            "description": "Description",
+            "description": "Get all the values in the listdb",
             "itemtype": "method",
             "name": "all",
             "return": {
-                "description": "values"
+                "description": "Values in the listdb",
+                "type": "Array"
             },
-            "class": "Script",
-            "module": "channel"
+            "class": "Listdb",
+            "module": "listdb"
         },
         {
             "file": "lib\\listdb.js",
             "line": 32,
-            "description": "Description",
+            "description": "Checks to see if the listdb has a certain value in it",
             "itemtype": "method",
             "name": "has",
             "params": [
                 {
                     "name": "value",
-                    "description": ""
+                    "description": "value to check for",
+                    "type": "Mixed"
                 },
                 {
                     "name": "ic",
-                    "description": ""
+                    "description": "Ignore case when searching",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
                 }
             ],
             "return": {
-                "description": "Literal"
+                "description": "True if the value exists in the listdb",
+                "type": "Boolean"
             },
-            "class": "Script",
-            "module": "channel"
+            "class": "Listdb",
+            "module": "listdb"
         },
         {
             "file": "lib\\listdb.js",
             "line": 51,
-            "description": "Description",
+            "description": "Adds an entry to the listdb",
             "itemtype": "method",
             "name": "add",
             "params": [
                 {
                     "name": "value",
-                    "description": ""
+                    "description": "",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "class": "Listdb",
+            "module": "listdb"
         },
         {
             "file": "lib\\listdb.js",
-            "line": 61,
-            "description": "Description",
+            "line": 60,
+            "description": "Remove a value from the listdb",
             "itemtype": "method",
             "name": "remove",
             "params": [
                 {
                     "name": "value",
-                    "description": ""
+                    "description": "value to remove from the listdb",
+                    "type": "Mixed"
                 },
                 {
                     "name": "ignoreCase",
-                    "description": ""
+                    "description": "Ignore case when searching to remove",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
                 }
             ],
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "class": "Listdb",
+            "module": "listdb"
         },
         {
             "file": "lib\\log.js",
-            "line": 6,
-            "description": "Description",
+            "line": 13,
+            "description": "Does an alert message (\"=> \"+message)",
             "itemtype": "method",
             "name": "alert",
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "params": [
+                {
+                    "name": "message",
+                    "description": "Message to display",
+                    "optional": true,
+                    "multiple": true
+                }
+            ],
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 23,
-            "description": "Description",
+            "line": 30,
+            "description": "Outputs an log signifying that the message was sent to an external server (\"-> \"+message)",
             "itemtype": "method",
             "name": "out",
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "params": [
+                {
+                    "name": "message",
+                    "description": "Message to display",
+                    "optional": true,
+                    "multiple": true
+                }
+            ],
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 40,
-            "description": "Description",
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "line": 47,
+            "description": "Outputs an log signifying that the message was recieved from an external server (\"<- \"+message)",
+            "itemtype": "method",
+            "name": "in",
+            "params": [
+                {
+                    "name": "message",
+                    "description": "Message to display",
+                    "optional": true,
+                    "multiple": true
+                }
+            ],
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 56,
-            "description": "Description",
+            "line": 64,
+            "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "params": [
+                {
+                    "name": "message",
+                    "description": "Message to display",
+                    "optional": true,
+                    "multiple": true
+                }
+            ],
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 71,
-            "description": "Description",
+            "line": 79,
+            "description": "Saves a line to a named log",
             "itemtype": "method",
             "name": "save",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "path to the log",
+                    "type": "String"
                 },
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "line to write to the log file",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "access": "private",
+            "tagname": "",
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 98,
-            "description": "Description",
+            "line": 106,
+            "description": "Returns the listdb object for a specific log",
             "itemtype": "method",
             "name": "get",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "path to the log file",
+                    "type": "String"
                 }
             ],
             "return": {
-                "description": "CallExpression"
+                "description": "log",
+                "type": "Listdb"
             },
-            "class": "Script",
-            "module": "channel"
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 107,
-            "description": "Description",
+            "line": 115,
+            "description": "Logs a message and saves the output to a log",
             "itemtype": "method",
             "name": "log",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
-                },
-                {
-                    "name": "save",
-                    "description": ""
+                    "description": "Message to output"
                 },
                 {
                     "name": "error",
-                    "description": ""
+                    "description": "Should the logged output be a console.error call or not",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
                 }
             ],
             "return": {
-                "description": "msg"
+                "description": "msg",
+                "type": "String"
             },
-            "class": "Script",
-            "module": "channel"
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 133,
-            "description": "Description",
+            "line": 140,
+            "description": "Outputs a trace log",
             "itemtype": "method",
             "name": "trace",
-            "return": {
-                "description": ""
-            },
-            "class": "Script",
-            "module": "channel"
+            "class": "log",
+            "module": "log"
         },
         {
             "file": "lib\\script.js",
@@ -659,565 +926,638 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 13,
-            "description": "Description",
-            "itemtype": "method",
-            "name": "exports",
-            "params": [
-                {
-                    "name": "config",
-                    "description": ""
-                }
-            ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "line": 40,
+            "description": "Array of channels on the server",
+            "itemtype": "property",
+            "name": "channels",
+            "type": "{Array}",
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
             "line": 46,
-            "description": "Description",
+            "description": "Array of users on the server that are known",
+            "itemtype": "property",
+            "name": "users",
+            "type": "{Array}",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 52,
+            "description": "Array of all hooks installed on the server",
+            "itemtype": "property",
+            "name": "hooks",
+            "type": "{Array}",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 58,
+            "description": "Array of all the scripts installed on the server",
+            "itemtype": "property",
+            "name": "scripts",
+            "type": "{Array}",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 64,
+            "description": "Array of all the commands on the server",
+            "itemtype": "property",
+            "name": "commands",
+            "type": "{Object}",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 70,
+            "description": "Server config",
+            "itemtype": "property",
+            "name": "config",
+            "type": "{Object}",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 76,
+            "description": "Run function in the context of a specific script",
             "itemtype": "method",
             "name": "run",
             "params": [
                 {
                     "name": "id",
-                    "description": ""
+                    "description": "Script ID to run under (0 == run as server)",
+                    "type": "Number"
                 },
                 {
                     "name": "fn",
-                    "description": ""
+                    "description": "function to run",
+                    "type": "Function"
                 }
             ],
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 70,
-            "description": "Description",
+            "line": 100,
+            "description": "Log something in the context of the server",
             "itemtype": "method",
             "name": "log",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "Message to log",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 80,
-            "description": "Description",
+            "line": 110,
+            "description": "log.in something in the context of the server",
             "itemtype": "method",
             "name": "logIn",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "Message to log",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 90,
-            "description": "Description",
+            "line": 120,
+            "description": "log.out something in the context of the server",
             "itemtype": "method",
             "name": "logOut",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "Message to log",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 100,
-            "description": "Description",
+            "line": 130,
+            "description": "log.error something in the context of the server",
             "itemtype": "method",
             "name": "logError",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "Message to log",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 110,
-            "description": "Description",
+            "line": 140,
+            "description": "Connect to the IRC server",
             "itemtype": "method",
             "name": "connect",
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 190,
-            "description": "Description",
+            "line": 219,
+            "description": "Send a message to the IRC server",
             "itemtype": "method",
             "name": "send",
             "params": [
                 {
                     "name": "d",
-                    "description": ""
+                    "description": "Message to send",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 210,
-            "description": "Description",
+            "line": 240,
+            "description": "Install a hook on the server.",
             "itemtype": "method",
             "name": "on",
             "params": [
                 {
                     "name": "hook",
-                    "description": ""
+                    "description": "Hook to install (can be named or RegExp)",
+                    "type": "String|RegExp"
                 },
                 {
                     "name": "callback",
-                    "description": ""
+                    "description": "Callback to run when the hook fires",
+                    "type": "Function"
                 },
                 {
                     "name": "once",
-                    "description": ""
+                    "description": "Should this hook uninstall itself when it is run?",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 240,
-            "description": "Description",
+            "line": 270,
+            "description": "Uninstall a hook from the server",
             "itemtype": "method",
             "name": "off",
             "params": [
                 {
                     "name": "hook",
-                    "description": ""
+                    "description": "Hook to remove",
+                    "type": "String|RegExp"
                 },
                 {
                     "name": "callback",
-                    "description": ""
+                    "description": "callback used in the hook you want to remove",
+                    "type": "Function",
+                    "optional": true
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 270,
-            "description": "Description",
+            "line": 300,
+            "description": "Add a command to the server",
             "itemtype": "method",
             "name": "add",
             "params": [
                 {
                     "name": "command",
-                    "description": ""
+                    "description": "Command name (used to invoke command)",
+                    "type": "String"
                 },
                 {
                     "name": "callback",
-                    "description": ""
+                    "description": "Callback to run when command invoked",
+                    "type": "Function"
                 },
                 {
                     "name": "help",
-                    "description": ""
+                    "description": "Help line for the command",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 288,
-            "description": "Description",
+            "line": 318,
+            "description": "Remove a command listener from the server",
             "itemtype": "method",
             "name": "remove",
             "params": [
                 {
                     "name": "command",
-                    "description": ""
+                    "description": "Command you want to remove",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 306,
-            "description": "Description",
+            "line": 336,
+            "description": "Fire an event on the IRC server",
             "itemtype": "method",
             "name": "fire",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "Name of the event to trigger",
+                    "type": "String"
                 },
                 {
                     "name": "args",
-                    "description": ""
+                    "description": "Arguments to provide the event callbacks",
+                    "type": "Array"
                 },
                 {
                     "name": "scope",
-                    "description": ""
+                    "description": "What the event callbacks should use for the 'this' keyword",
+                    "type": "Mixed"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 326,
-            "description": "Description",
+            "line": 356,
+            "description": "Join a channel",
             "itemtype": "method",
             "name": "join",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "Channel name",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 343,
-            "description": "Description",
+            "line": 373,
+            "description": "Leave a channel",
             "itemtype": "method",
             "name": "part",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "Name of the channel",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 356,
-            "description": "Description",
+            "line": 386,
+            "description": "Check if in a channel",
             "itemtype": "method",
             "name": "in",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "Name of the channel",
+                    "type": "String"
                 }
             ],
             "return": {
-                "description": "Literal"
+                "description": "status of server in channel",
+                "type": "Boolean"
             },
-            "class": "User",
-            "module": "script"
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 370,
-            "description": "Description",
+            "line": 401,
+            "description": "Get a channel based on it's name",
             "itemtype": "method",
             "name": "channel",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "Name of the channel",
+                    "type": "String"
                 }
             ],
             "return": {
-                "description": "Literal"
+                "description": "Returns false if channel doesn't exist. Returns the channel otherwise",
+                "type": "Channel|boolean"
             },
-            "class": "User",
-            "module": "script"
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 384,
-            "description": "Description",
+            "line": 415,
+            "description": "Gets the user or syncs a user on the server",
             "itemtype": "method",
             "name": "user",
             "params": [
                 {
                     "name": "user",
-                    "description": ""
+                    "description": "User object to sync or nick you want the user object for",
+                    "type": "String|User"
                 }
             ],
             "return": {
-                "description": "old"
+                "description": "The user object",
+                "type": "User"
             },
-            "class": "User",
-            "module": "script"
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 417,
-            "description": "Description",
+            "line": 448,
+            "description": "Gets a script based on the sid",
             "itemtype": "method",
             "name": "script",
             "params": [
                 {
                     "name": "sid",
-                    "description": ""
+                    "description": "",
+                    "type": "Number"
                 }
             ],
             "return": {
-                "description": "ConditionalExpression"
+                "description": "Returns false if script is not found, otherwise returns the script.",
+                "type": "Boolean|Script"
             },
-            "class": "User",
-            "module": "script"
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 427,
-            "description": "Description",
+            "line": 458,
+            "description": "Reconnects to the IRC server",
             "itemtype": "method",
             "name": "reconnect",
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\server.js",
-            "line": 439,
-            "description": "Description",
+            "line": 470,
+            "description": "Quits from the IRC server",
             "itemtype": "method",
             "name": "quit",
             "params": [
                 {
                     "name": "msg",
-                    "description": ""
+                    "description": "Quit message. defaults to \"Bot shutting down\".",
+                    "type": "String",
+                    "optional": true,
+                    "optdefault": "string"
                 }
             ],
-            "return": {
-                "description": "self"
-            },
-            "class": "User",
-            "module": "script"
-        },
-        {
-            "file": "lib\\server.js",
-            "line": 524,
-            "description": "Description",
-            "itemtype": "method",
-            "name": "fn",
-            "params": [
-                {
-                    "name": "i",
-                    "description": ""
-                }
-            ],
-            "return": {
-                "description": ""
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "server",
+            "module": "server"
         },
         {
             "file": "lib\\stdin.js",
-            "line": 4,
-            "description": "Description",
+            "line": 10,
+            "description": "Start listening for user input",
             "itemtype": "method",
             "name": "start",
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
         },
         {
             "file": "lib\\stdin.js",
-            "line": 14,
-            "description": "Description",
+            "line": 20,
+            "description": "Stop waiting for user input",
             "itemtype": "method",
             "name": "stop",
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
         },
         {
             "file": "lib\\stdin.js",
-            "line": 23,
-            "description": "Description",
+            "line": 29,
+            "description": "Register an event listener",
             "itemtype": "method",
             "name": "on",
             "params": [
                 {
                     "name": "event",
-                    "description": ""
+                    "description": "Event name",
+                    "type": "String"
                 },
                 {
                     "name": "callback",
-                    "description": ""
+                    "description": "Callback to run",
+                    "type": "Function"
                 }
             ],
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
         },
         {
             "file": "lib\\stdin.js",
-            "line": 34,
-            "description": "Description",
+            "line": 40,
+            "description": "Adds a command to the stdin",
             "itemtype": "method",
             "name": "add",
             "params": [
                 {
                     "name": "name",
-                    "description": ""
+                    "description": "name for the command",
+                    "type": "String"
                 },
                 {
                     "name": "callback",
-                    "description": ""
+                    "description": "callback to run when command is entered",
+                    "type": "Function"
                 },
                 {
                     "name": "info",
-                    "description": ""
+                    "description": "Command help line",
+                    "type": "String",
+                    "optional": true
                 }
             ],
-            "return": {
-                "description": "ThisExpression"
-            },
-            "class": "User",
-            "module": "script"
+            "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
         },
         {
             "file": "lib\\tools.js",
-            "line": 3,
-            "description": "Description",
+            "line": 8,
+            "description": "Sanitizes a string for sending to an IRC server",
             "itemtype": "method",
             "name": "sanitize",
             "params": [
                 {
                     "name": "d",
-                    "description": ""
+                    "description": "",
+                    "type": "String"
                 }
             ],
             "return": {
-                "description": "CallExpression"
+                "description": "sanitized string",
+                "type": "String"
             },
-            "class": "User",
-            "module": "script"
+            "class": "tools",
+            "module": "tools"
         },
         {
             "file": "lib\\tools.js",
-            "line": 23,
-            "description": "Description",
+            "line": 28,
+            "description": "Recursive mkdir",
             "itemtype": "method",
             "name": "mkdirParent",
             "params": [
                 {
                     "name": "dirPath",
-                    "description": ""
+                    "description": "path to create directory structure for",
+                    "type": "String"
                 },
                 {
                     "name": "mode",
-                    "description": ""
+                    "description": "mode to create new directories with",
+                    "type": "String"
                 }
             ],
-            "return": {
-                "description": ""
-            },
-            "class": "User",
-            "module": "script"
+            "class": "tools",
+            "module": "tools"
         },
         {
             "file": "lib\\tools.js",
-            "line": 44,
-            "description": "Description",
+            "line": 48,
+            "description": "Makes a string safe for use in RegExp",
             "itemtype": "method",
             "name": "regexString",
             "params": [
                 {
                     "name": "str",
-                    "description": ""
+                    "description": "",
+                    "type": "String"
                 }
             ],
             "return": {
-                "description": "CallExpression"
+                "description": "RegExp safe string",
+                "type": "String"
             },
-            "class": "User",
-            "module": "script"
+            "class": "tools",
+            "module": "tools"
         },
         {
             "file": "lib\\user.js",
-            "line": 12,
+            "line": 13,
             "description": "User nickname",
             "type": "{String}",
             "itemtype": "property",
             "name": "nick",
             "class": "User",
             "module": "user"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 19,
+            "description": "User's username",
+            "type": "{string}",
+            "itemtype": "property",
+            "name": "username",
+            "class": "User",
+            "module": "user"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 25,
+            "description": "User's hostname",
+            "type": "{string}",
+            "itemtype": "property",
+            "name": "host",
+            "class": "User",
+            "module": "user"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 31,
+            "description": "User's real name",
+            "type": "{string}",
+            "itemtype": "property",
+            "name": "realname",
+            "class": "User",
+            "module": "user"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 37,
+            "description": "Array of channels the user is in",
+            "type": "{Array}",
+            "itemtype": "property",
+            "name": "channels",
+            "class": "User",
+            "module": "user"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 43,
+            "description": "List of the modes applied to the user",
+            "type": "{Array}",
+            "itemtype": "property",
+            "name": "modes",
+            "class": "User",
+            "module": "user"
         }
     ],
-    "warnings": [
-        {
-            "message": "Missing item type\nDescription",
-            "line": " lib\\log.js:40"
-        }
-    ]
+    "warnings": []
 }

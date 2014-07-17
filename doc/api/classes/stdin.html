@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Channel - EeeZorBot API</title>
+    <title>stdin - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -120,7 +120,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Channel Class</h1>
+                        <h1>stdin Class</h1>
 <div class="box meta">
     
 
@@ -128,13 +128,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/lib_channel.js.html#l4"><code>lib\channel.js:4</code></a>
+            Defined in: <a href="../files/lib_stdin.js.html#l1"><code>lib\stdin.js:1</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/channel.html">channel</a>
+            Module: <a href="../modules/stdin.html">stdin</a>
         
     
 
@@ -144,7 +144,7 @@
 
 
 <div class="box intro">
-    <p>Channel class</p>
+    <p>stdin control</p>
 
 </div>
 
@@ -157,8 +157,6 @@
         
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
-        
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -175,42 +173,28 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_join">join</a>
+                                <a href="#method_add">add</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_mode">mode</a>
+                                <a href="#method_on">on</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_part">part</a>
+                                <a href="#method_start">start</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_topic">topic</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_users">users</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_who">who</a>
+                                <a href="#method_stop">stop</a>
 
                                 
                                 
@@ -220,35 +204,6 @@
                 </div>
             
 
-            
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                        
-                            <li class="index-item property">
-                                <a href="#property_modes">modes</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_name">name</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_server">server</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
             
 
             
@@ -261,65 +216,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_join" class="method item">
-    <h3 class="name"><code>join</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l112"><code>lib\channel.js:112</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Join the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_mode" class="method item">
-    <h3 class="name"><code>mode</code></h3>
+                    <div id="method_add" class="method item">
+    <h3 class="name"><code>add</code></h3>
 
     
         <div class="args">
@@ -327,13 +225,19 @@
             
                 <li class="arg">
                     
-                        <code>modes</code>
+                        <code>name</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code class="optional">[users]</code>
+                        <code>callback</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[info]</code>
                     
                 </li>
             
@@ -368,7 +272,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l65"><code>lib\channel.js:65</code></a>
+        <a href="../files/lib_stdin.js.html#l40"><code>lib\stdin.js:40</code></a>
         
         </p>
 
@@ -379,7 +283,7 @@
     </div>
 
     <div class="description">
-        <p>Sets the mode of the channel, or users in the channel</p>
+        <p>Adds a command to the stdin</p>
 
     </div>
 
@@ -391,14 +295,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">modes</code>
+                        <code class="param-name">name</code>
                         <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>String containing the modes (ie: &quot;+o-v&quot;)</p>
+                        <p>name for the command</p>
 
                     </div>
 
@@ -407,15 +311,31 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[users]</code>
-                        <span class="type">Array</span>
+                        <code class="param-name">callback</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>callback to run when command is entered</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[info]</code>
+                        <span class="type">String</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>A list of users (nick or User objects) to apply the modes to</p>
+                        <p>Command help line</p>
 
                     </div>
 
@@ -432,65 +352,8 @@
 </div>
 
                 
-                    <div id="method_part" class="method item">
-    <h3 class="name"><code>part</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l103"><code>lib\channel.js:103</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Leave the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_topic" class="method item">
-    <h3 class="name"><code>topic</code></h3>
+                    <div id="method_on" class="method item">
+    <h3 class="name"><code>on</code></h3>
 
     
         <div class="args">
@@ -498,7 +361,13 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[topic]</code>
+                        <code>event</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>callback</code>
                     
                 </li>
             
@@ -533,7 +402,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l89"><code>lib\channel.js:89</code></a>
+        <a href="../files/lib_stdin.js.html#l29"><code>lib\stdin.js:29</code></a>
         
         </p>
 
@@ -544,7 +413,7 @@
     </div>
 
     <div class="description">
-        <p>Set or get the topic of the channel (It will trigger a topic event)</p>
+        <p>Register an event listener</p>
 
     </div>
 
@@ -556,15 +425,31 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[topic]</code>
+                        <code class="param-name">event</code>
                         <span class="type">String</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                         
+                        <p>Event name</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">callback</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Callback to run</p>
+
                     </div>
 
                     
@@ -580,81 +465,8 @@
 </div>
 
                 
-                    <div id="method_users" class="method item">
-    <h3 class="name"><code>users</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Array</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l48"><code>lib\channel.js:48</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns an array of all the users in the channel</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Array</span>:
-                    
-                    <p>users</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_who" class="method item">
-    <h3 class="name"><code>who</code></h3>
+                    <div id="method_start" class="method item">
+    <h3 class="name"><code>start</code></h3>
 
     
         <span class="paren">()</span>
@@ -687,7 +499,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l33"><code>lib\channel.js:33</code></a>
+        <a href="../files/lib_stdin.js.html#l10"><code>lib\stdin.js:10</code></a>
         
         </p>
 
@@ -698,7 +510,64 @@
     </div>
 
     <div class="description">
-        <p>Runs a /who on the channel, refreshing user data</p>
+        <p>Start listening for user input</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_stop" class="method item">
+    <h3 class="name"><code>stop</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag chainable">chainable</span>
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_stdin.js.html#l20"><code>lib\stdin.js:20</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Stop waiting for user input</p>
 
     </div>
 
@@ -713,147 +582,6 @@
             </div>
         
 
-        
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-                
-                    <div id="property_modes" class="property item">
-    <h3 class="name"><code>modes</code></h3>
-    <span class="type">Object</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l21"><code>lib\channel.js:21</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Channel modes</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_name" class="property item">
-    <h3 class="name"><code>name</code></h3>
-    <span class="type">String</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l15"><code>lib\channel.js:15</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Name of the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_server" class="property item">
-    <h3 class="name"><code>server</code></h3>
-    <span class="type">Server</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l27"><code>lib\channel.js:27</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Parent server</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lib\stdin.js - EeeZorBot API</title>
+    <title>debug - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -120,119 +120,184 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: lib\stdin.js</h1>
+                        <h1>debug Class</h1>
+<div class="box meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-/**
- * stdin control
- * @module stdin
- * @class stdin
- * @static
- */
-var commands = [],
-	log = require(&#x27;./log.js&#x27;),
-	stdin = {
-		/**
-		 * Start listening for user input
-		 * @method start
-		 * @chainable
-		 */
-		start: function(){
-			process.stdin.resume();
-			process.stdin.setEncoding(&#x27;utf8&#x27;);
-			return this;
-		},
-		/**
-		 * Stop waiting for user input
-		 * @method stop
-		 * @chainable
-		 */
-		stop: function(){
-			process.stdin.pause();
-			return this;
-		},
-		/**
-		 * Register an event listener
-		 * @method on
-		 * @param {string} event Event name
-		 * @param {function} callback Callback to run
-		 * @chainable
-		 */
-		on: function(event,callback){
-			process.stdin.on(event,callback);
-			return this;
-		},
-		/**
-		 * Adds a command to the stdin
-		 * @method add
-		 * @param {string} name name for the command
-		 * @param {function} callback callback to run when command is entered
-		 * @param {string} [info] Command help line
-		 * @chainable
-		 */
-		add: function(name,callback,info){
-			commands.push({
-				name: name,
-				fn: callback,
-				info: info === undefined?&#x27;&#x27;:info
-			});
-			return this;
-		}
-	};
-module.exports = stdin;
-process.stdin.on(&#x27;data&#x27;,function(d){
-	var i,
-		argv = d.split(&#x27; &#x27;);
-	for(i=0;i&lt;argv.length;i++){
-		argv[i] = argv[i].trim();
-	}
-	argv = argv.filter(function(n){
-		return n;
-	});
-	for(i=0;i&lt;commands.length;i++){
-		if(argv[0] == commands[i].name){
-			try{
-				commands[i].fn(argv);
-			}catch(e){
-				log.error(e);
-			}
-		}
-	}
-});
-stdin.add(&#x27;help&#x27;,function(argv){
-	var m=&#x27;&#x27;,
-		i;
-	if(argv.length == 1){
-		for(i=0;i&lt;commands.length;i++){
-			m += commands[i].name+&#x27; &#x27;;
-		}
-		log.log(&#x27;Available commands:&#x27;);
-		log.log(m);
-	}else{
-		for(i=0;i&lt;commands.length;i++){
-			if(commands[i].name === argv[1]){
-				log.log(commands[i].name+&#x27;: &#x27;+commands[i].info);
-			}
-		}
-	}
-},&#x27;Lists all help topics, or lists information on a specific topic&#x27;);
-stdin.add(&#x27;exit&#x27;,function(){
-	process.exit();
-},&#x27;Quits the bot&#x27;);
-stdin.add(&#x27;debug&#x27;,function(){
-	stdin.stop();
-	log.log(&#x27;Starting debugger&#x27;);
-	require(&#x27;repl&#x27;).start({
-		terminal: true,
-		useColor: true,
-		useGlobal: true
-	}).on(&#x27;exit&#x27;,function(){
-		log.log(&#x27;Debugger exiting&#x27;);
-		stdin.start();
-	});
-},&#x27;Starts the debugger&#x27;);
-    </pre>
+    
+
+    
+        <div class="foundat">
+            Defined in: <a href="../files/lib_debug.js.html#l2"><code>lib\debug.js:2</code></a>
+        </div>
+    
+
+    
+        
+            Module: <a href="../modules/debug.html">debug</a>
+        
+    
+
+    
+</div>
+
+
+
+<div class="box intro">
+    <p>Debug functions</p>
+
+</div>
+
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_log">log</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_log" class="method item">
+    <h3 class="name"><code>log</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code class="optional">[message]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag chainable">chainable</span>
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_debug.js.html#l10"><code>lib\debug.js:10</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Outputs a debug log (&quot;DEBUG: &quot;+JSON.stringify(message))</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[message]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
+
+                    <div class="param-description">
+                        <p>messages to output</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lib\stdin.js - EeeZorBot API</title>
+    <title>lib\api.js - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -120,118 +120,28 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: lib\stdin.js</h1>
+                        <h1 class="file-heading">File: lib\api.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /**
- * stdin control
- * @module stdin
- * @class stdin
+ * API class, contains references to all important modules
+ * @module api
+ * @class api
  * @static
  */
-var commands = [],
-	log = require(&#x27;./log.js&#x27;),
-	stdin = {
-		/**
-		 * Start listening for user input
-		 * @method start
-		 * @chainable
-		 */
-		start: function(){
-			process.stdin.resume();
-			process.stdin.setEncoding(&#x27;utf8&#x27;);
-			return this;
-		},
-		/**
-		 * Stop waiting for user input
-		 * @method stop
-		 * @chainable
-		 */
-		stop: function(){
-			process.stdin.pause();
-			return this;
-		},
-		/**
-		 * Register an event listener
-		 * @method on
-		 * @param {string} event Event name
-		 * @param {function} callback Callback to run
-		 * @chainable
-		 */
-		on: function(event,callback){
-			process.stdin.on(event,callback);
-			return this;
-		},
-		/**
-		 * Adds a command to the stdin
-		 * @method add
-		 * @param {string} name name for the command
-		 * @param {function} callback callback to run when command is entered
-		 * @param {string} [info] Command help line
-		 * @chainable
-		 */
-		add: function(name,callback,info){
-			commands.push({
-				name: name,
-				fn: callback,
-				info: info === undefined?&#x27;&#x27;:info
-			});
-			return this;
-		}
-	};
-module.exports = stdin;
-process.stdin.on(&#x27;data&#x27;,function(d){
-	var i,
-		argv = d.split(&#x27; &#x27;);
-	for(i=0;i&lt;argv.length;i++){
-		argv[i] = argv[i].trim();
-	}
-	argv = argv.filter(function(n){
-		return n;
-	});
-	for(i=0;i&lt;commands.length;i++){
-		if(argv[0] == commands[i].name){
-			try{
-				commands[i].fn(argv);
-			}catch(e){
-				log.error(e);
-			}
-		}
-	}
-});
-stdin.add(&#x27;help&#x27;,function(argv){
-	var m=&#x27;&#x27;,
-		i;
-	if(argv.length == 1){
-		for(i=0;i&lt;commands.length;i++){
-			m += commands[i].name+&#x27; &#x27;;
-		}
-		log.log(&#x27;Available commands:&#x27;);
-		log.log(m);
-	}else{
-		for(i=0;i&lt;commands.length;i++){
-			if(commands[i].name === argv[1]){
-				log.log(commands[i].name+&#x27;: &#x27;+commands[i].info);
-			}
-		}
-	}
-},&#x27;Lists all help topics, or lists information on a specific topic&#x27;);
-stdin.add(&#x27;exit&#x27;,function(){
-	process.exit();
-},&#x27;Quits the bot&#x27;);
-stdin.add(&#x27;debug&#x27;,function(){
-	stdin.stop();
-	log.log(&#x27;Starting debugger&#x27;);
-	require(&#x27;repl&#x27;).start({
-		terminal: true,
-		useColor: true,
-		useGlobal: true
-	}).on(&#x27;exit&#x27;,function(){
-		log.log(&#x27;Debugger exiting&#x27;);
-		stdin.start();
-	});
-},&#x27;Starts the debugger&#x27;);
+var api = {
+	tools: require(&#x27;./tools.js&#x27;),
+	log: require(&#x27;./log.js&#x27;),
+	Channel: require(&#x27;./channel.js&#x27;),
+	User: require(&#x27;./user.js&#x27;),
+	Server: require(&#x27;./server.js&#x27;),
+	stdin: require(&#x27;./stdin.js&#x27;),
+	listdb: require(&#x27;./listdb.js&#x27;),
+	debug: require(&#x27;./debug.js&#x27;),
+	api: api
+};
+module.exports = api;
     </pre>
 </div>
 

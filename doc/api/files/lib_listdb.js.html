@@ -41,9 +41,23 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/api.html">api</a></li>
+            
                 <li><a href="../classes/Channel.html">Channel</a></li>
             
+                <li><a href="../classes/debug.html">debug</a></li>
+            
+                <li><a href="../classes/Listdb.html">Listdb</a></li>
+            
+                <li><a href="../classes/log.html">log</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
+            
+                <li><a href="../classes/server.html">server</a></li>
+            
+                <li><a href="../classes/stdin.html">stdin</a></li>
+            
+                <li><a href="../classes/tools.html">tools</a></li>
             
                 <li><a href="../classes/User.html">User</a></li>
             
@@ -51,9 +65,23 @@
 
             <ul id="api-modules" class="apis modules">
             
+                <li><a href="../modules/api.html">api</a></li>
+            
                 <li><a href="../modules/channel.html">channel</a></li>
             
+                <li><a href="../modules/debug.html">debug</a></li>
+            
+                <li><a href="../modules/listdb.html">listdb</a></li>
+            
+                <li><a href="../modules/log.html">log</a></li>
+            
                 <li><a href="../modules/script.html">script</a></li>
+            
+                <li><a href="../modules/server.html">server</a></li>
+            
+                <li><a href="../modules/stdin.html">stdin</a></li>
+            
+                <li><a href="../modules/tools.html">tools</a></li>
             
                 <li><a href="../modules/user.html">user</a></li>
             
@@ -100,93 +128,89 @@ var fs = require(&#x27;fs&#x27;),
 	path = require(&#x27;path&#x27;),
 	tools = require(&#x27;./tools.js&#x27;);
 /**
- * Description
- * @method get
- * @param {} dbName
- * @return db
+ * listdb class
+ * @module listdb
+ * @class Listdb
+ * @constructor
  */
-exports.get = function (dbName) {
+module.exports = function(dbName){
 	var values,
 		todo = [],
 		all = false,
 		active = false,
-		db = {
-			/**
-			 * Description
-			 * @method name
-			 * @return dbName
-			 */
-			name: function(){
-				return dbName;
-			},
-			/**
-			 * Description
-			 * @method all
-			 * @return values
-			 */
-			all: function(){
-				return values;
-			},
-			/**
-			 * Description
-			 * @method has
-			 * @param {} value
-			 * @param {} ic
-			 * @return Literal
-			 */
-			has: function(value,ic){
-				var i,
-					v;
-				ic = ic||false;
-				for(i=0;i&lt;values.length;i++){
-					v = values[i];
-					if((ic?v.toUpperCase():v) == (ic?value.toUpperCase():value)){
-						return true;
-					}
-				}
-				return false;
-			},
-			/**
-			 * Description
-			 * @method add
-			 * @param {} value
-			 * @return 
-			 */
-			add: function (value) {
-				values.push(value);
-				todo.push(value);
-			},
-			/**
-			 * Description
-			 * @method remove
-			 * @param {} value
-			 * @param {} ignoreCase
-			 * @return 
-			 */
-			remove: function (value, ignoreCase){
-				dirty = true;
-				ignoreCase = ignoreCase || false;
-				for(var i=0; i&lt;values.length; i++) {
-					if(ignoreCase) {
-						if(values[i].toUpperCase() == value.toUpperCase()) {
-							values.splice(i,1);
-							i--;
-						}
-					} else {
-						if(values[i] == value) {
-							values.splice(i,1);
-							i--;
-						}
-					}
-				}
-				active = true;
-				fs.ftruncate(fd,buff.length,function(){
-					active = false;
-					all = true;
-				});
-			}
-		},
 		fd = &#x27;data/&#x27;+dbName+&#x27;.db&#x27;;
+	/**
+	 * Returnst the name of the listdb
+	 * @method name
+	 * @return {string} Name of the listdb
+	 */
+	this.name = function(){
+		return dbName;
+	};
+	/**
+	 * Get all the values in the listdb
+	 * @method all
+	 * @return {array} Values in the listdb
+	 */
+	this.all = function(){
+		return values;
+	};
+	/**
+	 * Checks to see if the listdb has a certain value in it
+	 * @method has
+	 * @param {mixed} value value to check for
+	 * @param {boolean} [ic=false] Ignore case when searching
+	 * @return {Boolean} True if the value exists in the listdb
+	 */
+	this.has = function(value,ic){
+		var i,
+			v;
+		ic = ic||false;
+		for(i=0;i&lt;values.length;i++){
+			v = values[i];
+			if((ic?v.toUpperCase():v) == (ic?value.toUpperCase():value)){
+				return true;
+			}
+		}
+		return false;
+	};
+	/**
+	 * Adds an entry to the listdb
+	 * @method add
+	 * @param {mixed} value
+	 */
+	this.add = function (value) {
+		values.push(value);
+		todo.push(value);
+	};
+	/**
+	 * Remove a value from the listdb
+	 * @method remove
+	 * @param {mixed} value value to remove from the listdb
+	 * @param {boolean} [ignoreCase=false] Ignore case when searching to remove
+	 */
+	this.remove = function (value, ignoreCase){
+		dirty = true;
+		ignoreCase = ignoreCase || false;
+		for(var i=0; i&lt;values.length; i++) {
+			if(ignoreCase) {
+				if(values[i].toUpperCase() == value.toUpperCase()) {
+					values.splice(i,1);
+					i--;
+				}
+			} else {
+				if(values[i] == value) {
+					values.splice(i,1);
+					i--;
+				}
+			}
+		}
+		active = true;
+		fs.ftruncate(fd,buff.length,function(){
+			active = false;
+			all = true;
+		});
+	};
 	tools.mkdirParent(path.dirname(fd));
 	try{
 		values = fs.readFileSync(fileName,{
@@ -218,7 +242,7 @@ exports.get = function (dbName) {
 			}
 		},1);
 	});
-	return db;
+	return this;
 };
     </pre>
 </div>

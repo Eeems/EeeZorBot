@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Channel - EeeZorBot API</title>
+    <title>log - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -120,7 +120,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Channel Class</h1>
+                        <h1>log Class</h1>
 <div class="box meta">
     
 
@@ -128,13 +128,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/lib_channel.js.html#l4"><code>lib\channel.js:4</code></a>
+            Defined in: <a href="../files/lib_log.js.html#l5"><code>lib\log.js:5</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/channel.html">channel</a>
+            Module: <a href="../modules/log.html">log</a>
         
     
 
@@ -144,7 +144,7 @@
 
 
 <div class="box intro">
-    <p>Channel class</p>
+    <p>Logging module to handle outputting logs with the correct format, and saving them to files</p>
 
 </div>
 
@@ -157,8 +157,6 @@
         
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
-        
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -175,42 +173,56 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_join">join</a>
+                                <a href="#method_alert">alert</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_mode">mode</a>
+                                <a href="#method_error">error</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_part">part</a>
+                                <a href="#method_get">get</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_topic">topic</a>
+                                <a href="#method_in">in</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_users">users</a>
+                                <a href="#method_log">log</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_who">who</a>
+                                <a href="#method_out">out</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_save">save</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_trace">trace</a>
 
                                 
                                 
@@ -220,35 +232,6 @@
                 </div>
             
 
-            
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                        
-                            <li class="index-item property">
-                                <a href="#property_modes">modes</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_name">name</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_server">server</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
             
 
             
@@ -261,65 +244,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_join" class="method item">
-    <h3 class="name"><code>join</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l112"><code>lib\channel.js:112</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Join the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_mode" class="method item">
-    <h3 class="name"><code>mode</code></h3>
+                    <div id="method_alert" class="method item">
+    <h3 class="name"><code>alert</code></h3>
 
     
         <div class="args">
@@ -327,13 +253,7 @@
             
                 <li class="arg">
                     
-                        <code>modes</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[users]</code>
+                        <code class="optional">[message]</code>
                     
                 </li>
             
@@ -352,8 +272,6 @@
     
 
     
-        <span class="flag chainable">chainable</span>
-    
 
     
 
@@ -368,7 +286,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l65"><code>lib\channel.js:65</code></a>
+        <a href="../files/lib_log.js.html#l13"><code>lib\log.js:13</code></a>
         
         </p>
 
@@ -379,7 +297,7 @@
     </div>
 
     <div class="description">
-        <p>Sets the mode of the channel, or users in the channel</p>
+        <p>Does an alert message (&quot;=&gt; &quot;+message)</p>
 
     </div>
 
@@ -391,31 +309,17 @@
             
                 <li class="param">
                     
-                        <code class="param-name">modes</code>
-                        <span class="type">String</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>String containing the modes (ie: &quot;+o-v&quot;)</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[users]</code>
-                        <span class="type">Array</span>
+                        <code class="param-name optional">[message]</code>
+                        <span class="type">Object</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
 
                     <div class="param-description">
-                        <p>A list of users (nick or User objects) to apply the modes to</p>
+                        <p>Message to display</p>
 
                     </div>
 
@@ -432,65 +336,8 @@
 </div>
 
                 
-                    <div id="method_part" class="method item">
-    <h3 class="name"><code>part</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l103"><code>lib\channel.js:103</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Leave the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_topic" class="method item">
-    <h3 class="name"><code>topic</code></h3>
+                    <div id="method_error" class="method item">
+    <h3 class="name"><code>error</code></h3>
 
     
         <div class="args">
@@ -498,7 +345,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[topic]</code>
+                        <code class="optional">[message]</code>
                     
                 </li>
             
@@ -517,8 +364,6 @@
     
 
     
-        <span class="flag chainable">chainable</span>
-    
 
     
 
@@ -533,7 +378,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l89"><code>lib\channel.js:89</code></a>
+        <a href="../files/lib_log.js.html#l64"><code>lib\log.js:64</code></a>
         
         </p>
 
@@ -544,7 +389,7 @@
     </div>
 
     <div class="description">
-        <p>Set or get the topic of the channel (It will trigger a topic event)</p>
+        <p>Log an error message (&quot;Error: &quot;+message)</p>
 
     </div>
 
@@ -556,15 +401,18 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[topic]</code>
-                        <span class="type">String</span>
+                        <code class="param-name optional">[message]</code>
+                        <span class="type">Object</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
 
                     <div class="param-description">
-                         
+                        <p>Message to display</p>
+
                     </div>
 
                     
@@ -580,16 +428,26 @@
 </div>
 
                 
-                    <div id="method_users" class="method item">
-    <h3 class="name"><code>users</code></h3>
+                    <div id="method_get" class="method item">
+    <h3 class="name"><code>get</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>name</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
         <span class="returns-inline">
-            <span class="type">Array</span>
+            <span class="type"><a href="../classes/Listdb.html" class="crosslink">Listdb</a></span>
         </span>
     
 
@@ -616,7 +474,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l48"><code>lib\channel.js:48</code></a>
+        <a href="../files/lib_log.js.html#l106"><code>lib\log.js:106</code></a>
         
         </p>
 
@@ -627,10 +485,34 @@
     </div>
 
     <div class="description">
-        <p>Returns an array of all the users in the channel</p>
+        <p>Returns the listdb object for a specific log</p>
 
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>path to the log file</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -640,9 +522,9 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">Array</span>:
+                        <span class="type"><a href="../classes/Listdb.html" class="crosslink">Listdb</a></span>:
                     
-                    <p>users</p>
+                    <p>log</p>
 
                 
             </div>
@@ -653,8 +535,435 @@
 </div>
 
                 
-                    <div id="method_who" class="method item">
-    <h3 class="name"><code>who</code></h3>
+                    <div id="method_in" class="method item">
+    <h3 class="name"><code>in</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code class="optional">[message]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_log.js.html#l47"><code>lib\log.js:47</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Outputs an log signifying that the message was recieved from an external server (&quot;&lt;- &quot;+message)</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[message]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
+
+                    <div class="param-description">
+                        <p>Message to display</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_log" class="method item">
+    <h3 class="name"><code>log</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>msg</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[error=false]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_log.js.html#l115"><code>lib\log.js:115</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Logs a message and saves the output to a log</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">msg</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Message to output</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[error=false]</code>
+                        <span class="type">Boolean</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Should the logged output be a console.error call or not</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>msg</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_out" class="method item">
+    <h3 class="name"><code>out</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code class="optional">[message]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_log.js.html#l30"><code>lib\log.js:30</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Outputs an log signifying that the message was sent to an external server (&quot;-&gt; &quot;+message)</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[message]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
+
+                    <div class="param-description">
+                        <p>Message to display</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_save" class="method item private">
+    <h3 class="name"><code>save</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>name</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>msg</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_log.js.html#l79"><code>lib\log.js:79</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Saves a line to a named log</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>path to the log</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">msg</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>line to write to the log file</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_trace" class="method item">
+    <h3 class="name"><code>trace</code></h3>
 
     
         <span class="paren">()</span>
@@ -671,8 +980,6 @@
     
 
     
-        <span class="flag chainable">chainable</span>
-    
 
     
 
@@ -687,7 +994,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l33"><code>lib\channel.js:33</code></a>
+        <a href="../files/lib_log.js.html#l140"><code>lib\log.js:140</code></a>
         
         </p>
 
@@ -698,7 +1005,7 @@
     </div>
 
     <div class="description">
-        <p>Runs a /who on the channel, refreshing user data</p>
+        <p>Outputs a trace log</p>
 
     </div>
 
@@ -713,147 +1020,6 @@
             </div>
         
 
-        
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-                
-                    <div id="property_modes" class="property item">
-    <h3 class="name"><code>modes</code></h3>
-    <span class="type">Object</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l21"><code>lib\channel.js:21</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Channel modes</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_name" class="property item">
-    <h3 class="name"><code>name</code></h3>
-    <span class="type">String</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l15"><code>lib\channel.js:15</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Name of the channel</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_server" class="property item">
-    <h3 class="name"><code>server</code></h3>
-    <span class="type">Server</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l27"><code>lib\channel.js:27</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Parent server</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         

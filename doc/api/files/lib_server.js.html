@@ -41,9 +41,23 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/api.html">api</a></li>
+            
                 <li><a href="../classes/Channel.html">Channel</a></li>
             
+                <li><a href="../classes/debug.html">debug</a></li>
+            
+                <li><a href="../classes/Listdb.html">Listdb</a></li>
+            
+                <li><a href="../classes/log.html">log</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
+            
+                <li><a href="../classes/server.html">server</a></li>
+            
+                <li><a href="../classes/stdin.html">stdin</a></li>
+            
+                <li><a href="../classes/tools.html">tools</a></li>
             
                 <li><a href="../classes/User.html">User</a></li>
             
@@ -51,9 +65,23 @@
 
             <ul id="api-modules" class="apis modules">
             
+                <li><a href="../modules/api.html">api</a></li>
+            
                 <li><a href="../modules/channel.html">channel</a></li>
             
+                <li><a href="../modules/debug.html">debug</a></li>
+            
+                <li><a href="../modules/listdb.html">listdb</a></li>
+            
+                <li><a href="../modules/log.html">log</a></li>
+            
                 <li><a href="../modules/script.html">script</a></li>
+            
+                <li><a href="../modules/server.html">server</a></li>
+            
+                <li><a href="../modules/stdin.html">stdin</a></li>
+            
+                <li><a href="../modules/tools.html">tools</a></li>
             
                 <li><a href="../modules/user.html">user</a></li>
             
@@ -109,10 +137,11 @@ process.on(&#x27;SIGINT&#x27;,function(){
 	process.exit();
 });
 /**
- * Description
- * @method exports
- * @param {} config
- * @return self
+ * IRC Server object
+ * @module server
+ * @class server
+ * @constructor
+ * @param {object} config
  */
 module.exports = function(config){
 	var self = this,
@@ -134,28 +163,57 @@ module.exports = function(config){
 			config[i] = defaults[i];
 		}
 	}
+	/**
+	 * Array of channels on the server
+	 * @property channels
+	 * @type {Array}
+	 */
 	self.channels = [];
+	/**
+	 * Array of users on the server that are known
+	 * @property users
+	 * @type {Array}
+	 */
 	self.users = [];
+	/**
+	 * Array of all hooks installed on the server
+	 * @property hooks
+	 * @type {Array}
+	 */
 	self.hooks = [];
+	/**
+	 * Array of all the scripts installed on the server
+	 * @property scripts
+	 * @type {Array}
+	 */
 	self.scripts  = [];
+	/**
+	 * Array of all the commands on the server
+	 * @property commands
+	 * @type {Object}
+	 */
 	self.commands = {};
-	self.help = new require(&#x27;./help.js&#x27;)();
+	/**
+	 * Server config
+	 * @property config
+	 * @type {Object}
+	 */
 	self.config = {};
 	/**
-	 * Description
+	 * Run function in the context of a specific script
 	 * @method run
-	 * @param {} id
-	 * @param {} fn
-	 * @return ThisExpression
+	 * @param {number} id Script ID to run under (0 == run as server)
+	 * @param {function} fn function to run
+	 * @chainable
 	 */
 	self.run = function(id,fn){
 		var osid = sid;
 		debug.log(&#x27;Entering sid &#x27;+id);
 		sid = id;
-		fn.call(this,sid);
+		fn.call(self,sid);
 		debug.log(&#x27;Reverting to sid &#x27;+osid);
 		sid = osid;
-		return this;
+		return self;
 	};
 	for(i in config){
 		switch(i){
@@ -166,49 +224,49 @@ module.exports = function(config){
 		}
 	}
 	/**
-	 * Description
+	 * Log something in the context of the server
 	 * @method log
-	 * @param {} msg
-	 * @return self
+	 * @param {mixed} msg Message to log
+	 * @chainable
 	 */
 	self.log = function(msg){
 		log.alert(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
 		return self;
 	};
 	/**
-	 * Description
+	 * log.in something in the context of the server
 	 * @method logIn
-	 * @param {} msg
-	 * @return self
+	 * @param {mixed} msg Message to log
+	 * @chainable
 	 */
 	self.logIn = function(msg){
 		log.in(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
 		return self;
 	};
 	/**
-	 * Description
+	 * log.out something in the context of the server
 	 * @method logOut
-	 * @param {} msg
-	 * @return self
+	 * @param {mixed} msg Message to log
+	 * @chainable
 	 */
 	self.logOut = function(msg){
 		log.out(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
 		return self;
 	};
 	/**
-	 * Description
+	 * log.error something in the context of the server
 	 * @method logError
-	 * @param {} msg
-	 * @return self
+	 * @param {mixed} msg Message to log
+	 * @chainable
 	 */
 	self.logError = function(msg){
 		log.error(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
 		return self;
 	};
 	/**
-	 * Description
+	 * Connect to the IRC server
 	 * @method connect
-	 * @return self
+	 * @chainable
 	 */
 	self.connect = function(){
 		if(self.socket === undefined){
@@ -218,7 +276,7 @@ module.exports = function(config){
 			self.socket.setEncoding(&#x27;ascii&#x27;);
 			self.socket.on(&#x27;connect&#x27;,function(){
 				self.log(&#x27;Connection established (evt)&#x27;);
-				// connection established
+				self.fire(&#x27;connect&#x27;,arguments,self);
 			});
 			self.socket.on(&#x27;data&#x27;,function(d){
 				self.fire(&#x27;data&#x27;,arguments,self);
@@ -279,17 +337,16 @@ module.exports = function(config){
 				self.log(&#x27;Connection established&#x27;);
 				self.send(&#x27;NICK &#x27;+self.config.nick);
 				self.send(&#x27;USER &#x27;+self.config.name+&#x27; localhost * &#x27;+self.config.name);
-				self.fire(&#x27;connect&#x27;,arguments,self);
 				// TODO - Handle connection
 			});
 		}
 		return self;
 	};
 	/**
-	 * Description
+	 * Send a message to the IRC server
 	 * @method send
-	 * @param {} d
-	 * @return self
+	 * @param {string} d Message to send
+	 * @chainable
 	 */
 	self.send = function(d){
 		if(d.length &gt; 510){
@@ -301,17 +358,18 @@ module.exports = function(config){
 				// TODO - data sent
 			});
 		}catch(e){
+			self.error(e);
 			// TODO - data failed to send
 		}
 		return self;
 	};
 	/**
-	 * Description
+	 * Install a hook on the server.
 	 * @method on
-	 * @param {} hook
-	 * @param {} callback
-	 * @param {} once
-	 * @return self
+	 * @param {string|RegExp} hook Hook to install (can be named or RegExp)
+	 * @param {function} callback Callback to run when the hook fires
+	 * @param {boolean} [once=false] Should this hook uninstall itself when it is run?
+	 * @chainable
 	 */
 	self.on = function(hook,callback,once){
 		debug.log(&#x27;Adding hook for sid &#x27;+sid);
@@ -336,11 +394,11 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Uninstall a hook from the server
 	 * @method off
-	 * @param {} hook
-	 * @param {} callback
-	 * @return self
+	 * @param {string|RegExp} hook Hook to remove
+	 * @param {function} [callback] callback used in the hook you want to remove
+	 * @chainable
 	 */
 	self.off = function(hook,callback){
 		var i,
@@ -366,12 +424,12 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Add a command to the server
 	 * @method add
-	 * @param {} command
-	 * @param {} callback
-	 * @param {} help
-	 * @return self
+	 * @param {string} command Command name (used to invoke command)
+	 * @param {function} callback Callback to run when command invoked
+	 * @param {string} help Help line for the command
+	 * @chainable
 	 */
 	self.add = function(command,callback,help){
 		if(self.commands[command] === undefined){
@@ -384,10 +442,10 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Remove a command listener from the server
 	 * @method remove
-	 * @param {} command
-	 * @return self
+	 * @param {string} command Command you want to remove
+	 * @chainable
 	 */
 	self.remove = function(command){
 		if(command === undefined){
@@ -402,12 +460,12 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Fire an event on the IRC server
 	 * @method fire
-	 * @param {} name
-	 * @param {} args
-	 * @param {} scope
-	 * @return self
+	 * @param {string} name Name of the event to trigger
+	 * @param {array} args Arguments to provide the event callbacks
+	 * @param {mixed} scope What the event callbacks should use for the &#x27;this&#x27; keyword
+	 * @chainable
 	 */
 	self.fire = function(name,args,scope){
 		var i,
@@ -422,10 +480,10 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Join a channel
 	 * @method join
-	 * @param {} name
-	 * @return self
+	 * @param {string} name Channel name
+	 * @chainable
 	 */
 	self.join = function(name){
 		// TODO - handle adding to channel array if it doesn&#x27;t already exist
@@ -439,10 +497,10 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Leave a channel
 	 * @method part
-	 * @param {} name
-	 * @return self
+	 * @param {string} name Name of the channel
+	 * @chainable
 	 */
 	self.part = function(name){
 		var c = self.channel(name);
@@ -452,12 +510,13 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Check if in a channel
 	 * @method in
-	 * @param {} name
-	 * @return Literal
+	 * @param {string} name Name of the channel
+	 * @return {boolean} status of server in channel
 	 */
 	self.in = function(name){
+		// TODO - detect if actually joined to channel and not just created for shits/giggles... I mean for record keeping
 		for(var i=0;i&lt;self.channels.length;i++){
 			if(self.channels[i].name == name){
 				return true;
@@ -466,10 +525,10 @@ module.exports = function(config){
 		return false;
 	};
 	/**
-	 * Description
+	 * Get a channel based on it&#x27;s name
 	 * @method channel
-	 * @param {} name
-	 * @return Literal
+	 * @param {string} name Name of the channel
+	 * @return {Channel|boolean} Returns false if channel doesn&#x27;t exist. Returns the channel otherwise
 	 */
 	self.channel = function(name){
 		for(var i=0;i&lt;self.channels.length;i++){
@@ -480,10 +539,10 @@ module.exports = function(config){
 		return false;
 	};
 	/**
-	 * Description
+	 * Gets the user or syncs a user on the server
 	 * @method user
-	 * @param {} user
-	 * @return old
+	 * @param {string|User} user User object to sync or nick you want the user object for
+	 * @return {User} The user object
 	 */
 	self.user = function(user){
 		var i,
@@ -513,19 +572,19 @@ module.exports = function(config){
 		return old;
 	};
 	/**
-	 * Description
+	 * Gets a script based on the sid
 	 * @method script
-	 * @param {} sid
-	 * @return ConditionalExpression
+	 * @param {number} sid
+	 * @return {boolean|Script} Returns false if script is not found, otherwise returns the script.
 	 */
 	self.script = function(sid){
 		s = self.scripts[sid-1];
 		return s===undefined||s===null?false:s;
 	};
 	/**
-	 * Description
+	 * Reconnects to the IRC server
 	 * @method reconnect
-	 * @return self
+	 * @chainable
 	 */
 	self.reconnect = function(){
 		self.log(&#x27;Reconnecting&#x27;);
@@ -535,10 +594,10 @@ module.exports = function(config){
 		return self;
 	};
 	/**
-	 * Description
+	 * Quits from the IRC server
 	 * @method quit
-	 * @param {} msg
-	 * @return self
+	 * @param {string} [msg=string] Quit message. defaults to &quot;Bot shutting down&quot;.
+	 * @chainable
 	 */
 	self.quit = function(msg){
 		msg = msg === undefined?&#x27;Bot shutting down&#x27;:msg;
@@ -619,12 +678,6 @@ module.exports = function(config){
 			self.user(user);
 		}
 	});
-	/**
-	 * Description
-	 * @method fn
-	 * @param {} i
-	 * @return 
-	 */
 	var fn = function(i){
 		self.scripts[ii] = new Script(config.scripts[ii],self,i);
 	};
