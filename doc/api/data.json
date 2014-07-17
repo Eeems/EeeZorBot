@@ -475,6 +475,100 @@
     },
     "classitems": [
         {
+            "file": "lib\\api.js",
+            "line": 8,
+            "description": "Provides the tools module",
+            "static": 1,
+            "itemtype": "property",
+            "name": "tools",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 14,
+            "description": "Provides the log module",
+            "static": 1,
+            "itemtype": "property",
+            "name": "log",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 20,
+            "description": "Provides the Channel class",
+            "static": 1,
+            "is_constructor": 1,
+            "itemtype": "property",
+            "name": "Channel",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 27,
+            "description": "Provides the User class",
+            "static": 1,
+            "itemtype": "property",
+            "name": "User",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 34,
+            "description": "Provides the Server class",
+            "static": 1,
+            "itemtype": "property",
+            "name": "Server",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 41,
+            "description": "Provides the stdin module",
+            "static": 1,
+            "itemtype": "property",
+            "name": "stdin",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 47,
+            "description": "Provides the Listdb class",
+            "static": 1,
+            "itemtype": "property",
+            "name": "Listdb",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 54,
+            "description": "Provides the debug module",
+            "static": 1,
+            "itemtype": "property",
+            "name": "debug",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 60,
+            "description": "Provides a circular reference to API",
+            "static": 1,
+            "itemtype": "property",
+            "name": "api",
+            "class": "api",
+            "module": "api"
+        },
+        {
             "file": "lib\\channel.js",
             "line": 15,
             "description": "Name of the channel",
