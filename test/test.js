@@ -7,6 +7,7 @@ var test = require('tape'),
 	Listdb = api.Listdb,
 	tools = api.tools,
 	stdin = api.stdin,
+	log = api.log,
 	debug = api.debug;
 
 test('todo',function(t){

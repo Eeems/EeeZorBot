@@ -1,5 +1,15 @@
 {
-	"logtype": "listdb",
+	"logs": {
+		"levels": {
+			"in": false,
+			"out": false
+		},
+		"type": "listdb"
+	},
+	"stdin": {
+		"console": true,
+		"write": true
+	},
 	"servers": [
 		{
 			"host": "localhost",

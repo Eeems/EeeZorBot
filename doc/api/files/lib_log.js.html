@@ -124,10 +124,57 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
-var config = require(&#x27;../etc/config.json&#x27;),
+var config = (function(){
+		var c = require(&#x27;../etc/config.json&#x27;).logs,
+			d = {
+				levels: {
+					debug: true,
+					log: true,
+					error: true,
+					trace: true,
+					alert: true,
+					&quot;in&quot;: false,
+					out: false
+				},
+				type: &quot;text&quot;
+			},
+			i,
+			ii;
+		for(i in d){
+			if(c[i] === undefined){
+				c[i] = d[i];
+			}else if(typeof d[i] == &#x27;object&#x27;){
+				for(ii in d[i]){
+					if(c[i][ii] === undefined){
+						c[i][ii] = d[i][ii];
+					}
+				}
+			}
+		}
+		return c;
+	})(),
 	path = require(&#x27;path&#x27;),
 	fs = require(&#x27;fs&#x27;),
-	Listdb = require(&#x27;./listdb.js&#x27;);
+	Listdb = require(&#x27;./listdb.js&#x27;),
+	stdin = require(&#x27;./stdin.js&#x27;),
+	write = function(msg,error){
+		var d = new Date();
+		error = typeof error==&#x27;undefined&#x27;?false:true;
+		if(!msg instanceof Array || typeof msg == &#x27;string&#x27;){
+			msg = [msg];
+		}
+		for(var i in msg){
+			if(!isNaN(parseInt(i,10))){
+				log.save(d.toDateString(),msg[i]);
+				if(error){
+					console.error(msg[i]);
+				}else{
+					console.log(msg[i]);
+				}
+			}
+		}
+		return msg;
+	};
 /**
  * Logging module to handle outputting logs with the correct format, and saving them to files
  * @module log
@@ -142,14 +189,16 @@ log = {
 	 * @param [message]* Message to display
 	 */
 	alert: function(){
-		for(var i in arguments){
-			switch(typeof arguments[i]){
-				case &quot;string&quot;: case &quot;number&quot;:
-					return log.log(&quot;=&gt; &quot;+arguments[i]);
-				case &quot;function&quot;:
-					return log.log(&quot;=&gt; &quot;+arguments[i]());
-				default:
-					return log.error(&quot;tried to alert an object or array&quot;);
+		if(config.levels.alert){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;string&quot;: case &quot;number&quot;:
+						return write(&quot;=&gt; &quot;+arguments[i]);
+					case &quot;function&quot;:
+						return write(&quot;=&gt; &quot;+arguments[i]());
+					default:
+						return log.error(&quot;tried to alert an object or array&quot;);
+				}
 			}
 		}
 	},
@@ -159,14 +208,16 @@ log = {
 	 * @param [message]* Message to display
 	 */
 	out: function(){
-		for(var i in arguments){
-			switch(typeof arguments[i]){
-				case &quot;string&quot;: case &quot;number&quot;:
-					return log.log(&quot;-&gt; &quot;+arguments[i]);
-				case &quot;function&quot;:
-					return log.log(&quot;-&gt; &quot;+arguments[i]());
-				default:
-					return log.error(&quot;tried to alert an object or array&quot;);
+		if(config.levels.out){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;string&quot;: case &quot;number&quot;:
+						return write(&quot;-&gt; &quot;+arguments[i]);
+					case &quot;function&quot;:
+						return write(&quot;-&gt; &quot;+arguments[i]());
+					default:
+						return log.error(&quot;tried to alert an object or array&quot;);
+				}
 			}
 		}
 	},
@@ -176,14 +227,16 @@ log = {
 	 * @param [message]* Message to display
 	 */
 	&quot;in&quot;: function(){
-		for(var i in arguments){
-			switch(typeof arguments[i]){
-				case &quot;string&quot;: case &quot;number&quot;:
-					return log.log(&quot;&lt;- &quot;+arguments[i]);
-				case &quot;function&quot;:
-					return log.log(&quot;&lt;- &quot;+arguments[i]());
-				default:
-					return log.error(&quot;tried to alert an object or array&quot;);
+		if(config.levels.in){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;string&quot;: case &quot;number&quot;:
+						return write(&quot;&lt;- &quot;+arguments[i]);
+					case &quot;function&quot;:
+						return write(&quot;&lt;- &quot;+arguments[i]());
+					default:
+						return log.error(&quot;tried to alert an object or array&quot;);
+				}
 			}
 		}
 	},
@@ -193,12 +246,14 @@ log = {
 	 * @param [message]* Message to display
 	 */
 	error: function(){
-		for(var i in arguments){
-			switch(typeof arguments[i]){
-				case &quot;function&quot;:
-					return log.log(&quot;Error: &quot;+arguments[i](),true);
-				default:
-					return log.log(&quot;Error: &quot;+arguments[i],true);
+		if(config.levels.error){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;function&quot;:
+						return write(&quot;Error: &quot;+arguments[i](),true);
+					default:
+						return write(&quot;Error: &quot;+arguments[i],true);
+				}
 			}
 		}
 	},
@@ -214,7 +269,7 @@ log = {
 		if(typeof msg.toString != &#x27;undefiend&#x27;){
 			msg = msg.toString();
 		}
-		switch(config.logtype){
+		switch(config.type){
 			case &#x27;listdb&#x27;:
 				var l = log.get(name);
 				l.add(JSON.stringify({
@@ -241,47 +296,28 @@ log = {
 	/**
 	 * Logs a message and saves the output to a log
 	 * @method log
-	 * @param msg Message to output
-	 * @param {Boolean} [error=false] Should the logged output be a console.error call or not
-	 * @return {string} msg
+	 * @param {mixed} [message]* Messages to output
 	 */
-	log: function(msg,error){
-		var d = new Date();
-		error = typeof error==&#x27;undefined&#x27;?false:true;
-		if(!msg instanceof Array || typeof msg == &#x27;string&#x27;){
-			msg = [msg];
+	log: function(){
+		if(config.levels.log){
+			write.call();
 		}
-		for(var i in msg){
-			if(!isNaN(parseInt(i,10))){
-				log.save(d.toDateString(),msg[i]);
-				if(error){
-					console.error(msg[i]);
-				}else{
-					console.log(msg[i]);
-				}
-			}
-		}
-		return msg;
 	},
 	/**
 	 * Outputs a trace log
 	 * @method trace
 	 */
 	trace: function(){
-		log.log((new Error()).stack);
+		if(config.levels.trace){
+			write((new Error()).stack);
+		}
 	},
 	/**
-	 * Changes or returns the logtype
-	 * @param {string} [logtype] The logtype to use
-	 * @method logtype
-	 * @return {string} logtype being used
+	 * log config
+	 * @type {object}
+	 * @property config
 	 */
-	logtype: function(logtype){
-		if(logtype !== undefined){
-			config.logtype = logtype;
-		}
-		return config.logtype;
-	}
+	config: config
 };
 module.exports = log;
     </pre>

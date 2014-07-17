@@ -199,7 +199,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\log.js",
-            "line": 5,
+            "line": 52,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "itemtype": "main",
             "static": 1
@@ -351,7 +351,7 @@
             "module": "log",
             "namespace": "",
             "file": "lib\\log.js",
-            "line": 5,
+            "line": 52,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "mainName": "",
             "tag": "main",
@@ -379,7 +379,7 @@
                 },
                 {
                     "name": "server",
-                    "description": "The server this channel is on",
+                    "description": "The server this script is on",
                     "type": "Server"
                 },
                 {
@@ -794,7 +794,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 13,
+            "line": 60,
             "description": "Does an alert message (\"=> \"+message)",
             "itemtype": "method",
             "name": "alert",
@@ -811,7 +811,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 30,
+            "line": 79,
             "description": "Outputs an log signifying that the message was sent to an external server (\"-> \"+message)",
             "itemtype": "method",
             "name": "out",
@@ -828,7 +828,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 47,
+            "line": 98,
             "description": "Outputs an log signifying that the message was recieved from an external server (\"<- \"+message)",
             "itemtype": "method",
             "name": "in",
@@ -845,7 +845,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 64,
+            "line": 117,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -862,7 +862,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 79,
+            "line": 134,
             "description": "Saves a line to a named log",
             "itemtype": "method",
             "name": "save",
@@ -885,7 +885,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 106,
+            "line": 161,
             "description": "Returns the listdb object for a specific log",
             "itemtype": "method",
             "name": "get",
@@ -905,33 +905,25 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 115,
+            "line": 170,
             "description": "Logs a message and saves the output to a log",
             "itemtype": "method",
             "name": "log",
             "params": [
                 {
-                    "name": "msg",
-                    "description": "Message to output"
-                },
-                {
-                    "name": "error",
-                    "description": "Should the logged output be a console.error call or not",
-                    "type": "Boolean",
+                    "name": "message",
+                    "description": "Messages to output",
+                    "type": "Mixed",
                     "optional": true,
-                    "optdefault": "false"
+                    "multiple": true
                 }
             ],
-            "return": {
-                "description": "msg",
-                "type": "String"
-            },
             "class": "log",
             "module": "log"
         },
         {
             "file": "lib\\log.js",
-            "line": 140,
+            "line": 180,
             "description": "Outputs a trace log",
             "itemtype": "method",
             "name": "trace",
@@ -940,22 +932,11 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 147,
-            "description": "Changes or returns the logtype",
-            "params": [
-                {
-                    "name": "logtype",
-                    "description": "The logtype to use",
-                    "type": "String",
-                    "optional": true
-                }
-            ],
-            "itemtype": "method",
-            "name": "logtype",
-            "return": {
-                "description": "logtype being used",
-                "type": "String"
-            },
+            "line": 189,
+            "description": "log config",
+            "type": "{object}",
+            "itemtype": "property",
+            "name": "config",
             "class": "log",
             "module": "log"
         },
@@ -1484,7 +1465,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 10,
+            "line": 23,
             "description": "Start listening for user input",
             "itemtype": "method",
             "name": "start",
@@ -1494,7 +1475,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 20,
+            "line": 35,
             "description": "Stop waiting for user input",
             "itemtype": "method",
             "name": "stop",
@@ -1504,7 +1485,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 29,
+            "line": 46,
             "description": "Register an event listener",
             "itemtype": "method",
             "name": "on",
@@ -1526,7 +1507,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 40,
+            "line": 61,
             "description": "Adds a command to the stdin",
             "itemtype": "method",
             "name": "add",
@@ -1549,6 +1530,40 @@
                 }
             ],
             "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 79,
+            "description": "Calls a console output method",
+            "itemtype": "method",
+            "name": "console",
+            "params": [
+                {
+                    "name": "method",
+                    "description": "The method to call",
+                    "type": "String"
+                },
+                {
+                    "name": "args",
+                    "description": "The arguments to pass",
+                    "type": "Array",
+                    "optional": true,
+                    "multiple": true
+                }
+            ],
+            "chainable": 1,
+            "class": "stdin",
+            "module": "stdin"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 92,
+            "description": "stdin config",
+            "type": "{object}",
+            "itemtype": "property",
+            "name": "config",
             "class": "stdin",
             "module": "stdin"
         },
