@@ -1,0 +1,10 @@
+{
+    "name": "EeeZorBot API",
+    "description": "EeeZorBot API: a node IRC bot library",
+    "version": "0.2",
+    "url": "http://eeems.ca/",
+    "options": {
+        "outdir": "doc/api/"
+    },
+    "tabtospace": 4
+}

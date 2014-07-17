@@ -1,0 +1,1223 @@
+{
+    "project": {
+        "name": "EeeZorBot API",
+        "description": "EeeZorBot API: a node IRC bot library",
+        "version": "0.2",
+        "url": "http://eeems.ca/",
+        "tabtospace": 4
+    },
+    "files": {
+        "lib\\channel.js": {
+            "name": "lib\\channel.js",
+            "modules": {
+                "channel": 1
+            },
+            "classes": {
+                "Channel": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\debug.js": {
+            "name": "lib\\debug.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\listdb.js": {
+            "name": "lib\\listdb.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\log.js": {
+            "name": "lib\\log.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\script.js": {
+            "name": "lib\\script.js",
+            "modules": {
+                "script": 1
+            },
+            "classes": {
+                "Script": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\server.js": {
+            "name": "lib\\server.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\stdin.js": {
+            "name": "lib\\stdin.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\tools.js": {
+            "name": "lib\\tools.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib\\user.js": {
+            "name": "lib\\user.js",
+            "modules": {
+                "user": 1
+            },
+            "classes": {
+                "User": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "channel": {
+            "name": "channel",
+            "submodules": {},
+            "classes": {
+                "Channel": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\channel.js",
+            "line": 4,
+            "description": "Channel class",
+            "params": [
+                {
+                    "name": "server",
+                    "description": "The server the channel is created on",
+                    "type": "Server"
+                },
+                {
+                    "name": "name",
+                    "description": "the name of the channel (ie: \"#irp\")",
+                    "type": "String"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "script": {
+            "name": "script",
+            "submodules": {},
+            "classes": {
+                "Script": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\script.js",
+            "line": 5,
+            "description": "Provides a script object that allows a server to handle the loaded script"
+        },
+        "user": {
+            "name": "user",
+            "submodules": {},
+            "classes": {
+                "User": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\user.js",
+            "line": 1,
+            "description": "User object constructor"
+        }
+    },
+    "classes": {
+        "Channel": {
+            "name": "Channel",
+            "shortname": "Channel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "channel",
+            "namespace": "",
+            "file": "lib\\channel.js",
+            "line": 4,
+            "description": "Channel class"
+        },
+        "Script": {
+            "name": "Script",
+            "shortname": "Script",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "script",
+            "namespace": "",
+            "file": "lib\\script.js",
+            "line": 5,
+            "description": "Provides a script object that allows a server to handle the loaded script",
+            "params": [
+                {
+                    "name": "path",
+                    "description": "The path to the script",
+                    "type": "String"
+                },
+                {
+                    "name": "server",
+                    "description": "The server this channel is on",
+                    "type": "Server"
+                },
+                {
+                    "name": "sid",
+                    "description": "The script identifier for this script",
+                    "type": "Number"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "User": {
+            "name": "User",
+            "shortname": "User",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "user",
+            "namespace": "",
+            "file": "lib\\user.js",
+            "line": 1,
+            "description": "User object constructor",
+            "params": [
+                {
+                    "name": "nick",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "username",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "host",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "realname",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "is_constructor": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "lib\\channel.js",
+            "line": 14,
+            "description": "Name of the channel",
+            "type": "{string}",
+            "itemtype": "property",
+            "name": "name",
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 20,
+            "description": "Channel modes",
+            "type": "{Object}",
+            "itemtype": "property",
+            "name": "modes",
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 26,
+            "description": "Parent server",
+            "type": "{Server}",
+            "itemtype": "property",
+            "name": "server",
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 32,
+            "description": "Runs a /who on the channel, refreshing user data",
+            "itemtype": "method",
+            "name": "who",
+            "chainable": 1,
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 47,
+            "description": "Returns an array of all the users in the channel",
+            "itemtype": "method",
+            "name": "users",
+            "return": {
+                "description": "users",
+                "type": "Array"
+            },
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 64,
+            "description": "Sets the mode of the channel, or users in the channel",
+            "itemtype": "method",
+            "name": "mode",
+            "params": [
+                {
+                    "name": "modes",
+                    "description": "String containing the modes (ie: \"+o-v\")",
+                    "type": "String"
+                },
+                {
+                    "name": "users",
+                    "description": "A list of users (nick or User objects) to apply the modes to",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "chainable": 1,
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 88,
+            "description": "Set or get the topic of the channel (It will trigger a topic event)",
+            "itemtype": "method",
+            "name": "topic",
+            "params": [
+                {
+                    "name": "topic",
+                    "description": "",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "chainable": 1,
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 102,
+            "description": "Leave the channel",
+            "itemtype": "method",
+            "name": "part",
+            "chainable": 1,
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 111,
+            "description": "Join the channel",
+            "itemtype": "method",
+            "name": "join",
+            "chainable": 1,
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\debug.js",
+            "line": 3,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "log",
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 4,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "dbName",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "db"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 16,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "name",
+            "return": {
+                "description": "dbName"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 24,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "all",
+            "return": {
+                "description": "values"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 32,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "has",
+            "params": [
+                {
+                    "name": "value",
+                    "description": ""
+                },
+                {
+                    "name": "ic",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "Literal"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 51,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "value",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\listdb.js",
+            "line": 61,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "value",
+                    "description": ""
+                },
+                {
+                    "name": "ignoreCase",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 6,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "alert",
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 23,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "out",
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 40,
+            "description": "Description",
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 56,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "error",
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 71,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "save",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                },
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 98,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "CallExpression"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 107,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "log",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                },
+                {
+                    "name": "save",
+                    "description": ""
+                },
+                {
+                    "name": "error",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "msg"
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\log.js",
+            "line": 133,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "trace",
+            "return": {
+                "description": ""
+            },
+            "class": "Script",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 23,
+            "description": "stores the script identifier",
+            "itemtype": "property",
+            "name": "sid",
+            "type": "{number}",
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 29,
+            "description": "Stores a reference to the server that this script is used on",
+            "itemtype": "property",
+            "name": "server",
+            "type": "{Server}",
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 35,
+            "description": "The path to the script that is run",
+            "itemtype": "property",
+            "name": "path",
+            "type": "{string}",
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 41,
+            "description": "Boolean determining if the script is currently active",
+            "itemtype": "property",
+            "name": "enabled",
+            "type": "{Boolean}",
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 47,
+            "description": "reloads the script from the disk",
+            "itemtype": "method",
+            "name": "reload",
+            "chainable": 1,
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 68,
+            "description": "Disables the script (hooks, commands etc)",
+            "itemtype": "method",
+            "name": "disable",
+            "chainable": 1,
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 81,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "enable",
+            "chainable": 1,
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 98,
+            "description": "Disables and removes the script from the server.",
+            "itemtype": "method",
+            "name": "remove",
+            "chainable": 1,
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 13,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "exports",
+            "params": [
+                {
+                    "name": "config",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 46,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "run",
+            "params": [
+                {
+                    "name": "id",
+                    "description": ""
+                },
+                {
+                    "name": "fn",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 70,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "log",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 80,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "logIn",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 90,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "logOut",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 100,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "logError",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 110,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "connect",
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 190,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "send",
+            "params": [
+                {
+                    "name": "d",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 210,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "on",
+            "params": [
+                {
+                    "name": "hook",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                },
+                {
+                    "name": "once",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 240,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "off",
+            "params": [
+                {
+                    "name": "hook",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 270,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "command",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                },
+                {
+                    "name": "help",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 288,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "command",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 306,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "fire",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                },
+                {
+                    "name": "args",
+                    "description": ""
+                },
+                {
+                    "name": "scope",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 326,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "join",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 343,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "part",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 356,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "in",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "Literal"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 370,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "channel",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "Literal"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 384,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "user",
+            "params": [
+                {
+                    "name": "user",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "old"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 417,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "script",
+            "params": [
+                {
+                    "name": "sid",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "ConditionalExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 427,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "reconnect",
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 439,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "quit",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "self"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 524,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "fn",
+            "params": [
+                {
+                    "name": "i",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 4,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "start",
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 14,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "stop",
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 23,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "on",
+            "params": [
+                {
+                    "name": "event",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\stdin.js",
+            "line": 34,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                },
+                {
+                    "name": "info",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "ThisExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\tools.js",
+            "line": 3,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "sanitize",
+            "params": [
+                {
+                    "name": "d",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "CallExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\tools.js",
+            "line": 23,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "mkdirParent",
+            "params": [
+                {
+                    "name": "dirPath",
+                    "description": ""
+                },
+                {
+                    "name": "mode",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\tools.js",
+            "line": 44,
+            "description": "Description",
+            "itemtype": "method",
+            "name": "regexString",
+            "params": [
+                {
+                    "name": "str",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "CallExpression"
+            },
+            "class": "User",
+            "module": "script"
+        },
+        {
+            "file": "lib\\user.js",
+            "line": 12,
+            "description": "User nickname",
+            "type": "{String}",
+            "itemtype": "property",
+            "name": "nick",
+            "class": "User",
+            "module": "user"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nDescription",
+            "line": " lib\\log.js:40"
+        }
+    ]
+}
