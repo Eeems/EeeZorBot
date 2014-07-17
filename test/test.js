@@ -1,5 +1,13 @@
 var test = require('tape'),
-	main = require(__dirname+'/../lib/main.js');
+	api = require(__dirname+'/../index.js'),
+	User = api.User,
+	Channel = api.Channel,
+	Script = api.Script,
+	Server = api.Server,
+	Listdb = api.Listdb,
+	tools = api.tools,
+	stdin = api.stdin,
+	debug = api.debug;
 
 test('todo',function(t){
 	t.ok(true,'todo');

@@ -939,6 +939,27 @@
             "module": "log"
         },
         {
+            "file": "lib\\log.js",
+            "line": 147,
+            "description": "Changes or returns the logtype",
+            "params": [
+                {
+                    "name": "logtype",
+                    "description": "The logtype to use",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "itemtype": "method",
+            "name": "logtype",
+            "return": {
+                "description": "logtype being used",
+                "type": "String"
+            },
+            "class": "log",
+            "module": "log"
+        },
+        {
             "file": "lib\\script.js",
             "line": 23,
             "description": "stores the script identifier",
