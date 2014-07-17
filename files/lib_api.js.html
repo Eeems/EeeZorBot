@@ -131,14 +131,63 @@
  * @static
  */
 var api = {
+	/**
+	 * Provides the tools module
+	 * @static
+	 * @property tools
+	 */
 	tools: require(&#x27;./tools.js&#x27;),
+	/**
+	 * Provides the log module
+	 * @static
+	 * @property log
+	 */
 	log: require(&#x27;./log.js&#x27;),
+	/**
+	 * Provides the Channel class
+	 * @static
+	 * @constructor
+	 * @property Channel
+	 */
 	Channel: require(&#x27;./channel.js&#x27;),
+	/**
+	 * Provides the User class
+	 * @static
+	 * @property User
+	 * @constructor
+	 */
 	User: require(&#x27;./user.js&#x27;),
+	/**
+	 * Provides the Server class
+	 * @static
+	 * @property Server
+	 * @constructor
+	 */
 	Server: require(&#x27;./server.js&#x27;),
+	/**
+	 * Provides the stdin module
+	 * @static
+	 * @property stdin
+	 */
 	stdin: require(&#x27;./stdin.js&#x27;),
-	listdb: require(&#x27;./listdb.js&#x27;),
+	/**
+	 * Provides the Listdb class
+	 * @static
+	 * @property Listdb
+	 * @constructor
+	 */
+	Listdb: require(&#x27;./listdb.js&#x27;),
+	/**
+	 * Provides the debug module
+	 * @static
+	 * @property debug
+	 */
 	debug: require(&#x27;./debug.js&#x27;),
+	/**
+	 * Provides a circular reference to API
+	 * @static
+	 * @property api
+	 */
 	api: api
 };
 module.exports = api;
