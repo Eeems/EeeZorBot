@@ -27,7 +27,8 @@
 				"#irp"
 			],
 			"scripts": [
-				"scripts/test.js"
+				"scripts/test.js",
+				"scripts/manager.js"
 			]
 		},
 		{
@@ -44,7 +45,8 @@
 				"#irp"
 			],
 			"scripts": [
-				"scripts/test.js"
+				"scripts/test.js",
+				"scripts/manager.js"
 			]
 		}
 	]
