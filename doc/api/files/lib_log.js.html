@@ -131,6 +131,8 @@ var config = (function(){
 					debug: true,
 					log: true,
 					error: true,
+					warn: true,
+					info: true,
 					trace: true,
 					alert: true,
 					&quot;in&quot;: false,
@@ -153,12 +155,14 @@ var config = (function(){
 		}
 		return c;
 	})(),
+	util = require(&#x27;util&#x27;),
 	path = require(&#x27;path&#x27;),
 	fs = require(&#x27;fs&#x27;),
 	Listdb = require(&#x27;./listdb.js&#x27;),
 	stdin = require(&#x27;./stdin.js&#x27;),
-	write = function(msg,error){
+	write = function(msg,type){
 		var d = new Date();
+		type = type === undefined?&#x27;log&#x27;:type;
 		error = typeof error==&#x27;undefined&#x27;?false:true;
 		if(!msg instanceof Array || typeof msg == &#x27;string&#x27;){
 			msg = [msg];
@@ -166,11 +170,7 @@ var config = (function(){
 		for(var i in msg){
 			if(!isNaN(parseInt(i,10))){
 				log.save(d.toDateString(),msg[i]);
-				if(error){
-					console.error(msg[i]);
-				}else{
-					console.log(msg[i]);
-				}
+				stdin.console(type,msg[i]);
 			}
 		}
 		return msg;
@@ -193,9 +193,9 @@ log = {
 			for(var i in arguments){
 				switch(typeof arguments[i]){
 					case &quot;string&quot;: case &quot;number&quot;:
-						return write(&quot;=&gt; &quot;+arguments[i]);
+						return write(&quot;=&gt; &quot;+arguments[i],&#x27;info&#x27;);
 					case &quot;function&quot;:
-						return write(&quot;=&gt; &quot;+arguments[i]());
+						return write(&quot;=&gt; &quot;+arguments[i](),&#x27;info&#x27;);
 					default:
 						return log.error(&quot;tried to alert an object or array&quot;);
 				}
@@ -212,9 +212,9 @@ log = {
 			for(var i in arguments){
 				switch(typeof arguments[i]){
 					case &quot;string&quot;: case &quot;number&quot;:
-						return write(&quot;-&gt; &quot;+arguments[i]);
+						return write(&quot;-&gt; &quot;+arguments[i],&#x27;log&#x27;);
 					case &quot;function&quot;:
-						return write(&quot;-&gt; &quot;+arguments[i]());
+						return write(&quot;-&gt; &quot;+arguments[i](),&#x27;log&#x27;);
 					default:
 						return log.error(&quot;tried to alert an object or array&quot;);
 				}
@@ -231,9 +231,9 @@ log = {
 			for(var i in arguments){
 				switch(typeof arguments[i]){
 					case &quot;string&quot;: case &quot;number&quot;:
-						return write(&quot;&lt;- &quot;+arguments[i]);
+						return write(&quot;&lt;- &quot;+arguments[i],&#x27;log&#x27;);
 					case &quot;function&quot;:
-						return write(&quot;&lt;- &quot;+arguments[i]());
+						return write(&quot;&lt;- &quot;+arguments[i](),&#x27;log&#x27;);
 					default:
 						return log.error(&quot;tried to alert an object or array&quot;);
 				}
@@ -250,9 +250,55 @@ log = {
 			for(var i in arguments){
 				switch(typeof arguments[i]){
 					case &quot;function&quot;:
-						return write(&quot;Error: &quot;+arguments[i](),true);
+						return write(&quot;Error: &quot;+arguments[i](),&#x27;error&#x27;);
 					default:
-						return write(&quot;Error: &quot;+arguments[i],true);
+						return write(&quot;Error: &quot;+arguments[i],&#x27;error&#x27;);
+				}
+			}
+		}
+	},
+	/**
+	 * Log an error message (&quot;Error: &quot;+message)
+	 * @method error
+	 * @param [message]* Message to display
+	 */
+	warn: function(){
+		if(config.levels.warn){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;function&quot;:
+						return write(&quot;Warn: &quot;+arguments[i](),&#x27;warn&#x27;);
+					default:
+						return write(&quot;Warn: &quot;+arguments[i],&#x27;warn&#x27;);
+				}
+			}
+		}
+	},
+	/**
+	 * Log an debug message (&quot;debug: &quot;+message)
+	 * @method debug
+	 * @param [message]* Message to display
+	 */
+	debug: function(){
+		if(config.levels.debug){
+			for(var i in arguments){
+				write(&quot;Debug:&quot;+util.inspect(arguments[i]),&#x27;log&#x27;);
+			}
+		}
+	},
+	/**
+	 * Log an debug message (&quot;Info: &quot;+message)
+	 * @method info
+	 * @param [message]* Message to display
+	 */
+	info: function(){
+		if(config.levels.info){
+			for(var i in arguments){
+				switch(typeof arguments[i]){
+					case &quot;function&quot;:
+						return write(&quot;Info: &quot;+arguments[i](),&#x27;info&#x27;);
+					default:
+						return write(&quot;Info: &quot;+arguments[i],&#x27;info&#x27;);
 				}
 			}
 		}
@@ -277,7 +323,7 @@ log = {
 					msg: msg
 				}));
 			break;
-			//case &#x27;txt&#x27;:
+			//case &#x27;text&#x27;:
 			default:
 				fs.createWriteStream(name+&#x27;.log&#x27;,{
 					flags: &#x27;a&#x27;

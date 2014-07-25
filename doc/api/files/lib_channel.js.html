@@ -137,7 +137,8 @@ var User = require(&#x27;./user.js&#x27;),
  * @constructor
  */
 module.exports = function(server,name){
-	var self = this;
+	var self = this,
+		topic = null;
 	/**
 	 * Name of the channel
 	 * @type {string}
@@ -146,16 +147,39 @@ module.exports = function(server,name){
 	self.name = name;
 	/**
 	 * Channel modes
-	 * @type {Object}
+	 * @type {Array}
 	 * @property modes
 	 */
-	self.modes = {};
+	self.modes = [];
+	/**
+	 * Contains the topic of the channel
+	 * To set the value without sending a topic command change the value to an array with the topic in it (ie: [&#x27;new topic&#x27;])
+	 * @type {String}
+	 * @property topic
+	 */
+	Object.defineProperty(self,&#x27;topic&#x27;,{
+		set: function(val){
+			if(!(val instanceof Array)){
+				self.server.send(&#x27;TOPIC &#x27;+self.name+&#x27; &#x27;+val);
+			}else{
+				topic = val[0];
+			}
+		},
+		get: function(){
+			return topic;
+		},
+		enumerable: true
+	});
 	/**
 	 * Parent server
 	 * @type {Server}
 	 * @property server
+	 * @static
 	 */
-	self.server = server;
+	Object.defineProperty(self,&#x27;server&#x27;,{
+		value: server,
+		enumerable: true
+	});
 	/**
 	 * Runs a /who on the channel, refreshing user data
 	 * @method who
@@ -196,6 +220,7 @@ module.exports = function(server,name){
 	 * @chainable
 	 */
 	self.mode = function(modes,users){
+		// TODO - fix
 		if(users === undefined){
 			self.server.send(&#x27;mode &#x27;+self.name+&#x27; &#x27;+modes);
 		}else{
@@ -209,20 +234,6 @@ module.exports = function(server,name){
 				}
 				self.server.send(&#x27;mode &#x27;+self.name+&#x27; &#x27;+modes+&#x27; &#x27;+u);
 			}
-		}
-		return self;
-	};
-	/**
-	 * Set or get the topic of the channel (It will trigger a topic event)
-	 * @method topic
-	 * @param {String} [topic]
-	 * @chainable
-	 */
-	self.topic = function(topic){
-		if(topic === undefined){
-			self.server.send(&#x27;TOPIC &#x27;+self.name);
-		}else{
-			self.server.send(&#x27;TOPIC &#x27;+self.name+&#x27; &#x27;+topic);
 		}
 		return self;
 	};
@@ -241,10 +252,9 @@ module.exports = function(server,name){
 	 * @chainable
 	 */
 	self.join = function(){
-		self.server.send(&#x27;join &#x27;+self.name);
+		self.server.send(&#x27;join &#x27;+self.name);		// join channel
 		return self;
 	};
-	self.who();
 	return self;
 };
     </pre>

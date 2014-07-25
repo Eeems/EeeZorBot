@@ -153,7 +153,8 @@ module.exports = function(config){
 			name: &#x27;&#x27;,
 			nickserv: undefined,
 			channels: [],
-			scripts: []
+			scripts: [],
+			showping: false
 		},
 		sid = 0,
 		i,
@@ -208,10 +209,10 @@ module.exports = function(config){
 	 */
 	self.run = function(id,fn){
 		var osid = sid;
-		debug.log(&#x27;Entering sid &#x27;+id);
+		self.debug(&#x27;Entering sid &#x27;+id);
 		sid = id;
 		fn.call(self,sid);
-		debug.log(&#x27;Reverting to sid &#x27;+osid);
+		self.debug(&#x27;Reverting to sid &#x27;+osid);
 		sid = osid;
 		return self;
 	};
@@ -231,6 +232,36 @@ module.exports = function(config){
 	 */
 	self.log = function(msg){
 		log.alert(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
+		return self;
+	};
+	/**
+	 * Log something in the context of the server
+	 * @method info
+	 * @param {mixed} msg Message to log
+	 * @chainable
+	 */
+	self.info = function(msg){
+		log.info(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
+		return self;
+	};
+	/**
+	 * Log something in the context of the server
+	 * @method debug
+	 * @param {mixed} msg Message to log
+	 * @chainable
+	 */
+	self.debug = function(msg){
+		debug.log(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
+		return self;
+	};
+	/**
+	 * Log something in the context of the server
+	 * @method error
+	 * @param {mixed} msg Message to log
+	 * @chainable
+	 */
+	self.error = function(msg){
+		log.error(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
 		return self;
 	};
 	/**
@@ -275,7 +306,7 @@ module.exports = function(config){
 			self.socket.setNoDelay(true);
 			self.socket.setEncoding(&#x27;ascii&#x27;);
 			self.socket.on(&#x27;connect&#x27;,function(){
-				self.log(&#x27;Connection established (evt)&#x27;);
+				self.info(&#x27;Connection established (evt)&#x27;);
 				self.fire(&#x27;connect&#x27;,arguments,self);
 			});
 			self.socket.on(&#x27;data&#x27;,function(d){
@@ -284,10 +315,27 @@ module.exports = function(config){
 					i,
 					ii,
 					match,
-					hook;
+					hook,
+					m,
+					o;
 				for(ii=0;ii&lt;s.length;ii++){
 					if(s[ii] !== &#x27;&#x27;){
-						self.logIn(s[ii]);
+						m = /^PING :(.+)/i.exec(s[ii]);
+						if(m){
+							if(self.config.showping){
+								self.logIn(s[ii]);
+							}else{
+								o = log.config.levels.out;
+								log.config.levels.out = false;
+							}
+							self.send(&#x27;PONG :&#x27;+m[1]);
+							if(!self.config.showping){
+								log.config.levels.out = o;
+							}
+							self.fire(&#x27;ping&#x27;,arguments,self);
+						}else{
+							self.logIn(s[ii]);
+						}
 						for(i=0;i&lt;self.hooks.length;i++){
 							hook = self.hooks[i];
 							if(hook.type == &#x27;regex&#x27;){
@@ -305,36 +353,37 @@ module.exports = function(config){
 				// TODO - incoming data
 			});
 			self.socket.on(&#x27;drain&#x27;,function(){
+				self.debug(&#x27;Drain event&#x27;);
 				self.fire(&#x27;drain&#x27;,arguments,self);
 				// TODO - No more outgoing data
 			});
 			self.socket.on(&#x27;error&#x27;,function(e){
-				self.log(&#x27;Connection errored&#x27;);
+				self.info(&#x27;Connection errored&#x27;);
 				self.fire(&#x27;error&#x27;,arguments,self);
 				self.logError(e);
 			});
 			self.socket.on(&#x27;timeout&#x27;,function(){
-				self.log(&#x27;Connection timed out&#x27;);
+				self.info(&#x27;Connection timed out&#x27;);
 				self.fire(&#x27;timeout&#x27;,arguments,self);
 				self.reconnect();
 			});
 			self.socket.on(&#x27;end&#x27;,function(){
-				self.log(&#x27;Connection ended&#x27;);
+				self.info(&#x27;Connection ended&#x27;);
 				self.fire(&#x27;end&#x27;,arguments,self);
 				// TODO - server closed connection
 			});
 			self.socket.on(&#x27;close&#x27;,function(e){
 				self.fire(&#x27;close&#x27;,arguments,self);
 				if(e){
-					self.log(&#x27;Connection closed due to an error&#x27;);
+					self.info(&#x27;Connection closed due to an error&#x27;);
 					// TODO - socket was closed due to error
 				}else{
-					self.log(&#x27;Connection closed&#x27;);
+					self.info(&#x27;Connection closed&#x27;);
 					// TODO - socket closure was intended
 				}
 			});
 			self.socket.connect(self.config.port,self.config.host,function(){
-				self.log(&#x27;Connection established&#x27;);
+				self.info(&#x27;Connection established&#x27;);
 				self.send(&#x27;NICK &#x27;+self.config.nick);
 				self.send(&#x27;USER &#x27;+self.config.name+&#x27; localhost * &#x27;+self.config.name);
 				// TODO - Handle connection
@@ -372,7 +421,7 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.on = function(hook,callback,once){
-		debug.log(&#x27;Adding hook for sid &#x27;+sid);
+		self.debug(&#x27;Adding hook for sid &#x27;+sid);
 		once = once===undefined?false:once;
 		if(hook instanceof RegExp){
 			self.hooks.push({
@@ -401,6 +450,7 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.off = function(hook,callback){
+
 		var i,
 			h,
 			t;
@@ -587,7 +637,7 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.reconnect = function(){
-		self.log(&#x27;Reconnecting&#x27;);
+		self.info(&#x27;Reconnecting&#x27;);
 		self.quit();
 		self.connect();
 		self.fire(&#x27;reconnect&#x27;,arguments,self);
@@ -600,6 +650,7 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.quit = function(msg){
+		self.fire(&#x27;quit&#x27;,arguments,self);
 		msg = msg === undefined?&#x27;Bot shutting down&#x27;:msg;
 		try{
 			self.send(&#x27;QUIT :&#x27;+msg);
@@ -610,15 +661,11 @@ module.exports = function(config){
 		try{
 			self.socket.destroy();
 		}catch(e){}
-		self.fire(&#x27;quit&#x27;,arguments,self);
+		delete self.socket;
 		return self;
 	};
 	process.on(&#x27;exit&#x27;,function(){
 		self.quit();
-	});
-	self.on(/^PING :(.+)/i,function(m){
-		self.send(&#x27;PONG :&#x27;+m[1]);
-		self.fire(&#x27;ping&#x27;,arguments,self);
 	});
 	self.on(/:.+ 001 .+ :.+/i,function(){
 		var i;
@@ -630,6 +677,12 @@ module.exports = function(config){
 		}
 	});
 	self.on(new RegExp(&quot;^:(\\w+)!(.+)@(.+)\\sPRIVMSG\\s(\\#?\\w+)\\s:?&quot;+tools.regexString(self.config.prefix)+&quot;(\\S+)\\s?(.+)?$&quot;,&#x27;i&#x27;),function(m){
+		// 1 - nick
+		// 2 - username
+		// 3 - host
+		// 4 - channel
+		// 5 - command
+		// 6 - arguments
 		var c = self.commands[m[5]],
 			i,
 			a = m[6],
@@ -640,7 +693,7 @@ module.exports = function(config){
 			ch = new Channel(self,m[4]);
 		}
 		if(u === false){
-			u = new User(m[1],m[2],m[3],&#x27;&#x27;);
+			u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
 			u.channels.push(ch);
 			self.users.push(u);
 		}
@@ -654,18 +707,26 @@ module.exports = function(config){
 		}
 	});
 	self.on(new RegExp(&#x27;:.+ 315 .+ (\\S+) :End of \/WHO list.&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - channel
 		var c = self.channel(m[1]);
 		if(!c){
-			c = new Channel(m[1]);
+			c = new Channel(self,m[1]);
 			self.channels.push(c);
 		}
 		self.fire(&#x27;who&#x27;,[c],self);
 	});
 	self.on(new RegExp(&#x27;:.+ 352 .+ (.+) (.+) (.+) (.+) (.+) .+ :(\\d+) (.+)&#x27;,&#x27;i&#x27;),function(m){
-		var user = self.user([5]),
+		// 1 - channel
+		// 2 - username
+		// 3 - host
+		// 4 - 
+		// 5 - nick
+		// 6 - 
+		// 7 - realname
+		var user = self.user(m[5]),
 			channel = self.channel(m[1]);
 		if(!channel){
-			channel = new Channel(m[1]);
+			channel = new Channel(self,m[1]);
 			self.channels.push(channel);
 		}
 		if(user){
@@ -673,16 +734,258 @@ module.exports = function(config){
 				user.channels.push(channel);
 			}
 		}else{
-			user = new User(m[5],m[2],m[3],m[7]);
+			user = new User(m[5],m[2],m[3],m[7],self);
 			user.channels.push(channel);
 			self.user(user);
 		}
+		user.whois();
 	});
+	self.on(new RegExp(&#x27;:.+ 311 .+ (\\S+) (.+) (.+) * :(.+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - nick
+		// 2 - username
+		// 3 - host
+		// 4 - realname
+		var user = self.user(m[1]);
+		if(!user){
+			user = new User(m[1],m[2],m[3],m[4],self);
+			self.users.push(user);
+		}else{
+			user.username = m[2];
+			user.host = m[3];
+			user.realname = m[4];
+		}
+	});
+	self.on(new RegExp(&#x27;:.+ 319 .+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - Nick
+		// 2 - channels
+		var user = (function(nick){
+				var u = self.user(nick);
+				if(!u){
+					u = new User(nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
+				}
+				return u;
+			})(m[1]),
+			channels = m[2].split(&#x27; &#x27;),
+			i,
+			ii,
+			channel,
+			modes,
+			mode;
+		user.modes = {};
+		for(i=0;i &lt; channels.length;i++){
+			channel = channels[i];
+			modes = channel.substr(0,channel.indexOf(&#x27;#&#x27;));
+			channel = channel.substr(channel.indexOf(&#x27;#&#x27;));
+			channel = self.channel(channel);
+			if(!channel){
+				channel = new Channel(self,channels[i]);
+				self.channels.push(channel);
+			}
+			if(user.channels.indexOf(channel) == -1){
+				user.channels.push(channel);
+			}
+			user.modes[channel.name] = [];
+			for(ii=0;ii &lt; modes.length;ii++){
+				mode = modes[i];
+				switch(mode){
+					case &#x27;+&#x27;:
+						mode=&#x27;v&#x27;;
+					break;
+					case &#x27;%&#x27;:
+						mode=&#x27;h&#x27;;
+					break;
+					case &#x27;@&#x27;:
+						mode=&#x27;o&#x27;;
+					break;
+					case &#x27;&amp;&#x27;:
+						mode=&#x27;a&#x27;;
+					break;
+					case &#x27;~&#x27;:
+						mode=&#x27;q&#x27;;
+					break;
+				}
+				if(mode !== undefined){
+					user.modes[channel.name].push(mode);
+				}
+			}
+		}
+	});
+	self.on(new RegExp(&#x27;:.+ 324 .+ (\\S+) \\+(.+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - channel
+		// 2 - modes
+		var channel = self.channel(m[1]),
+			i,
+			modes = m[2];
+		if(!channel){
+			channel = new Channel(m[1],self);
+			self.channels.push(channel);
+		}
+		for(i in channel.modes){
+			if(!(channel.modes[i] instanceof Array)){
+				channel.modes[i] = modes.indexOf(i) !== -1;
+			}
+		}
+	});
+	self.on(new RegExp(&#x27;:.+ (367|348|346) \\S+ (\\S+) (\\S+) (\\S+) (\\d+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - code
+		// 2 - channel
+		// 3 - hostmask
+		// 4 - user
+		// 5 - timestamp
+		var channel = self.channel(m[1]),
+			i,
+			mode;
+		switch(m[1]){
+			case 367:mode=&#x27;b&#x27;;break;
+			case 348:mode=&#x27;e&#x27;;break;
+			case 346:mode=&#x27;I&#x27;;break;
+		}
+		if(!channel){
+			channel = new Channel(m[2],self);
+			self.channels.push(channel);
+		}
+		if(!(channel.modes[mode] instanceof Array)){
+			channel.modes[mode] = [];
+		}
+		if(channel.modes[mode].indexOf(m[3]) === -1){
+			channel.modes[mode].push(m[3]);
+		}
+	});
+	//:my.server.name 332 nodebot #irp :testing
+	self.on(new RegExp(&#x27;:.+ (331|332) \\S+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - code
+		// 2 - channel
+		// 3 - topic
+		var channel = self.channel(m[2]);
+		if(!channel){
+			channel = new Channel(m[2],self);
+			self.channels.push(channel);
+		}
+		if(m[1] == 331){
+			channel.topic = [null];
+		}else{
+			channel.topic = [m[3]];
+		}
+		channel.who();							// get users
+		self.send(&#x27;MODE &#x27;+channel.name);		// get modes
+		self.send(&#x27;MODE &#x27;+channel.name+&#x27; b&#x27;);	// get bans
+		self.send(&#x27;MODE &#x27;+channel.name+&#x27; e&#x27;);	// get exceptions
+		self.send(&#x27;MODE &#x27;+channel.name+&#x27; I&#x27;);	// get invitation masks
+	});
+	self.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) TOPIC (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - nick
+		// 2 - username
+		// 3 - host
+		// 4 - channel
+		// 5 - topic
+		var channel = self.channel(m[4]);
+		if(!channel){
+			channel = new Channel(m[4],self);
+			self.channels.push(channel);
+		}
+		channel.topic = [m[5]];
+	});
+	
+	self.on(new RegExp(&#x27;:(.+)\\!(.+)@(.+) MODE (\\S+) (\\S+) ?(.+)?&#x27;,&#x27;i&#x27;),function(m){
+		// 1 - nick (doing the action)
+		// 2 - username
+		// 3 - host
+		// 4 - channel
+		// 5 - modes
+		// 6 - nick (recieving the action)
+		var guser = function(nick){
+				var user = self.user(nick); //m[6]
+				if(!user){
+					user = new User(m[1],&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
+					self.users.push(user);
+				}
+				if(user.channels.indexOf(channel) === -1){
+					user.channels.push(channel);
+				}
+				if(user.modes[channel.name] === undefined){
+					user.modes[channel.name] = [];
+				}
+				return user;
+			},
+			channel = self.channel(m[4]),
+			i,
+			ii = 0,
+			user,
+			state = m[5][0],
+			mode,
+			index,
+			argv = m[6] === undefined?[]:m[6].split(&#x27; &#x27;);
+		if(!channel){
+			channel = new Channel(m[4],self);
+		}
+		for(i=1;i&lt;m[5].length;i++){
+			mode = m[5][i];
+			if(&#x27;+-&#x27;.indexOf(mode) !== -1){
+				state = mode;
+			}else{
+				if(&#x27;vhoaq&#x27;.indexOf(mode) !== -1 &amp;&amp; argv[ii] !== undefined){
+					user = guser(argv[ii]);
+					if(state == &#x27;+&#x27;){
+						if(user.modes[channel.name].indexOf(mode) === -1){
+							user.modes[channel.name].push(mode);
+						}
+					}else{
+						index = user.modes[channel.name].indexOf(mode);
+						if(index !== -1){
+							user.modes[channel.name].splice(index,1);
+						}
+					}
+				}else if(&#x27;bdefIJklLR&#x27;.indexOf() &amp;&amp; argv[ii] !== undefined){
+					if(state == &#x27;+&#x27;){
+						if(!(channel.modes[mode] instanceof Array)){
+							channel.modes[mode] = [];
+						}
+						channel.modes[mode].push(argv[ii]);
+					}else{
+						if(channel.modes[mode] instanceof Array){
+							index = channel.modes[mode].indexOf(argv[ii]);
+							if(index !== -1){
+								channel.modes[mode].splice(index,1);
+							}
+							if(channel.modes[mode].length === 0){
+								channel.modes[mode] = false;
+							}
+						}else{
+							channel.modes[mode] = false;
+						}
+					}
+				}else{
+					channel.modes[mode] = state == &#x27;+&#x27;;
+				}
+				ii++;
+			}
+		}
+	});
+	self.add(&#x27;help&#x27;,function(){
+		var i,a;
+		if(this.argv.length === 0){
+			var s = &#x27;Available commands: &#x27;;
+			for(i in self.commands){
+				s += i+&#x27;, &#x27;;
+			}
+			s = s.substr(0,s.length-2);
+			self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+s);
+		}else{
+			for(i in this.argv){
+				a = this.argv[i];
+				if(self.commands[a] === undefined){
+					self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: undefined&#x27;);
+				}else{
+					self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: &#x27;+self.commands[a].help);
+				}
+			}
+		}
+	},&#x27;Provides information on available commands&#x27;);
 	var fn = function(i){
 		self.scripts[ii] = new Script(config.scripts[ii],self,i);
 	};
 	for(ii = 0;ii &lt; config.scripts.length; ii++){
-		debug.log(&quot;Loading Script: &quot;+config.scripts[ii]);
+		self.debug(&quot;Loading Script: &quot;+config.scripts[ii]);
 		self.run(ii+1,fn);
 	}
 	return self;

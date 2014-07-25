@@ -142,7 +142,9 @@ module.exports = function(path,server,sid){
 		watcher = {
 			close: function(){}
 		},i;
-	self.api = {};
+	self.api = {
+		process: process
+	};
 	for(i in api){
 		self.api[i] = api[i];
 	}
