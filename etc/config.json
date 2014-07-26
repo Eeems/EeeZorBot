@@ -10,7 +10,10 @@
 		"console": true,
 		"levels": {
 			"debug": true
-		}
+		},
+		"scripts": [
+			"scripts/manager-stdin.js"
+		]
 	},
 	"servers": [
 		{
@@ -27,8 +30,7 @@
 				"#irp"
 			],
 			"scripts": [
-				"scripts/test.js",
-				"scripts/manager.js"
+				"scripts/manager-server.js"
 			]
 		},
 		{
@@ -45,8 +47,7 @@
 				"#irp"
 			],
 			"scripts": [
-				"scripts/test.js",
-				"scripts/manager.js"
+				"scripts/manager-server.js"
 			]
 		}
 	]
