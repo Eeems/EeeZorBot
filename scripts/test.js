@@ -1,16 +1,6 @@
-server.on('data',function(){
-	//debug.log('test');
-});
-
-/*hook('data',function(match,data,replyTo,connection){
-	disp.log("Test Command Recieved");
-	connection.reply(replyTo,"Test Command Recieved");
-},{
-	regex: new RegExp(config.prefix+'test','i')
-});
-listen(rCommand('timeout'),function(match,data,replyTo,connection){
-	connection.emit('timeout');
-});
-regHelp('timeout','simulate a timeout.');
-regHelp("test","lets you know if scripts are currently working.");
-disp.alert('test script finished');*/
+server.add('test',function(){
+		this.server.send('PRIVMSG '+this.channel.name+' :Test Command Recieved');
+	},'lets you know if scripts are working correctly')
+	.add('timeout',function(){
+		this.server.socket.emit('timeout');
+	},'simulates a timeout');

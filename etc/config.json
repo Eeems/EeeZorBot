@@ -30,8 +30,10 @@
 				"#irp"
 			],
 			"scripts": [
+				"scripts/test.js",
 				"scripts/manager-server.js"
-			]
+			],
+			"showping": false
 		},
 		{
 			"host": "irc.omnimaga.org",
@@ -47,8 +49,10 @@
 				"#irp"
 			],
 			"scripts": [
+				"scripts/test.js",
 				"scripts/manager-server.js"
-			]
+			],
+			"showping": false
 		}
 	]
 }
