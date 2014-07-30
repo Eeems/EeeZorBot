@@ -1,3 +1,7 @@
+
+
+
+/*
 listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
 	var user = match[1].trim();
 	if(getUser(user).flags.voice){
@@ -31,3 +35,4 @@ hook('unload',function(){
 });
 regHelp('voice-ignore','Do not automatically voice this user');
 regHelp('voice-unignore','Automatically voice this user');
+*/

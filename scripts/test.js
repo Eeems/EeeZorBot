@@ -4,3 +4,6 @@ server.add('test',function(){
 	.add('timeout',function(){
 		this.server.socket.emit('timeout');
 	},'simulates a timeout on the IRC server socket');
+script.unload = function(){
+	console.log('Script unloading. Running cleanup');
+};
