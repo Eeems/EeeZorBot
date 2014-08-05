@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>debug - EeeZorBot API</title>
+    <title>lib\owners.js - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -124,184 +124,201 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>debug Class</h1>
-<div class="box meta">
-    
+                        <h1 class="file-heading">File: lib\owners.js</h1>
 
-    
-
-    
-        <div class="foundat">
-            Defined in: <a href="../files/lib_debug.js.html#l2"><code>lib\debug.js:2</code></a>
-        </div>
-    
-
-    
-        
-            Module: <a href="../modules/debug.html">debug</a>
-        
-    
-
-    
-</div>
-
-
-
-<div class="box intro">
-    <p>Debug functions</p>
-
-</div>
-
-
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-        
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-        
-        
-        
-        
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-            
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                        
-                            <li class="index-item method">
-                                <a href="#method_log">log</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
-
-            
-
-            
-
-            
-        </div>
-
-        
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-                
-                    <div id="method_log" class="method item">
-    <h3 class="name"><code>log</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code class="optional">[message]</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_debug.js.html#l10"><code>lib\debug.js:10</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Outputs a debug log (&quot;DEBUG: &quot;+JSON.stringify(message))</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[message]</code>
-                        <span class="type">Object</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
-                    
-
-                    <div class="param-description">
-                        <p>messages to output</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
-        
-
-        
-
-        
-
-        
-    </div>
+<div class="file">
+    <pre class="code prettyprint linenums">
+var storage = require(&#x27;node-persist&#x27;),
+	tools = require(&#x27;./tools.js&#x27;);
+storage.initSync({
+	dir: &#x27;owners/&#x27;
+});
+/**
+ * Owners class
+ * @module owners
+ * @class owners
+ * @static
+ */
+module.exports = (function(){
+	var self = this,
+		owners;
+	/**
+	 * Returns all the owners
+	 * @method values
+	 * @return {Map} owners
+	 */
+	self.values = function(){
+		self.fetch();
+		return owners;
+	};
+	/**
+	 * The number of owners stored
+	 * @type {Number}
+	 * @property length
+	 * @static
+	 */
+	Object.defineProperty(self,&#x27;length&#x27;,{
+		enumerable: true,
+		get: function(){
+			self.fetch();
+			var i,
+				c=0;
+			for(i in owners){
+				c++;
+			}
+			return c;
+		}
+	});
+	/**
+	 * Fetch the current state of the object
+	 * @method fetch
+	 * @chainable
+	 */
+	self.fetch = function(){
+		owners = storage.getItem(&#x27;owners&#x27;);
+		return self;
+	};
+	/**
+	 * Flushes changes to the object
+	 * @method flush
+	 * @chainable
+	 */
+	self.flush = function(){
+		storage.setItem(&#x27;owners&#x27;,owners);
+		return self;
+	};
+	/**
+	 * Gets a owner object
+	 * @param  {String} nick nick that the owner is registered under
+	 * @return {Map} The owner object
+	 */
+	self.get = function(nick){
+		self.fetch();
+		return owners[nick];
+	};
+	/**
+	 * Adds or updates a owner
+	 * @method add
+	 * @param {String} nick The nick that the owner is registered under
+	 * @param {Map} options parameters to store on the owner
+	 * @chainable
+	 */
+	self.add = function(nick,options){
+		self.fetch();
+		var owner = owners[nick],
+			i;
+		if(owner === undefined){
+			owner = {
+				nick: nick,
+				hostmasks: [],
+				flags: &#x27;v&#x27;
+			};
+		}
+		for(i in options){
+			owner[i] = options[i];
+		}
+		owners[nick] = owner;
+		self.flush();
+		return self;
+	};
+	/**
+	 * Removes a owner from the object
+	 * @method remove
+	 * @param  {String} nick The nick that the owner is registered under
+	 * @chainable
+	 */
+	self.remove = function(nick){
+		self.fetch();
+		var o = {},
+			i;
+		for(i in owners){
+			if(i != nick){
+				o[i] = owners[i];
+			}
+		}
+		owners = o;
+		self.flush();
+		return self;
+	};
+	/**
+	 * Adds a hostmask to a owner
+	 * @method addHostMask
+	 * @param {String} nick     The nick the owner is registered under
+	 * @param {String} hostmask The hostmask to add to the owner
+	 * @chainable
+	 */
+	self.addHostMask = function(nick,hostmask){
+		if(self.match(hostmask) === undefined){
+			var owner = owners[nick];
+			if(owner === undefined){
+				self.add(nick);
+				owner = owners[nick];
+			}
+			owner.hostmasks.push(hostmask);
+			owners[nick] = owner;
+			self.flush();
+		}
+		return self;
+	};
+	/**
+	 * Remove a hostmask from a owner
+	 * @param  {String} nick     The nick the owner is registered under
+	 * @param  {String} hostmask The hostmask to remove from the owner
+	 * @chainable
+	 */
+	self.removeHostMask = function(hostmask){
+		var owner = self.match(hostmask),
+			i;
+		if(owner !== undefined){
+			for(i=0;i&lt;owner.hostmasks.length;i++){
+				if(owner.hostmasks[i] == hostmask){
+					owner.hostmasks.splice(i,1);
+				}
+			}
+			owners[owner.nick] = owner;
+		}
+		self.flush();
+		return self;
+	};
+	/**
+	 * Returns the owner who matches the hostmask
+	 * @param  {String} hostmask Hostmask to search for.
+	 * @return {Object}          owner who matched the hostmask, undefined if none found.
+	 */
+	self.match = function(hostmask){
+		self.fetch();
+		var owner,
+			i,
+			ii,
+			iii,
+			h;
+		console.log(&#x27;Looking for match: &#x27;+hostmask);
+		for(i in owners){
+			owner = owners[i];
+			console.log(&#x27;	&#x27;+owner.nick);
+			for(ii=0;ii&lt;owner.hostmasks.length;ii++){
+				h = owner.hostmasks[ii];
+				console.log(&#x27;		&#x27;+h);
+				if(h.indexOf(&#x27;*&#x27;) != -1){
+					var s = tools.wildcardString(h);
+					console.log(&#x27;			/&#x27;+s+&#x27;/ == &#x27;+hostmask.search(new RegExp(s)));
+					if(hostmask.search(new RegExp(s)) != -1){
+						return owner;
+					}
+				}else if(h == hostmask){
+					return owner;
+				}
+			}
+		}
+	};
+	self.fetch();
+	if(owners === undefined){
+		owners = {};
+		self.flush();
+	}
+	return self;
+})();
+    </pre>
 </div>
 
                     </div>

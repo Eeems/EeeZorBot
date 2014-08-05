@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -192,6 +196,16 @@ module.exports = function(nick,username,host,realname,server){
 		self.server.send(&#x27;WHOIS &#x27;+self.nick);
 		return self;
 	};
+	/**
+	 * The current hostmask for the user
+	 * @property hostmask
+	 * @type {String}
+	 */
+	Object.defineProperty(self,&#x27;hostmask&#x27;,{
+		get: function(){
+			return self.nick+&#x27;!&#x27;+self.username+&#x27;@&#x27;+self.host;
+		}
+	});
 	return self;
 };
     </pre>

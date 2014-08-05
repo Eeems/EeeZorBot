@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -180,6 +184,16 @@ exports.mkdirParent = function(dirPath,mode){
 exports.regexString = function(str){
 	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, &quot;\\$&amp;&quot;);
 };
+/**
+ * Makes a string safe for use in RegExp with * converted to .+
+ * @method wildcardString
+ * @param {string} str
+ * @return {string} RegExp safe string with * turned to .+
+ */
+exports.wildcardString = function(str){
+	return str.replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g,&quot;\\$&amp;&quot;).replace(/\*/g,&#x27;.+&#x27;);
+};
+
     </pre>
 </div>
 

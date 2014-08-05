@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -196,13 +200,6 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_users">users</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
                                 <a href="#method_who">who</a>
 
                                 
@@ -218,6 +215,13 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property__topic">_topic</a>
+
+                                
+                                
+                            </li>
                         
                             <li class="index-item property">
                                 <a href="#property_modes">modes</a>
@@ -244,6 +248,13 @@
                         
                             <li class="index-item property">
                                 <a href="#property_topic">topic</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_users">users</a>
 
                                 
                                 
@@ -297,7 +308,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l123"><code>lib\channel.js:123</code></a>
+        <a href="../files/lib_channel.js.html#l132"><code>lib\channel.js:132</code></a>
         
         </p>
 
@@ -370,7 +381,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l89"><code>lib\channel.js:89</code></a>
+        <a href="../files/lib_channel.js.html#l98"><code>lib\channel.js:98</code></a>
         
         </p>
 
@@ -468,7 +479,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l114"><code>lib\channel.js:114</code></a>
+        <a href="../files/lib_channel.js.html#l123"><code>lib\channel.js:123</code></a>
         
         </p>
 
@@ -485,79 +496,6 @@
 
     
 
-    
-
-    
-</div>
-
-                
-                    <div id="method_users" class="method item">
-    <h3 class="name"><code>users</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Array</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_channel.js.html#l72"><code>lib\channel.js:72</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns an array of all the users in the channel</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Array</span>:
-                    
-                    <p>users</p>
-
-                
-            </div>
-        </div>
     
 
     
@@ -598,7 +536,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l57"><code>lib\channel.js:57</code></a>
+        <a href="../files/lib_channel.js.html#l63"><code>lib\channel.js:63</code></a>
         
         </p>
 
@@ -627,6 +565,53 @@
         
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property__topic" class="property item private">
+    <h3 class="name"><code>_topic</code></h3>
+    <span class="type">Unknown</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_channel.js.html#l42"><code>lib\channel.js:42</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Interface for setting the topic internally</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="property_modes" class="property item">
@@ -744,7 +729,7 @@
             
         
         
-        <a href="../files/lib_channel.js.html#l47"><code>lib\channel.js:47</code></a>
+        <a href="../files/lib_channel.js.html#l53"><code>lib\channel.js:53</code></a>
         
         </p>
 
@@ -799,8 +784,52 @@
     </div>
 
     <div class="description">
-        <p>Contains the topic of the channel
-To set the value without sending a topic command change the value to an array with the topic in it (ie: [&#39;new topic&#39;])</p>
+        <p>Contains the topic of the channel and tries to change it if set</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_users" class="property item">
+    <h3 class="name"><code>users</code></h3>
+    <span class="type">Unknown</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_channel.js.html#l78"><code>lib\channel.js:78</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns an array of all the users in the channel</p>
 
     </div>
 

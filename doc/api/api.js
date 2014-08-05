@@ -8,6 +8,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "api",
         "debug",
         "log",
+        "owners",
         "server",
         "stdin",
         "tools"
@@ -18,6 +19,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "debug",
         "listdb",
         "log",
+        "owners",
         "script",
         "server",
         "stdin",
@@ -49,6 +51,11 @@ YUI.add("yuidoc-meta", function(Y) {
             "displayName": "log",
             "name": "log",
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files"
+        },
+        {
+            "displayName": "owners",
+            "name": "owners",
+            "description": "Owners class"
         },
         {
             "displayName": "script",

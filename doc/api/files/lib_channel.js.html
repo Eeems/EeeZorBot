@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -152,23 +156,29 @@ module.exports = function(server,name){
 	 */
 	self.modes = [];
 	/**
-	 * Contains the topic of the channel
-	 * To set the value without sending a topic command change the value to an array with the topic in it (ie: [&#x27;new topic&#x27;])
+	 * Contains the topic of the channel and tries to change it if set
 	 * @type {String}
 	 * @property topic
 	 */
 	Object.defineProperty(self,&#x27;topic&#x27;,{
 		set: function(val){
-			if(!(val instanceof Array)){
-				self.server.send(&#x27;TOPIC &#x27;+self.name+&#x27; &#x27;+val);
-			}else{
-				topic = val[0];
-			}
+			self.server.send(&#x27;TOPIC &#x27;+self.name+&#x27; &#x27;+val);
 		},
 		get: function(){
 			return topic;
 		},
 		enumerable: true
+	});
+	/**
+	 * Interface for setting the topic internally
+	 * @property _topic
+	 * @private
+	 */
+	Object.defineProperty(self,&#x27;_topic&#x27;,{
+		set: function(val){
+			topic = val;
+		},
+		enumerable: false
 	});
 	/**
 	 * Parent server
@@ -188,8 +198,8 @@ module.exports = function(server,name){
 	self.who = function(){
 		var i,
 			user;
-		while(self.users().length &gt; 0){
-			user = self.users()[0];
+		while(self.users.length &gt; 0){
+			user = self.users[0];
 			user.channels.splice(user.channels.indexOf(self));
 		}
 		self.server.send(&#x27;WHO &#x27;+self.name);
@@ -197,21 +207,24 @@ module.exports = function(server,name){
 	};
 	/**
 	 * Returns an array of all the users in the channel
-	 * @method users
+	 * @property users
 	 * @return {Array} users
 	 */
-	self.users = function(){
-		var users = [],
-			i,
-			user;
-		for(i=0;i&lt;server.users.length;i++){
-			user = server.users[i];
-			if(user.channels.indexOf(self) != -1){
-				users.push(user);
+	Object.defineProperty(self,&#x27;users&#x27;,{
+		get: function(){
+			var users = [],
+				i,
+				user;
+			for(i=0;i&lt;server.users.length;i++){
+				user = server.users[i];
+				if(user.channels.indexOf(self) != -1){
+					users.push(user);
+				}
 			}
-		}
-		return users;
-	};
+			return users;
+		},
+		enumerable: true
+	});
 	/**
 	 * Sets the mode of the channel, or users in the channel
 	 * @method mode

@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -141,9 +145,10 @@ module.exports = function(path,server,sid){
 	var self = this,
 		watcher = {
 			close: function(){}
-		},i;
+		},
+		i;
 	self.api = {
-		process: process
+		script: self
 	};
 	for(i in api){
 		self.api[i] = api[i];
@@ -152,14 +157,22 @@ module.exports = function(path,server,sid){
 	 * stores the script identifier
 	 * @property sid
 	 * @type {number}
+	 * @static
 	 */
-	self.sid = sid;
+	Object.defineProperty(self,&#x27;sid&#x27;,{
+		value: sid,
+		enumerable: true
+	});
 	/**
 	 * Stores a reference to the server that this script is used on
 	 * @property server
 	 * @type {Server}
+	 * @static
 	 */
-	self.server = server;
+	Object.defineProperty(self,&#x27;server&#x27;,{
+		value: server,
+		enumerable: true
+	});
 	/**
 	 * The path to the script that is run
 	 * @property path
@@ -177,8 +190,8 @@ module.exports = function(path,server,sid){
 	 * @method reload
 	 * @chainable
 	 */
-	self.reload = function(){
-		log.log(&#x27;reloading script&#x27;);
+	self.load = function(){
+		log.log(&#x27;loading script&#x27;);
 		try{
 			d = fs.readFileSync(path);
 			self.api._path = self.path;
@@ -200,6 +213,7 @@ module.exports = function(path,server,sid){
 	 */
 	self.disable = function(){
 		self.server.run(sid,function(){
+			self.unload.call(self);
 			self.server.off();
 			self.server.remove();
 			self.enabled = false;
@@ -214,13 +228,15 @@ module.exports = function(path,server,sid){
 	self.enable = function(){
 		self.disable();
 		watcher = fs.watch(self.path,function(e,npath){
+			console.log(e,npath);
 			if(e == &#x27;change&#x27; &amp;&amp; self.enabled){
-				self.reload();
+				self.disable();
+				self.load();
 			}else if(e == &#x27;rename&#x27;){
 				self.path = npath;
 			}
 		});
-		self.reload();
+		self.load();
 		return self;
 	};
 	/**
@@ -234,6 +250,13 @@ module.exports = function(path,server,sid){
 		self.server.scripts[sid-1] = null;
 		return self;
 	};
+	/**
+	 * Function to run when the script is unloaded
+	 * @property unload
+	 * @event
+	 * @type {Function}
+	 */
+	self.unload = function(){};
 	self.enable();
 	return self;
 };
