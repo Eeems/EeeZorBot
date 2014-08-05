@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -131,65 +135,109 @@
  * @static
  */
 var api = {
-	/**
-	 * Provides the tools module
-	 * @static
-	 * @property tools
-	 */
-	tools: require(&#x27;./tools.js&#x27;),
-	/**
-	 * Provides the log module
-	 * @static
-	 * @property log
-	 */
-	log: require(&#x27;./log.js&#x27;),
-	/**
-	 * Provides the Channel class
-	 * @static
-	 * @constructor
-	 * @property Channel
-	 */
-	Channel: require(&#x27;./channel.js&#x27;),
-	/**
-	 * Provides the User class
-	 * @static
-	 * @property User
-	 * @constructor
-	 */
-	User: require(&#x27;./user.js&#x27;),
-	/**
-	 * Provides the Server class
-	 * @static
-	 * @property Server
-	 * @constructor
-	 */
-	Server: require(&#x27;./server.js&#x27;),
-	/**
-	 * Provides the stdin module
-	 * @static
-	 * @property stdin
-	 */
-	stdin: require(&#x27;./stdin.js&#x27;),
-	/**
-	 * Provides the Listdb class
-	 * @static
-	 * @property Listdb
-	 * @constructor
-	 */
-	Listdb: require(&#x27;./listdb.js&#x27;),
-	/**
-	 * Provides the debug module
-	 * @static
-	 * @property debug
-	 */
-	debug: require(&#x27;./debug.js&#x27;),
-	/**
-	 * Provides a circular reference to API
-	 * @static
-	 * @property api
-	 */
-	api: api
-};
+		/**
+		 * Provides the tools module
+		 * @static
+		 * @property tools
+		 */
+		tools: require(&#x27;./tools.js&#x27;),
+		/**
+		 * Provides the log module
+		 * @static
+		 * @property log
+		 */
+		log: require(&#x27;./log.js&#x27;),
+		/**
+		 * Provides the Channel class
+		 * @static
+		 * @constructor
+		 * @property Channel
+		 */
+		Channel: require(&#x27;./channel.js&#x27;),
+		/**
+		 * Provides the User class
+		 * @static
+		 * @property User
+		 * @constructor
+		 */
+		User: require(&#x27;./user.js&#x27;),
+		/**
+		 * Provides the Server class
+		 * @static
+		 * @property Server
+		 * @constructor
+		 */
+		Server: require(&#x27;./server.js&#x27;),
+		/**
+		 * Provides the stdin module
+		 * @static
+		 * @property stdin
+		 */
+		stdin: require(&#x27;./stdin.js&#x27;),
+		/**
+		 * Provides the Listdb class
+		 * @static
+		 * @property Listdb
+		 * @constructor
+		 */
+		Listdb: require(&#x27;./listdb.js&#x27;),
+		/**
+		 * Provides the debug module
+		 * @static
+		 * @property debug
+		 */
+		debug: require(&#x27;./debug.js&#x27;),
+		/**
+		 * Provides the owners interface
+		 * @static
+		 * @property owners
+		 * @constructor
+		 */
+		owners: require(&#x27;./owners.js&#x27;),
+		/**
+		 * Provides a circular reference to API
+		 * @static
+		 * @property api
+		 */
+		api: api,
+		/**
+		 * Provides access to the global console object
+		 * @static
+		 * @property console
+		 */
+		console: console,
+		/**
+		 * Provides access to the global process object
+		 * @static
+		 * @property process
+		 */
+		process: process
+	},
+	servers = [],
+	i;
+/**
+ * Provides access to all servers
+ * @static
+ * @property servers
+ */
+Object.defineProperty(api,&#x27;servers&#x27;,{
+	get: function(){
+		return servers;
+	},
+	set: function(){
+		throw &quot;You can&#x27;t change this variable&quot;;
+	}
+});
+/**
+ * The API version
+ * @property version
+ * @type {String}
+ * @protected
+ */
+Object.defineProperty(api,&#x27;version&#x27;,{
+	value: &#x27;0.2&#x27;,
+	writable: false
+});
 module.exports = api;
     </pre>
 </div>

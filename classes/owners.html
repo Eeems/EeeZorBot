@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Script - EeeZorBot API</title>
+    <title>owners - EeeZorBot API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -124,7 +124,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Script Class</h1>
+                        <h1>owners Class</h1>
 <div class="box meta">
     
 
@@ -132,13 +132,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/lib_script.js.html#l5"><code>lib\script.js:5</code></a>
+            Defined in: <a href="../files/lib_owners.js.html#l6"><code>lib\owners.js:6</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/script.html">script</a>
+            Module: <a href="../modules/owners.html">owners</a>
         
     
 
@@ -148,15 +148,113 @@
 
 
 <div class="box intro">
-    <p>Provides a script object that allows a server to handle the loaded script</p>
+    <p>Owners class</p>
 
 </div>
 
 
-    <div class="constructor">
-        <h2>Constructor</h2>
-        <div id="method_Script" class="method item">
-    <h3 class="name"><code>Script</code></h3>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_add">add</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_addHostMask">addHostMask</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_fetch">fetch</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_flush">flush</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_remove">remove</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_values">values</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#property_length">length</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_add" class="method item">
+    <h3 class="name"><code>add</code></h3>
 
     
         <div class="args">
@@ -164,19 +262,13 @@
             
                 <li class="arg">
                     
-                        <code>path</code>
+                        <code>nick</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>server</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>sid</code>
+                        <code>options</code>
                     
                 </li>
             
@@ -195,6 +287,8 @@
     
 
     
+        <span class="flag chainable">chainable</span>
+    
 
     
 
@@ -209,7 +303,7 @@
             
         
         
-        <a href="../files/lib_script.js.html#l5"><code>lib\script.js:5</code></a>
+        <a href="../files/lib_owners.js.html#l69"><code>lib\owners.js:69</code></a>
         
         </p>
 
@@ -220,7 +314,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Adds or updates a owner</p>
+
     </div>
 
     
@@ -231,14 +326,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">path</code>
+                        <code class="param-name">nick</code>
                         <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The path to the script</p>
+                        <p>The nick that the owner is registered under</p>
 
                     </div>
 
@@ -247,30 +342,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">server</code>
-                        <span class="type">Server</span>
+                        <code class="param-name">options</code>
+                        <span class="type">Map</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The server this script is on</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">sid</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The script identifier for this script</p>
+                        <p>parameters to store on the owner</p>
 
                     </div>
 
@@ -286,136 +365,122 @@
     
 </div>
 
-    </div>
+                
+                    <div id="method_addHostMask" class="method item">
+    <h3 class="name"><code>addHostMask</code></h3>
 
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-        
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-        
-        
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
-        
-        
-        
-            <li class="api-class-tab events"><a href="#events">Events</a></li>
-        
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
             
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                        
-                            <li class="index-item method">
-                                <a href="#method_disable">disable</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_enable">enable</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_reload">reload</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_remove">remove</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
+                <li class="arg">
+                    
+                        <code>nick</code>
+                    
+                </li>
             
-
+                <li class="arg">
+                    
+                        <code>hostmask</code>
+                    
+                </li>
             
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                        
-                            <li class="index-item property">
-                                <a href="#property_enabled">enabled</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_path">path</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_server">server</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_sid">sid</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
-
-            
-
-            
-                <div class="index-section events">
-                    <h3>Events</h3>
-
-                    <ul class="index-list events">
-                        
-                            <li class="index-item event">
-                                <a href="#event_"></a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
+            </ul><span class="paren">)</span>
         </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag chainable">chainable</span>
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_owners.js.html#l113"><code>lib\owners.js:113</code></a>
+        
+        </p>
+
 
         
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
+
+        
+    </div>
+
+    <div class="description">
+        <p>Adds a hostmask to a owner</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">nick</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The nick the owner is registered under</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">hostmask</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The hostmask to add to the owner</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
 
                 
-                    <div id="method_disable" class="method item">
-    <h3 class="name"><code>disable</code></h3>
+                    <div id="method_fetch" class="method item">
+    <h3 class="name"><code>fetch</code></h3>
 
     
         <span class="paren">()</span>
@@ -448,7 +513,7 @@
             
         
         
-        <a href="../files/lib_script.js.html#l79"><code>lib\script.js:79</code></a>
+        <a href="../files/lib_owners.js.html#l42"><code>lib\owners.js:42</code></a>
         
         </p>
 
@@ -459,7 +524,7 @@
     </div>
 
     <div class="description">
-        <p>Disables the script (hooks, commands etc)</p>
+        <p>Fetch the current state of the object</p>
 
     </div>
 
@@ -471,8 +536,8 @@
 </div>
 
                 
-                    <div id="method_enable" class="method item">
-    <h3 class="name"><code>enable</code></h3>
+                    <div id="method_flush" class="method item">
+    <h3 class="name"><code>flush</code></h3>
 
     
         <span class="paren">()</span>
@@ -505,7 +570,7 @@
             
         
         
-        <a href="../files/lib_script.js.html#l93"><code>lib\script.js:93</code></a>
+        <a href="../files/lib_owners.js.html#l51"><code>lib\owners.js:51</code></a>
         
         </p>
 
@@ -516,64 +581,7 @@
     </div>
 
     <div class="description">
-        <p>Description</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_reload" class="method item">
-    <h3 class="name"><code>reload</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag chainable">chainable</span>
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_script.js.html#l58"><code>lib\script.js:58</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>reloads the script from the disk</p>
+        <p>Flushes changes to the object</p>
 
     </div>
 
@@ -589,7 +597,17 @@
     <h3 class="name"><code>remove</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>nick</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -619,7 +637,7 @@
             
         
         
-        <a href="../files/lib_script.js.html#l112"><code>lib\script.js:112</code></a>
+        <a href="../files/lib_owners.js.html#l94"><code>lib\owners.js:94</code></a>
         
         </p>
 
@@ -630,12 +648,109 @@
     </div>
 
     <div class="description">
-        <p>Disables and removes the script from the server.</p>
+        <p>Removes a owner from the object</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">nick</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The nick that the owner is registered under</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_values" class="method item">
+    <h3 class="name"><code>values</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Map</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/lib_owners.js.html#l15"><code>lib\owners.js:15</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns all the owners</p>
 
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Map</span>:
+                    
+                    <p>owners</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -650,145 +765,8 @@
                 <h2 class="off-left">Properties</h2>
 
                 
-                    <div id="property_enabled" class="property item">
-    <h3 class="name"><code>enabled</code></h3>
-    <span class="type">Boolean</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_script.js.html#l52"><code>lib\script.js:52</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Boolean determining if the script is currently active</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_path" class="property item">
-    <h3 class="name"><code>path</code></h3>
-    <span class="type">String</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_script.js.html#l46"><code>lib\script.js:46</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The path to the script that is run</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_server" class="property item">
-    <h3 class="name"><code>server</code></h3>
-    <span class="type">Server</span>
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_script.js.html#l36"><code>lib\script.js:36</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Stores a reference to the server that this script is used on</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_sid" class="property item">
-    <h3 class="name"><code>sid</code></h3>
+                    <div id="property_length" class="property item">
+    <h3 class="name"><code>length</code></h3>
     <span class="type">Number</span>
 
     
@@ -812,7 +790,7 @@
             
         
         
-        <a href="../files/lib_script.js.html#l26"><code>lib\script.js:26</code></a>
+        <a href="../files/lib_owners.js.html#l24"><code>lib\owners.js:24</code></a>
         
         </p>
 
@@ -822,7 +800,7 @@
     </div>
 
     <div class="description">
-        <p>stores the script identifier</p>
+        <p>The number of owners stored</p>
 
     </div>
 
@@ -839,56 +817,6 @@
 
         
 
-        
-            <div id="events" class="api-class-tabpanel">
-                <h2 class="off-left">Events</h2>
-
-                
-                    <div id="event_" class="events item">
-    <h3 class="name"><code></code></h3>
-    <span class="type">Function</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/lib_script.js.html#l123"><code>lib\script.js:123</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Function to run when the script is unloaded</p>
-
-    </div>
-
-    
-
-
-    
-</div>
-
-                
-            </div>
         
     </div>
 </div>

@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -130,7 +134,13 @@
  * @class stdin
  * @static
  */
-var commands = [],
+var api,
+	fs = require(&#x27;fs&#x27;),
+	vm = require(&#x27;vm&#x27;),
+	commands = [],
+	i,
+	d,
+	path,
 	config = (function(){
 		var c = require(&#x27;../etc/config.json&#x27;).stdin,
 			d = {
@@ -142,8 +152,9 @@ var commands = [],
 					error: true,
 					trace: true,
 					dir: true,
-					debug: false,
-				}
+					debug: false
+				},
+				scripts: []
 			},
 			i,
 			ii;
@@ -209,6 +220,7 @@ var commands = [],
 		 */
 		add: function(name,callback,info){
 			if(config.console){
+				stdin.console(&#x27;info&#x27;,&#x27; |  |- command &#x27;+name);
 				commands.push({
 					name: name,
 					fn: callback,
@@ -259,38 +271,142 @@ process.stdin.on(&#x27;data&#x27;,function(d){
 		}
 	}
 });
+stdin.console(&#x27;info&#x27;,&#x27;Loading stdin scripts&#x27;);
+stdin.console(&#x27;info&#x27;,&#x27; |- lib/stdin.js&#x27;);
 stdin.add(&#x27;help&#x27;,function(argv){
-	var m=&#x27;&#x27;,
-		i;
-	if(argv.length == 1){
-		for(i=0;i&lt;commands.length;i++){
-			m += commands[i].name+&#x27; &#x27;;
-		}
-		stdin.console(&#x27;log&#x27;,&#x27;Available commands:&#x27;);
-		stdin.console(&#x27;log&#x27;,m);
-	}else{
-		for(i=0;i&lt;commands.length;i++){
-			if(commands[i].name === argv[1]){
-				stdin.console(&#x27;log&#x27;,commands[i].name+&#x27;: &#x27;+commands[i].info);
+		var m=&#x27;&#x27;,
+			i;
+		if(argv.length == 1){
+			for(i=0;i&lt;commands.length;i++){
+				m += commands[i].name+&#x27; &#x27;;
+			}
+			stdin.console(&#x27;log&#x27;,&#x27;Available commands:&#x27;);
+			stdin.console(&#x27;log&#x27;,m);
+		}else{
+			for(i=0;i&lt;commands.length;i++){
+				if(commands[i].name === argv[1]){
+					stdin.console(&#x27;log&#x27;,commands[i].name+&#x27;: &#x27;+commands[i].info);
+				}
 			}
 		}
+	},&#x27;Lists all help topics, or lists information on a specific topic&#x27;)
+	.add(&#x27;exit&#x27;,function(){
+		process.exit();
+	},&#x27;Quits the bot&#x27;)
+	.add(&#x27;debug&#x27;,function(){
+		stdin.stop();
+		stdin.console(&#x27;log&#x27;,&#x27;Starting debugger&#x27;);
+		var repl = require(&#x27;repl&#x27;).start({
+				terminal: true,
+				useColor: true,
+				useGlobal: true
+			}),
+			i;
+		repl.on(&#x27;exit&#x27;,function(){
+			stdin.console(&#x27;log&#x27;,&#x27;Debugger exiting&#x27;);
+			stdin.start();
+		});
+		global.api = require(&#x27;./api.js&#x27;);
+	},&#x27;Starts the debugger&#x27;)
+	.add(&#x27;raw&#x27;,function(argv){
+		argv.shift();
+		api.servers[argv.shift()].send(argv.join(&#x27; &#x27;));
+	},&#x27;Runs a command on a server.&#x27;)
+	.add(&#x27;info&#x27;,function(argv){
+		var i,
+			ii,
+			u,
+			c,
+			m,
+			s,
+			server = api.servers[argv[1]];
+		if(server !== undefined){
+			if(argv.length &gt; 2){
+				c = server.channel(argv[2]);
+				u = server.user(argv[2]);
+				if(c){
+					console.log(&#x27;Channel : &#x27;+argv[2]);
+					if(c.topic === null){
+						console.log(&#x27;No topic set.&#x27;);
+					}else{
+						console.log(&#x27;Topic: &#x27;+c.topic);
+					}
+					console.log(&#x27;Users:&#x27;);
+					for(i=0;i&lt;c.users.length;i++){
+						u = c.users[i];
+						console.log(&#x27;	&#x27;+u.nick+&#x27; (&#x27;+u.username+&#x27;@&#x27;+u.host+&#x27; &#x27;+u.realname+&#x27;)&#x27;);
+					}
+					if(c.modes.b instanceof Array){
+						console.log(&#x27;Bans:&#x27;);
+						for(i=0;i&lt;c.modes.b.length;i++){
+							console.log(&#x27;	&#x27;+c.modes.b[i]);
+						}
+					}
+					if(c.modes.e instanceof Array){
+						console.log(&#x27;Ban Exceptions:&#x27;);
+						for(i=0;i&lt;c.modes.e.length;i++){
+							console.log(&#x27;	&#x27;+c.modes.e[i]);
+						}
+					}
+					if(c.modes.I instanceof Array){
+						console.log(&#x27;Invitations:&#x27;);
+						for(i=0;i&lt;c.modes.I.length;i++){
+							console.log(&#x27;	&#x27;+c.modes.I[i]);
+						}
+					}
+				}else if(u){
+					console.log(&#x27;Nick: &#x27;+u.nick);
+					console.log(&#x27;Username: &#x27;+u.username);
+					console.log(&#x27;Real Name: &#x27;+u.realname);
+					console.log(&#x27;Host: &#x27;+u.host);
+					console.log(&#x27;Channels:&#x27;);
+					for(i=0;i&lt;u.channels.length;i++){
+						c = u.channels[i];
+						console.log(&#x27;	&#x27;+c.name);
+						m = u.modes[c.name];
+						if(m !== undefined &amp;&amp; m.length &gt; 0){
+							s = &#x27;&#x27;;
+							for(ii=0;ii&lt;m.length;ii++){
+								s += &#x27;,&#x27;+m[ii];
+							}
+							console.log(&#x27;		Modes: &#x27;+s.substr(1));
+						}
+						if(c.topic !== null){
+							console.log(&#x27;		Topic: &#x27;+c.topic);
+						}
+					}
+				}else{
+					console.log(&#x27;Invalid channel&#x27;);
+				}
+			}else{
+				console.log(&#x27;Channels:&#x27;);
+				for(i=0;i&lt;server.channels.length;i++){
+					console.log(&#x27;	&#x27;+server.channels[i].name);
+				}
+				console.log(&#x27;Users:&#x27;);
+				for(i=0;i&lt;server.users.length;i++){
+					console.log(&#x27;	&#x27;+server.users[i].nick);
+				}
+			}
+		}else{
+			console.log(&#x27;Servers:&#x27;);
+			for(i=0;i&lt;api.servers.length;i++){
+				console.log(&#x27;	&#x27;+i+&#x27;) &#x27;+api.servers[i].config.nick+&#x27;@&#x27;+api.servers[i].config.host);
+			}
+		}
+	},&#x27;Displays information on the servers/channels/users&#x27;);
+api = require(&#x27;./api.js&#x27;);
+for(i=0;i&lt;config.scripts.length;i++){
+	try{
+		path = config.scripts[i];
+		stdin.console(&#x27;info&#x27;,&#x27; |- &#x27;+path);
+		d = fs.readFileSync(path);
+		vm.runInNewContext(d,api,path);
+	}catch(e){
+		stdin.console(&#x27;trace&#x27;);
+		stdin.console(&#x27;error&#x27;,e);
 	}
-},&#x27;Lists all help topics, or lists information on a specific topic&#x27;);
-stdin.add(&#x27;exit&#x27;,function(){
-	process.exit();
-},&#x27;Quits the bot&#x27;);
-stdin.add(&#x27;debug&#x27;,function(){
-	stdin.stop();
-	stdin.console(&#x27;log&#x27;,&#x27;Starting debugger&#x27;);
-	require(&#x27;repl&#x27;).start({
-		terminal: true,
-		useColor: true,
-		useGlobal: true
-	}).on(&#x27;exit&#x27;,function(){
-		stdin.console(&#x27;log&#x27;,&#x27;Debugger exiting&#x27;);
-		stdin.start();
-	});
-},&#x27;Starts the debugger&#x27;);
+}
     </pre>
 </div>
 

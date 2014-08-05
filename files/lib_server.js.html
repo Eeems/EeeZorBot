@@ -51,6 +51,8 @@
             
                 <li><a href="../classes/log.html">log</a></li>
             
+                <li><a href="../classes/owners.html">owners</a></li>
+            
                 <li><a href="../classes/Script.html">Script</a></li>
             
                 <li><a href="../classes/server.html">server</a></li>
@@ -74,6 +76,8 @@
                 <li><a href="../modules/listdb.html">listdb</a></li>
             
                 <li><a href="../modules/log.html">log</a></li>
+            
+                <li><a href="../modules/owners.html">owners</a></li>
             
                 <li><a href="../modules/script.html">script</a></li>
             
@@ -126,12 +130,14 @@
     <pre class="code prettyprint linenums">
 var Channel = require(&#x27;./channel.js&#x27;),
 	User = require(&#x27;./user.js&#x27;),
+	owners = require(&#x27;./owners.js&#x27;),
 	Script = require(&#x27;./script.js&#x27;),
 	net = require(&#x27;net&#x27;),
 	tools = require(&#x27;./tools.js&#x27;),
 	log = require(&#x27;./log.js&#x27;),
 	stdin = require(&#x27;./stdin.js&#x27;),
-	debug = require(&#x27;./debug.js&#x27;);
+	debug = require(&#x27;./debug.js&#x27;),
+	api = require(&#x27;./api.js&#x27;);
 process.on(&#x27;SIGINT&#x27;,function(){
 	stdin.stop();
 	process.exit();
@@ -386,7 +392,6 @@ module.exports = function(config){
 				self.info(&#x27;Connection established&#x27;);
 				self.send(&#x27;NICK &#x27;+self.config.nick);
 				self.send(&#x27;USER &#x27;+self.config.name+&#x27; localhost * &#x27;+self.config.name);
-				// TODO - Handle connection
 			});
 		}
 		return self;
@@ -399,16 +404,17 @@ module.exports = function(config){
 	 */
 	self.send = function(d){
 		if(d.length &gt; 510){
-			// TODO - too large
+			self.fire(&#x27;error&#x27;,[new Error(&#x27;Send String too long&#x27;)],self);
+			return self;
 		}
 		try{
-			self.logOut(d);
 			self.socket.write(d+&#x27;\r\n&#x27;,&#x27;ascii&#x27;,function(){
-				// TODO - data sent
+				self.logOut(d);
+				self.fire(&#x27;send&#x27;,[d],self);
 			});
 		}catch(e){
 			self.error(e);
-			// TODO - data failed to send
+			self.fire(&#x27;error&#x27;,[e],self);
 		}
 		return self;
 	};
@@ -463,6 +469,8 @@ module.exports = function(config){
 						t = true;
 					}else if(h.type == &#x27;event&#x27; &amp;&amp; h.name === hook){
 						t = true;
+					}else if(hook === undefined){
+						t = true;
 					}
 					t = t &amp;&amp; (callback === undefined || h.fn === callback);
 				}
@@ -483,6 +491,7 @@ module.exports = function(config){
 	 */
 	self.add = function(command,callback,help){
 		if(self.commands[command] === undefined){
+			debug.log(&#x27;Adding command: &#x27;+command+&#x27; with help entry: &#x27;+help);
 			self.commands[command] = {
 				fn: callback,
 				sid: sid,
@@ -521,6 +530,7 @@ module.exports = function(config){
 		var i,
 			hook;
 		scope = scope===undefined?self:scope;
+		args = args===undefined?[]:args;
 		for(i=0;i&lt;self.hooks.length;i++){
 			hook = self.hooks[i];
 			if(hook.type == &#x27;event&#x27; &amp;&amp; hook.name == name){
@@ -667,320 +677,390 @@ module.exports = function(config){
 	process.on(&#x27;exit&#x27;,function(){
 		self.quit();
 	});
-	self.on(/:.+ 001 .+ :.+/i,function(){
-		var i;
-		for(i=0;i&lt;config.channels.length;i++){
-			self.join(config.channels[i]);
-		}
-		if(self.config.nickserv !== undefined){
-			self.send(&#x27;PRIVMSG NickServ :identify &#x27;+self.config.nickserv.nick+&#x27; &#x27;+self.config.nickserv.password);
-		}
-	});
-	self.on(new RegExp(&quot;^:(\\w+)!(.+)@(.+)\\sPRIVMSG\\s(\\#?\\w+)\\s:?&quot;+tools.regexString(self.config.prefix)+&quot;(\\S+)\\s?(.+)?$&quot;,&#x27;i&#x27;),function(m){
-		// 1 - nick
-		// 2 - username
-		// 3 - host
-		// 4 - channel
-		// 5 - command
-		// 6 - arguments
-		var c = self.commands[m[5]],
-			i,
-			a = m[6],
-			u = self.user(m[1]),
-			ch = self.channel(m[4]);
-		a = a===undefined?[]:a.split(&#x27; &#x27;);
-		if(ch === false){
-			ch = new Channel(self,m[4]);
-		}
-		if(u === false){
-			u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-			u.channels.push(ch);
-			self.users.push(u);
-		}
-		if(c !== undefined){
-			c.fn.apply({
-				server: self,
-				argv: a,
-				channel: ch,
-				user: u
-			},a);
-		}
-	});
-	self.on(new RegExp(&#x27;:.+ 315 .+ (\\S+) :End of \/WHO list.&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - channel
-		var c = self.channel(m[1]);
-		if(!c){
-			c = new Channel(self,m[1]);
-			self.channels.push(c);
-		}
-		self.fire(&#x27;who&#x27;,[c],self);
-	});
-	self.on(new RegExp(&#x27;:.+ 352 .+ (.+) (.+) (.+) (.+) (.+) .+ :(\\d+) (.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - channel
-		// 2 - username
-		// 3 - host
-		// 4 - 
-		// 5 - nick
-		// 6 - 
-		// 7 - realname
-		var user = self.user(m[5]),
-			channel = self.channel(m[1]);
-		if(!channel){
-			channel = new Channel(self,m[1]);
-			self.channels.push(channel);
-		}
-		if(user){
-			if(user.channels.indexOf(channel)){
-				user.channels.push(channel);
+	self.on(&#x27;error&#x27;,function(e){
+			self.error(e);
+		})
+		// RPL_WELCOME
+		.on(/:.+ 001 .+ :.+/i,function(){
+			var i;
+			for(i=0;i&lt;config.channels.length;i++){
+				self.join(config.channels[i]);
 			}
-		}else{
-			user = new User(m[5],m[2],m[3],m[7],self);
-			user.channels.push(channel);
-			self.user(user);
-		}
-		user.whois();
-	});
-	self.on(new RegExp(&#x27;:.+ 311 .+ (\\S+) (.+) (.+) * :(.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - nick
-		// 2 - username
-		// 3 - host
-		// 4 - realname
-		var user = self.user(m[1]);
-		if(!user){
-			user = new User(m[1],m[2],m[3],m[4],self);
-			self.users.push(user);
-		}else{
-			user.username = m[2];
-			user.host = m[3];
-			user.realname = m[4];
-		}
-	});
-	self.on(new RegExp(&#x27;:.+ 319 .+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - Nick
-		// 2 - channels
-		var user = (function(nick){
-				var u = self.user(nick);
-				if(!u){
-					u = new User(nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-				}
-				return u;
-			})(m[1]),
-			channels = m[2].split(&#x27; &#x27;),
-			i,
-			ii,
-			channel,
-			modes,
-			mode;
-		user.modes = {};
-		for(i=0;i &lt; channels.length;i++){
-			channel = channels[i];
-			modes = channel.substr(0,channel.indexOf(&#x27;#&#x27;));
-			channel = channel.substr(channel.indexOf(&#x27;#&#x27;));
-			channel = self.channel(channel);
+			if(self.config.nickserv !== undefined){
+				self.send(&#x27;PRIVMSG NickServ :identify &#x27;+self.config.nickserv.nick+&#x27; &#x27;+self.config.nickserv.password);
+			}
+		})
+		// PRIVMSG
+		.on(new RegExp(&quot;^:(\\w+)!(.+)@(.+)\\sPRIVMSG\\s(\\#?\\w+)\\s:?&quot;+tools.regexString(self.config.prefix)+&quot;(\\S+)\\s?(.+)?$&quot;,&#x27;i&#x27;),function(m){
+			// 1 - nick
+			// 2 - username
+			// 3 - host
+			// 4 - channel
+			// 5 - command
+			// 6 - arguments
+			var c = self.commands[m[5]],
+				i,
+				a = m[6],
+				u = self.user(m[1]),
+				ch = self.channel(m[4]);
+			a = a===undefined?[]:a.split(&#x27; &#x27;);
+			if(ch === false){
+				ch = new Channel(self,m[4]);
+			}
+			if(u === false){
+				u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
+				u.channels.push(ch);
+				self.users.push(u);
+			}
+			if(c !== undefined){
+				c.fn.apply({
+					server: self,
+					argv: a,
+					channel: ch,
+					user: u
+				},a);
+			}
+		})
+		// RPL_ENDOFWHO
+		.on(new RegExp(&#x27;:.+ 315 .+ (\\S+) :End of \/WHO list.&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - channel
+			var c = self.channel(m[1]);
+			if(!c){
+				c = new Channel(self,m[1]);
+				self.channels.push(c);
+			}
+			self.fire(&#x27;who&#x27;,[c],self);
+		})
+		// RPL_WHOREPLY
+		.on(new RegExp(&#x27;:.+ 352 .+ (.+) (.+) (.+) (.+) (.+) .+ :(\\d+) (.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - channel
+			// 2 - username
+			// 3 - host
+			// 4 - 
+			// 5 - nick
+			// 6 - 
+			// 7 - realname
+			var user = self.user(m[5]),
+				channel = self.channel(m[1]);
 			if(!channel){
-				channel = new Channel(self,channels[i]);
+				channel = new Channel(self,m[1]);
 				self.channels.push(channel);
 			}
-			if(user.channels.indexOf(channel) == -1){
-				user.channels.push(channel);
-			}
-			user.modes[channel.name] = [];
-			for(ii=0;ii &lt; modes.length;ii++){
-				mode = modes[i];
-				switch(mode){
-					case &#x27;+&#x27;:
-						mode=&#x27;v&#x27;;
-					break;
-					case &#x27;%&#x27;:
-						mode=&#x27;h&#x27;;
-					break;
-					case &#x27;@&#x27;:
-						mode=&#x27;o&#x27;;
-					break;
-					case &#x27;&amp;&#x27;:
-						mode=&#x27;a&#x27;;
-					break;
-					case &#x27;~&#x27;:
-						mode=&#x27;q&#x27;;
-					break;
-				}
-				if(mode !== undefined){
-					user.modes[channel.name].push(mode);
-				}
-			}
-		}
-	});
-	self.on(new RegExp(&#x27;:.+ 324 .+ (\\S+) \\+(.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - channel
-		// 2 - modes
-		var channel = self.channel(m[1]),
-			i,
-			modes = m[2];
-		if(!channel){
-			channel = new Channel(m[1],self);
-			self.channels.push(channel);
-		}
-		for(i in channel.modes){
-			if(!(channel.modes[i] instanceof Array)){
-				channel.modes[i] = modes.indexOf(i) !== -1;
-			}
-		}
-	});
-	self.on(new RegExp(&#x27;:.+ (367|348|346) \\S+ (\\S+) (\\S+) (\\S+) (\\d+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - code
-		// 2 - channel
-		// 3 - hostmask
-		// 4 - user
-		// 5 - timestamp
-		var channel = self.channel(m[1]),
-			i,
-			mode;
-		switch(m[1]){
-			case 367:mode=&#x27;b&#x27;;break;
-			case 348:mode=&#x27;e&#x27;;break;
-			case 346:mode=&#x27;I&#x27;;break;
-		}
-		if(!channel){
-			channel = new Channel(m[2],self);
-			self.channels.push(channel);
-		}
-		if(!(channel.modes[mode] instanceof Array)){
-			channel.modes[mode] = [];
-		}
-		if(channel.modes[mode].indexOf(m[3]) === -1){
-			channel.modes[mode].push(m[3]);
-		}
-	});
-	//:my.server.name 332 nodebot #irp :testing
-	self.on(new RegExp(&#x27;:.+ (331|332) \\S+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - code
-		// 2 - channel
-		// 3 - topic
-		var channel = self.channel(m[2]);
-		if(!channel){
-			channel = new Channel(m[2],self);
-			self.channels.push(channel);
-		}
-		if(m[1] == 331){
-			channel.topic = [null];
-		}else{
-			channel.topic = [m[3]];
-		}
-		channel.who();							// get users
-		self.send(&#x27;MODE &#x27;+channel.name);		// get modes
-		self.send(&#x27;MODE &#x27;+channel.name+&#x27; b&#x27;);	// get bans
-		self.send(&#x27;MODE &#x27;+channel.name+&#x27; e&#x27;);	// get exceptions
-		self.send(&#x27;MODE &#x27;+channel.name+&#x27; I&#x27;);	// get invitation masks
-	});
-	self.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) TOPIC (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - nick
-		// 2 - username
-		// 3 - host
-		// 4 - channel
-		// 5 - topic
-		var channel = self.channel(m[4]);
-		if(!channel){
-			channel = new Channel(m[4],self);
-			self.channels.push(channel);
-		}
-		channel.topic = [m[5]];
-	});
-	
-	self.on(new RegExp(&#x27;:(.+)\\!(.+)@(.+) MODE (\\S+) (\\S+) ?(.+)?&#x27;,&#x27;i&#x27;),function(m){
-		// 1 - nick (doing the action)
-		// 2 - username
-		// 3 - host
-		// 4 - channel
-		// 5 - modes
-		// 6 - nick (recieving the action)
-		var guser = function(nick){
-				var user = self.user(nick); //m[6]
-				if(!user){
-					user = new User(m[1],&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-					self.users.push(user);
-				}
-				if(user.channels.indexOf(channel) === -1){
+			if(user){
+				if(user.channels.indexOf(channel)){
 					user.channels.push(channel);
 				}
-				if(user.modes[channel.name] === undefined){
-					user.modes[channel.name] = [];
-				}
-				return user;
-			},
-			channel = self.channel(m[4]),
-			i,
-			ii = 0,
-			user,
-			state = m[5][0],
-			mode,
-			index,
-			argv = m[6] === undefined?[]:m[6].split(&#x27; &#x27;);
-		if(!channel){
-			channel = new Channel(m[4],self);
-		}
-		for(i=1;i&lt;m[5].length;i++){
-			mode = m[5][i];
-			if(&#x27;+-&#x27;.indexOf(mode) !== -1){
-				state = mode;
 			}else{
-				if(&#x27;vhoaq&#x27;.indexOf(mode) !== -1 &amp;&amp; argv[ii] !== undefined){
-					user = guser(argv[ii]);
-					if(state == &#x27;+&#x27;){
-						if(user.modes[channel.name].indexOf(mode) === -1){
-							user.modes[channel.name].push(mode);
-						}
-					}else{
-						index = user.modes[channel.name].indexOf(mode);
-						if(index !== -1){
-							user.modes[channel.name].splice(index,1);
-						}
+				user = new User(m[5],m[2],m[3],m[7],self);
+				user.channels.push(channel);
+				self.user(user);
+			}
+			user.whois();
+		})
+		// RPL_WHOISUSER
+		.on(new RegExp(&#x27;:.+ 311 \\S+ (\\S+) (\\S+) (\\S+) * :(.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - nick
+			// 2 - username
+			// 3 - host
+			// 4 - realname
+			var user = self.user(m[1]),
+				owner,
+				i;
+			if(!user){
+				user = new User(m[1],m[2],m[3],m[4],self);
+				self.users.push(user);
+			}else{
+				user.username = m[2];
+				user.host = m[3];
+				user.realname = m[4];
+			}
+			owner = owners.match(user.hostmask);
+			console.log(owner);
+			if(owner !== undefined){
+				console.log(&#x27;Checking owner flags&#x27;);
+				if(owner.flags.indexOf(&#x27;v&#x27;) != -1){
+					for(i=0;i&lt;user.channels.length;i++){
+						user.channels[i].mode(&#x27;+v&#x27;,user.nick);
 					}
-				}else if(&#x27;bdefIJklLR&#x27;.indexOf() &amp;&amp; argv[ii] !== undefined){
-					if(state == &#x27;+&#x27;){
-						if(!(channel.modes[mode] instanceof Array)){
-							channel.modes[mode] = [];
-						}
-						channel.modes[mode].push(argv[ii]);
-					}else{
-						if(channel.modes[mode] instanceof Array){
-							index = channel.modes[mode].indexOf(argv[ii]);
-							if(index !== -1){
-								channel.modes[mode].splice(index,1);
-							}
-							if(channel.modes[mode].length === 0){
-								channel.modes[mode] = false;
+				}
+			}
+		})
+		// RPL_WHOISCHANNELS
+		.on(new RegExp(&#x27;:.+ 319 .+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - Nick
+			// 2 - channels
+			var user = (function(nick){
+					var u = self.user(nick);
+					if(!u){
+						u = new User(nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
+					}
+					return u;
+				})(m[1]),
+				channels = m[2].split(&#x27; &#x27;),
+				i,
+				ii,
+				channel,
+				modes,
+				mode;
+			user.modes = {};
+			for(i=0;i &lt; channels.length;i++){
+				channel = channels[i];
+				modes = channel.substr(0,channel.indexOf(&#x27;#&#x27;));
+				channel = channel.substr(channel.indexOf(&#x27;#&#x27;));
+				channel = self.channel(channel);
+				if(!channel){
+					channel = new Channel(self,channels[i]);
+					self.channels.push(channel);
+				}
+				if(user.channels.indexOf(channel) == -1){
+					user.channels.push(channel);
+				}
+				user.modes[channel.name] = [];
+				for(ii=0;ii &lt; modes.length;ii++){
+					mode = modes[i];
+					switch(mode){
+						case &#x27;+&#x27;:
+							mode=&#x27;v&#x27;;
+						break;
+						case &#x27;%&#x27;:
+							mode=&#x27;h&#x27;;
+						break;
+						case &#x27;@&#x27;:
+							mode=&#x27;o&#x27;;
+						break;
+						case &#x27;&amp;&#x27;:
+							mode=&#x27;a&#x27;;
+						break;
+						case &#x27;~&#x27;:
+							mode=&#x27;q&#x27;;
+						break;
+					}
+					if(mode !== undefined){
+						user.modes[channel.name].push(mode);
+					}
+				}
+			}
+		})
+		// RPL_CHANNELMODEIS
+		.on(new RegExp(&#x27;:.+ 324 .+ (\\S+) \\+(.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - channel
+			// 2 - modes
+			var channel = self.channel(m[1]),
+				i,
+				modes = m[2];
+			if(!channel){
+				channel = new Channel(m[1],self);
+				self.channels.push(channel);
+			}
+			for(i in channel.modes){
+				if(!(channel.modes[i] instanceof Array)){
+					channel.modes[i] = modes.indexOf(i) !== -1;
+				}
+			}
+		})
+		// RPL_BANLIST RPL_EXCEPTLIST RPL_INVITELIST
+		.on(new RegExp(&#x27;:.+ (367|348|346) \\S+ (\\S+) (\\S+) (\\S+) (\\d+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - code
+			// 2 - channel
+			// 3 - hostmask
+			// 4 - user
+			// 5 - timestamp
+			var channel = self.channel(m[1]),
+				i,
+				mode;
+			switch(m[1]){
+				case 367:mode=&#x27;b&#x27;;break;
+				case 348:mode=&#x27;e&#x27;;break;
+				case 346:mode=&#x27;I&#x27;;break;
+			}
+			if(!channel){
+				channel = new Channel(m[2],self);
+				self.channels.push(channel);
+			}
+			if(!(channel.modes[mode] instanceof Array)){
+				channel.modes[mode] = [];
+			}
+			if(channel.modes[mode].indexOf(m[3]) === -1){
+				channel.modes[mode].push(m[3]);
+			}
+		})
+		// RPL_NOTOPIC RPL_TOPIC
+		.on(new RegExp(&#x27;:.+ (331|332) \\S+ (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - code
+			// 2 - channel
+			// 3 - topic
+			var channel = self.channel(m[2]);
+			if(!channel){
+				channel = new Channel(m[2],self);
+				self.channels.push(channel);
+			}
+			if(m[1] == 331){
+				channel._topic = [null];
+			}else{
+				channel._topic = [m[3]];
+			}
+		})
+		// TOPIC
+		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) TOPIC (\\S+) :(.+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - nick
+			// 2 - username
+			// 3 - host
+			// 4 - channel
+			// 5 - topic
+			var channel = self.channel(m[4]);
+			if(!channel){
+				channel = new Channel(m[4],self);
+				self.channels.push(channel);
+			}
+			channel._topic = [m[5]];
+		})
+		// JOIN
+		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) JOIN :(\\S+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - nick
+			// 2 - username
+			// 3 - host
+			// 4 - channel
+			var channel = (function(){
+					var c = self.channel(m[4]);
+					if(!c){
+						c = new Channel(m[4],self);
+						self.channels.push(c);
+					}
+					return c;
+				})(),
+				user,
+				owner;
+			if(m[1] == self.config.nick){
+				channel.who();							// get users
+				self.send(&#x27;MODE &#x27;+channel.name);		// get modes
+				self.send(&#x27;MODE &#x27;+channel.name+&#x27; b&#x27;);	// get bans
+				self.send(&#x27;MODE &#x27;+channel.name+&#x27; e&#x27;);	// get exceptions
+				self.send(&#x27;MODE &#x27;+channel.name+&#x27; I&#x27;);	// get invitation masks
+			}else{
+				user = self.user(m[1]);
+				if(!user){
+					user = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
+					self.users.push(user);
+				}
+				user.channels.push(channel);
+				user.whois();
+			}
+		})
+		// PART
+		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) PART (\\S+)&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - nick
+			// 2 - username
+			// 3 - host
+			// 4 - channel
+			var channel = (function(){
+					var c = self.channel(m[4]);
+					if(!c){
+						c = new Channel(m[4],self);
+						self.channels.push(c);
+					}
+					return c;
+				})(),
+				user = self.user(m[1]);
+			if(user &amp;&amp; user.channels.indexOf(channel) != -1){
+				user.channels.splice(user.channels.indexOf(channel),1);
+			}
+		})
+		// MODE
+		.on(new RegExp(&#x27;:(.+)\\!(.+)@(.+) MODE (\\S+) (\\S+) ?(.+)?&#x27;,&#x27;i&#x27;),function(m){
+			// 1 - nick (doing the action)
+			// 2 - username
+			// 3 - host
+			// 4 - channel
+			// 5 - modes
+			// 6 - nick (recieving the action)
+			var guser = function(nick){
+					var user = self.user(nick); //m[6]
+					if(!user){
+						user = new User(m[1],&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
+						self.users.push(user);
+					}
+					if(user.channels.indexOf(channel) === -1){
+						user.channels.push(channel);
+					}
+					if(user.modes[channel.name] === undefined){
+						user.modes[channel.name] = [];
+					}
+					return user;
+				},
+				channel = self.channel(m[4]),
+				i,
+				ii = 0,
+				user,
+				state = m[5][0],
+				mode,
+				index,
+				argv = m[6] === undefined?[]:m[6].split(&#x27; &#x27;);
+			if(!channel){
+				channel = new Channel(m[4],self);
+			}
+			for(i=1;i&lt;m[5].length;i++){
+				mode = m[5][i];
+				if(&#x27;+-&#x27;.indexOf(mode) !== -1){
+					state = mode;
+				}else{
+					if(&#x27;vhoaq&#x27;.indexOf(mode) !== -1 &amp;&amp; argv[ii] !== undefined){
+						user = guser(argv[ii]);
+						if(state == &#x27;+&#x27;){
+							if(user.modes[channel.name].indexOf(mode) === -1){
+								user.modes[channel.name].push(mode);
 							}
 						}else{
-							channel.modes[mode] = false;
+							index = user.modes[channel.name].indexOf(mode);
+							if(index !== -1){
+								user.modes[channel.name].splice(index,1);
+							}
 						}
+					}else if(&#x27;bdefIJklLR&#x27;.indexOf() &amp;&amp; argv[ii] !== undefined){
+						if(state == &#x27;+&#x27;){
+							if(!(channel.modes[mode] instanceof Array)){
+								channel.modes[mode] = [];
+							}
+							channel.modes[mode].push(argv[ii]);
+						}else{
+							if(channel.modes[mode] instanceof Array){
+								index = channel.modes[mode].indexOf(argv[ii]);
+								if(index !== -1){
+									channel.modes[mode].splice(index,1);
+								}
+								if(channel.modes[mode].length === 0){
+									channel.modes[mode] = false;
+								}
+							}else{
+								channel.modes[mode] = false;
+							}
+						}
+					}else{
+						channel.modes[mode] = state == &#x27;+&#x27;;
 					}
-				}else{
-					channel.modes[mode] = state == &#x27;+&#x27;;
-				}
-				ii++;
-			}
-		}
-	});
-	self.add(&#x27;help&#x27;,function(){
-		var i,a;
-		if(this.argv.length === 0){
-			var s = &#x27;Available commands: &#x27;;
-			for(i in self.commands){
-				s += i+&#x27;, &#x27;;
-			}
-			s = s.substr(0,s.length-2);
-			self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+s);
-		}else{
-			for(i in this.argv){
-				a = this.argv[i];
-				if(self.commands[a] === undefined){
-					self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: undefined&#x27;);
-				}else{
-					self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: &#x27;+self.commands[a].help);
+					ii++;
 				}
 			}
-		}
-	},&#x27;Provides information on available commands&#x27;);
+		})
+		.add(&#x27;help&#x27;,function(){
+			var i,a;
+			if(this.argv.length === 0){
+				var s = &#x27;Available commands: &#x27;;
+				for(i in self.commands){
+					s += i+&#x27;, &#x27;;
+				}
+				s = s.substr(0,s.length-2);
+				self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+s);
+			}else{
+				for(i in this.argv){
+					a = this.argv[i];
+					if(self.commands[a] === undefined){
+						self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: undefined&#x27;);
+					}else{
+						self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: &#x27;+self.commands[a].help);
+					}
+				}
+			}
+		},&#x27;Provides information on available commands&#x27;);
 	var fn = function(i){
 		self.scripts[ii] = new Script(config.scripts[ii],self,i);
 	};
@@ -988,6 +1068,7 @@ module.exports = function(config){
 		self.debug(&quot;Loading Script: &quot;+config.scripts[ii]);
 		self.run(ii+1,fn);
 	}
+	api.servers.push(self);
 	return self;
 };
     </pre>
