@@ -1,3 +1,6 @@
+//  /^(?:\x03[0-9]{1,2}([OC])\x0F|(#))<([^>]+)> (.*)/
+//  ^ handle OmnomIRC lines
+
 fs.mkdirParent("data/logs/");
 fs.mkdirParent('data/templates/');
 if(!fs.exists('data/templates/chatlog.html')){
