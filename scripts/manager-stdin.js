@@ -1,4 +1,5 @@
 stdin
 	.add('test',function(argv){
-		console.log('test');
+		stdin.console('log','test');
 	},'Runs a test command');
+console.log(global);

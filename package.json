@@ -16,7 +16,8 @@
 		"node": ">=0.6"
 	},
 	"dependencies": {
-		"node-persist": "0.0.x"
+		"node-persist": "0.0.x",
+		"mysql": "2.4.x"
 	},
 	"devDependencies": {
 		"tape": "2.x"

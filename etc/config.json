@@ -1,4 +1,9 @@
 {
+	"mysql": {
+		"host": "localhost",
+		"user": "ircbot",
+		"password": "ircbot"
+	},
 	"logs": {
 		"levels": {
 			"in": true,
@@ -31,7 +36,8 @@
 			],
 			"scripts": [
 				"scripts/test.js",
-				"scripts/manager-server.js"
+				"scripts/manager-server.js",
+				"scripts/topic.js"
 			],
 			"showping": false
 		},
