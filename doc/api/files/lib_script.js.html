@@ -128,8 +128,7 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
-var api = require(&#x27;./api.js&#x27;),
-	vm = require(&#x27;vm&#x27;),
+var vm = require(&#x27;vm&#x27;),
 	fs = require(&#x27;fs&#x27;),
 	log = require(&#x27;./log.js&#x27;);
 /**
@@ -146,13 +145,24 @@ module.exports = function(path,server,sid){
 		watcher = {
 			close: function(){}
 		},
-		i;
-	self.api = {
-		script: self
-	};
-	for(i in api){
-		self.api[i] = api[i];
-	}
+		api = function(){
+			var api =  require(&#x27;./api.js&#x27;),
+				_api = {
+					script: self,
+					require: require,
+					process: process,
+					console: console,
+					_path: self.path,
+					server: self.server,
+					sid: self.sid,
+					config: self.server.config
+				},
+				i;
+			for(i in _api){
+				api[i] = _api[i];
+			}
+			return api;
+		};
 	/**
 	 * stores the script identifier
 	 * @property sid
@@ -191,14 +201,9 @@ module.exports = function(path,server,sid){
 	 * @chainable
 	 */
 	self.load = function(){
-		log.log(&#x27;loading script&#x27;);
 		try{
 			d = fs.readFileSync(path);
-			self.api._path = self.path;
-			self.api.server = self.server;
-			self.api.sid = self.sid;
-			self.api.config = self.server.config;
-			vm.runInNewContext(d,self.api,self.path);
+			vm.runInNewContext(d,api(),self.path);
 			self.enabled = true;
 		}catch(e){
 			log.trace();
@@ -228,8 +233,9 @@ module.exports = function(path,server,sid){
 	self.enable = function(){
 		self.disable();
 		watcher = fs.watch(self.path,function(e,npath){
-			console.log(e,npath);
 			if(e == &#x27;change&#x27; &amp;&amp; self.enabled){
+				self.server.debug(&#x27;Reloading Script&#x27;);
+				self.server.debug(&#x27; |- &#x27;+npath);
 				self.disable();
 				self.load();
 			}else if(e == &#x27;rename&#x27;){

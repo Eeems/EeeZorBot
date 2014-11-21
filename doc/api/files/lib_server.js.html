@@ -136,8 +136,7 @@ var Channel = require(&#x27;./channel.js&#x27;),
 	tools = require(&#x27;./tools.js&#x27;),
 	log = require(&#x27;./log.js&#x27;),
 	stdin = require(&#x27;./stdin.js&#x27;),
-	debug = require(&#x27;./debug.js&#x27;),
-	api = require(&#x27;./api.js&#x27;);
+	debug = require(&#x27;./debug.js&#x27;);
 process.on(&#x27;SIGINT&#x27;,function(){
 	stdin.stop();
 	process.exit();
@@ -215,10 +214,8 @@ module.exports = function(config){
 	 */
 	self.run = function(id,fn){
 		var osid = sid;
-		self.debug(&#x27;Entering sid &#x27;+id);
 		sid = id;
 		fn.call(self,sid);
-		self.debug(&#x27;Reverting to sid &#x27;+osid);
 		sid = osid;
 		return self;
 	};
@@ -366,7 +363,7 @@ module.exports = function(config){
 			self.socket.on(&#x27;error&#x27;,function(e){
 				self.info(&#x27;Connection errored&#x27;);
 				self.fire(&#x27;error&#x27;,arguments,self);
-				self.logError(e);
+				self.error(e);
 			});
 			self.socket.on(&#x27;timeout&#x27;,function(){
 				self.info(&#x27;Connection timed out&#x27;);
@@ -408,10 +405,12 @@ module.exports = function(config){
 			return self;
 		}
 		try{
-			self.socket.write(d+&#x27;\r\n&#x27;,&#x27;ascii&#x27;,function(){
-				self.logOut(d);
-				self.fire(&#x27;send&#x27;,[d],self);
-			});
+			if(self.socket){
+				self.socket.write(d+&#x27;\r\n&#x27;,&#x27;ascii&#x27;,function(){
+					self.logOut(d);
+					self.fire(&#x27;send&#x27;,[d],self);
+				});
+			}
 		}catch(e){
 			self.error(e);
 			self.fire(&#x27;error&#x27;,[e],self);
@@ -427,7 +426,7 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.on = function(hook,callback,once){
-		self.debug(&#x27;Adding hook for sid &#x27;+sid);
+		self.debug(&#x27; |  |- Hook &#x27;+hook);
 		once = once===undefined?false:once;
 		if(hook instanceof RegExp){
 			self.hooks.push({
@@ -456,7 +455,6 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.off = function(hook,callback){
-
 		var i,
 			h,
 			t;
@@ -491,7 +489,7 @@ module.exports = function(config){
 	 */
 	self.add = function(command,callback,help){
 		if(self.commands[command] === undefined){
-			debug.log(&#x27;Adding command: &#x27;+command+&#x27; with help entry: &#x27;+help);
+			self.debug(&#x27; |  |- Command &#x27;+command);
 			self.commands[command] = {
 				fn: callback,
 				sid: sid,
@@ -507,14 +505,22 @@ module.exports = function(config){
 	 * @chainable
 	 */
 	self.remove = function(command){
+		var i,
+			n = {};
 		if(command === undefined){
-			for(var i in self.commands){
-				if(self.commands[i].sid == sid){
-					delete self.commands[i];
+			for(i in self.commands){
+				if(self.commands[i].sid !== sid){
+					n[i] = self.commands[i];
 				}
 			}
+			self.commands = n;
 		}else{
-			delete self.commands[command];
+			for(i in self.commands){
+				if(i !== command){
+					n[i] = self.commands[i];
+				}
+			}
+			self.commands = n;
 		}
 		return self;
 	};
@@ -534,7 +540,11 @@ module.exports = function(config){
 		for(i=0;i&lt;self.hooks.length;i++){
 			hook = self.hooks[i];
 			if(hook.type == &#x27;event&#x27; &amp;&amp; hook.name == name){
-				hook.fn.apply(scope,args);
+				try{
+					hook.fn.apply(scope,args);
+				}catch(e){
+					self.error(e);
+				}
 			}
 		}
 		return self;
@@ -553,7 +563,7 @@ module.exports = function(config){
 			self.channels.push(channel);
 		}
 		channel.join();
-		self.fire(&#x27;join&#x27;,arguments,self);
+		self.fire(&#x27;join&#x27;,[name,self.config.nick],self);
 		return self;
 	};
 	/**
@@ -677,6 +687,8 @@ module.exports = function(config){
 	process.on(&#x27;exit&#x27;,function(){
 		self.quit();
 	});
+	self.debug(&#x27;Loading server scripts&#x27;);
+	self.debug(&#x27; |- lib/server.js&#x27;);
 	self.on(&#x27;error&#x27;,function(e){
 			self.error(e);
 		})
@@ -912,6 +924,7 @@ module.exports = function(config){
 				channel = new Channel(m[4],self);
 				self.channels.push(channel);
 			}
+			self.fire(&#x27;topic&#x27;,[channel.topic,m[5]],channel);
 			channel._topic = [m[5]];
 		})
 		// JOIN
@@ -944,6 +957,12 @@ module.exports = function(config){
 				}
 				user.channels.push(channel);
 				user.whois();
+				self.fire(&#x27;join&#x27;,[],{
+					server: self,
+					channel: channel,
+					user: user,
+					owners: owners
+				});
 			}
 		})
 		// PART
@@ -963,6 +982,12 @@ module.exports = function(config){
 				user = self.user(m[1]);
 			if(user &amp;&amp; user.channels.indexOf(channel) != -1){
 				user.channels.splice(user.channels.indexOf(channel),1);
+				self.fire(&#x27;part&#x27;,[],{
+					server: self,
+					channel: channel,
+					user: user,
+					owners: owners
+				});
 			}
 		})
 		// MODE
@@ -1061,14 +1086,14 @@ module.exports = function(config){
 				}
 			}
 		},&#x27;Provides information on available commands&#x27;);
+	require(&#x27;./api.js&#x27;).servers.push(self);
 	var fn = function(i){
 		self.scripts[ii] = new Script(config.scripts[ii],self,i);
 	};
-	for(ii = 0;ii &lt; config.scripts.length; ii++){
-		self.debug(&quot;Loading Script: &quot;+config.scripts[ii]);
+	for(ii=0;ii&lt;config.scripts.length;ii++){
+		self.debug(&#x27; |- &#x27;+config.scripts[ii]);
 		self.run(ii+1,fn);
 	}
-	api.servers.push(self);
 	return self;
 };
     </pre>

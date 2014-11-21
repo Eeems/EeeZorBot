@@ -292,16 +292,12 @@ module.exports = (function(){
 			ii,
 			iii,
 			h;
-		console.log(&#x27;Looking for match: &#x27;+hostmask);
 		for(i in owners){
 			owner = owners[i];
-			console.log(&#x27;	&#x27;+owner.nick);
 			for(ii=0;ii&lt;owner.hostmasks.length;ii++){
 				h = owner.hostmasks[ii];
-				console.log(&#x27;		&#x27;+h);
 				if(h.indexOf(&#x27;*&#x27;) != -1){
 					var s = tools.wildcardString(h);
-					console.log(&#x27;			/&#x27;+s+&#x27;/ == &#x27;+hostmask.search(new RegExp(s)));
 					if(hostmask.search(new RegExp(s)) != -1){
 						return owner;
 					}
