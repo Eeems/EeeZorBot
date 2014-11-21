@@ -6,3 +6,17 @@ Version:
   0.2
 
 [API documentation](http://eeems.github.io/EeeZorBot)
+
+Install
+=======
+```
+git clone <repo> EeeZorBot
+cd EeeZorBot
+npm install
+```
+
+Run
+===
+```
+npm start
+```
