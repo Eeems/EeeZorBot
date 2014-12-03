@@ -2,7 +2,8 @@
 	"mysql": {
 		"host": "localhost",
 		"user": "ircbot",
-		"password": "ircbot"
+		"password": "ircbot",
+		"database": "ircbot"
 	},
 	"logs": {
 		"levels": {
