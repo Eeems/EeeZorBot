@@ -38,7 +38,8 @@
 			"scripts": [
 				"scripts/test.js",
 				"scripts/manager-server.js",
-				"scripts/topic.js"
+				"scripts/topic.js",
+				"scripts/newlog.js"
 			],
 			"showping": false
 		},
