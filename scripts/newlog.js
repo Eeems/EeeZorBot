@@ -1,5 +1,7 @@
 /*jshint multistr: true */
-var server;
+// Make sure database is set up. Create tables if missing
+// and create indexes if missing
+console.log('Tables');
 db.multiQuerySync([
 	"\
 		CREATE TABLE IF NOT EXISTS logs (\
@@ -16,5 +18,20 @@ db.multiQuerySync([
 		)\
 	"
 ]);
+console.log('Indexes');
 db.createIndexSync('logs','i_logs_t_id','t_id');
-process.exit();
+console.log('Server');
+var server = http.getServer('localhost',9003);
+server.handle(function(req,res){
+	switch(req.method){
+		case 'POST':
+			var data = '';
+			req.on('data',function(chunk){
+				data += chunk;
+			});
+			req.on('end',function(){
+				log.debug('Request Body: '+data);
+			});
+		break;
+	}
+});
