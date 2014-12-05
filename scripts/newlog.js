@@ -10,12 +10,6 @@ db.multiQuerySync([
 		)\
 	",
 	"\
-		CREATE TABLE IF NOT EXISTS channels (\
-			id int AUTO_INCREMENT PRIMARY KEY,\
-			name varchar(50) UNIQUE KEY NOT NULL\
-		)\
-	",
-	"\
 		CREATE TABLE IF NOT EXISTS users (\
 			id int AUTO_INCREMENT PRIMARY KEY,\
 			name varchar(9) UNIQUE KEY NOT NULL\
@@ -27,6 +21,18 @@ db.multiQuerySync([
 			name varchar(63) UNIQUE KEY NOT NULL,\
 			host varchar(400),\
 			port int\
+		)\
+	",
+	"\
+		CREATE TABLE IF NOT EXISTS channels (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			s_id int,\
+			name varchar(50) NOT NULL,\
+			INDEX i_channels_s_id(s_id),\
+			FOREIGN KEY(s_id)\
+				REFERENCES servers(id)\
+				ON DELETE CASCADE\
+				ON UPDATE CASCADE\
 		)\
 	",
 	"\
@@ -81,13 +87,14 @@ if(serv._holds == 1){
 }
 server.on('message',function(text){
 	var uid = db.querySync("select id from users where name = ?",[this.user.nick]),
-		cid = db.querySync("select id from channels where name = ?",[this.channel.name]),
 		sid = db.querySync("select id from servers where name = ?",[server.name]),
+		cid,
 		tid = db.querySync("select id from types where name = 'message'");
 	uid = uid[0]===undefined?db.insertSync('users',{name:this.user.nick}):uid[0].id;
-	cid = cid[0]===undefined?db.insertSync('channels',{name:this.channel.name}):cid[0].id;
 	sid = sid[0]===undefined?db.insertSync('servers',{name:server.name}):sid[0].id;
 	tid = tid[0]===undefined?db.insertSync('types',{name:'message'}):tid[0].id;
+	cid = db.querySync("select id from channels where name = ? and s_id = ?",[this.channel.name,sid]);
+	cid = cid[0]===undefined?db.insertSync('channels',{name:this.channel.name,s_id:sid}):cid[0].id;
 	db.insert('messages',{
 		text: text,
 		c_id: cid,
