@@ -12,7 +12,7 @@ db.multiQuerySync([
 	"\
 		CREATE TABLE IF NOT EXISTS users (\
 			id int AUTO_INCREMENT PRIMARY KEY,\
-			name varchar(9) UNIQUE KEY NOT NULL\
+			name varchar(30) UNIQUE KEY NOT NULL\
 		)\
 	",
 	"\
@@ -41,12 +41,10 @@ db.multiQuerySync([
 			date datetime DEFAULT CURRENT_TIMESTAMP,\
 			t_id int,\
 			c_id int,\
-			s_id int,\
 			u_id int,\
 			text varchar(512),\
 			INDEX i_logs_t_id(t_id),\
 			INDEX i_logs_c_id(c_id),\
-			INDEX i_logs_s_id(s_id),\
 			INDEX i_logs_u_id(u_id),\
 			FOREIGN KEY (t_id)\
 				REFERENCES types(id)\
@@ -54,10 +52,6 @@ db.multiQuerySync([
 				ON UPDATE CASCADE,\
 			FOREIGN KEY (c_id)\
 				REFERENCES channels(id)\
-				ON DELETE CASCADE\
-				ON UPDATE CASCADE,\
-			FOREIGN KEY (s_id)\
-				REFERENCES servers(id)\
 				ON DELETE CASCADE\
 				ON UPDATE CASCADE,\
 			FOREIGN KEY (u_id)\
@@ -76,10 +70,10 @@ db.multiQuerySync([
 					m.text,\
 					m.date\
 			FROM messages m\
-			JOIN servers s\
-				ON s.id = m.s_id\
 			JOIN channels c\
 				ON c.id = m.c_id\
+			JOIN servers s\
+				ON s.id = c.s_id\
 			JOIN users u\
 				ON u.id = m.u_id\
 			JOIN types t\
@@ -202,7 +196,6 @@ server.on('servername',function(){
 			text: text,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
-			s_id: id.server(),
 			t_id: id.type('message')
 		});
 	})
@@ -211,7 +204,6 @@ server.on('servername',function(){
 			text: '',
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
-			s_id: id.server(),
 			t_id: id.type('join')
 		});
 	})
@@ -220,7 +212,6 @@ server.on('servername',function(){
 			text: '',
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
-			s_id: id.server(),
 			t_id: id.type('part')
 		});
 	})
@@ -229,7 +220,6 @@ server.on('servername',function(){
 			text: new_topic,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
-			s_id: id.server(),
 			t_id: id.type('topic')
 		});
 	})
@@ -238,7 +228,6 @@ server.on('servername',function(){
 			text: (state?'+':'-')+mode+' '+value,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
-			s_id: id.server(),
 			t_id: id.type('mode')
 		});
 	});
