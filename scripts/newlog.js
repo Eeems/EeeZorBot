@@ -89,7 +89,26 @@ db.multiQuerySync([
 ]);
 // Start http server if it isn't running already
 var settings = require('../etc/config.json').logs.server,
-	serv = http.getServer(settings.host,settings.port).hold(script);
+	serv = http.getServer(settings.host,settings.port).hold(script),
+	id = {
+		channel: function(name){
+			var sid = id.server(),
+				cid = db.querySync("select id from channels where name = ? and s_id = ?",[name,sid])[0];
+			return cid===undefined?db.insertSync('channels',{name:name,s_id:sid}):cid.id;
+		},
+		user: function(nick){
+			var uid = db.querySync("select id from users where name = ?",[nick])[0];
+			return uid===undefined?db.insertSync('users',{name:nick}):uid.id;
+		},
+		type: function(name){
+			var tid = db.querySync("select id from types where name = ?",[name])[0];
+			return tid===undefined?db.insertSync('types',{name:name}):tid.id;
+		},
+		server: function(){
+			var sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port])[0];
+			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid.id;
+		}
+	};
 if(serv._holds.length == 1){
 	serv.handle(function(req,res){
 		switch(req.method){
@@ -113,7 +132,7 @@ if(serv._holds.length == 1){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body>");
+						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a></strong><br/>");
 						for(var i in r){
 							res.write("<a href=\"/"+r[i].id+"\">"+r[i].name+"</a><br/>");
 						}
@@ -126,11 +145,12 @@ if(serv._holds.length == 1){
 								name\
 						FROM channels\
 						WHERE s_id = ?\
+						AND name like '#%'\
 					",[args[0]],function(e,r){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body><strong>"+db.querySync("select name from servers where id = ?",[args[0]])[0].name+"</strong><br/>");
+						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> "+db.querySync("select name from servers where id = ?",[args[0]])[0].name+"</strong><br/>");
 						for(var i in r){
 							res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
 						}
@@ -156,7 +176,7 @@ if(serv._holds.length == 1){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body><pre>");
+						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+db.querySync("select name from servers where id = ?",[args[0]])[0].name+'</a> '+db.querySync("select name from channels where id = ?",[args[1]])[0].name+"</strong><pre>");
 						for(var i in r){
 							var m = r[i];
 							res.write('['+m.time+'] '+m.type+' &lt;'+m.user+'&gt; '+m.text+"\n");
@@ -178,62 +198,32 @@ server.on('servername',function(){
 		}
 	})
 	.on('message',function(text){
-		var uid = db.querySync("select id from users where name = ?",[this.user.nick]),
-			sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port]),
-			cid,
-			tid = db.querySync("select id from types where name = 'message'");
-		uid = uid[0]===undefined?db.insertSync('users',{name:this.user.nick}):uid[0].id;
-		sid = sid[0]===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid[0].id;
-		tid = tid[0]===undefined?db.insertSync('types',{name:'message'}):tid[0].id;
-		cid = db.querySync("select id from channels where name = ? and s_id = ?",[this.channel.name,sid]);
-		cid = cid[0]===undefined?db.insertSync('channels',{name:this.channel.name,s_id:sid}):cid[0].id;
 		db.insert('messages',{
 			text: text,
-			c_id: cid,
-			u_id: uid,
-			s_id: sid,
-			t_id: tid
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			s_id: id.server(),
+			t_id: id.type('message')
 		});
 	})
 	.on('join',function(){
-		console.log(this);
-		var uid = db.querySync("select id from users where name = ?",[this.user.nick]),
-			sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port]),
-			cid,
-			tid = db.querySync("select id from types where name = 'join'");
-		uid = uid[0]===undefined?db.insertSync('users',{name:this.user.nick}):uid[0].id;
-		sid = sid[0]===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid[0].id;
-		tid = tid[0]===undefined?db.insertSync('types',{name:'join'}):tid[0].id;
-		cid = db.querySync("select id from channels where name = ? and s_id = ?",[this.channel.name,sid]);
-		cid = cid[0]===undefined?db.insertSync('channels',{name:this.channel.name,s_id:sid}):cid[0].id;
 		db.insert('messages',{
 			text: '',
-			c_id: cid,
-			u_id: uid,
-			s_id: sid,
-			t_id: tid
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			s_id: id.server(),
+			t_id: id.type('join')
 		});
 	})
 	.on('part',function(){
-		console.log(this);
-		var uid = db.querySync("select id from users where name = ?",[this.user.nick]),
-			sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port]),
-			cid,
-			tid = db.querySync("select id from types where name = 'part'");
-		uid = uid[0]===undefined?db.insertSync('users',{name:this.user.nick}):uid[0].id;
-		sid = sid[0]===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid[0].id;
-		tid = tid[0]===undefined?db.insertSync('types',{name:'part'}):tid[0].id;
-		cid = db.querySync("select id from channels where name = ? and s_id = ?",[this.channel.name,sid]);
-		cid = cid[0]===undefined?db.insertSync('channels',{name:this.channel.name,s_id:sid}):cid[0].id;
 		db.insert('messages',{
 			text: '',
-			c_id: cid,
-			u_id: uid,
-			s_id: sid,
-			t_id: tid
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			s_id: id.server(),
+			t_id: id.type('part')
 		});
 	});
 script.unload = function(){
 	serv.release(script);
-	serv = undefined;
 };
