@@ -65,12 +65,31 @@ db.multiQuerySync([
 				ON DELETE RESTRICT\
 				ON UPDATE CASCADE\
 		)\
+	",
+	"\
+		CREATE OR REPLACE VIEW messages_v AS\
+			SELECT	m.id,\
+					s.name AS server,\
+					c.name AS channel,\
+					u.name AS user,\
+					t.name AS type,\
+					text,\
+					date\
+			FROM messages m\
+			JOIN servers s\
+				ON s.id = m.s_id\
+			JOIN channels c\
+				ON c.id = m.c_id\
+			JOIN users u\
+				ON u.id = m.u_id\
+			JOIN types t\
+				ON t.id = m.t_id\
 	"
 ]);
 // Start http server if it isn't running already
 var settings = require('../etc/config.json').logs.server,
 	serv = http.getServer(settings.host,settings.port).hold(script.suid);
-if(serv._holds == 1){
+if(serv._holds.length == 1){
 	serv.handle(function(req,res){
 		switch(req.method){
 			case 'POST':
@@ -81,6 +100,69 @@ if(serv._holds == 1){
 				req.on('end',function(){
 					log.debug('Request Body: '+data);
 				});
+			break;
+			case 'GET':
+				var args = req.url.split('/').filter(Boolean);
+				if(args.length === 0){
+					db.query("\
+						SELECT	id,\
+								name\
+						FROM servers\
+					",function(e,r){
+						if(e){
+							throw e;
+						}
+						res.write("<html><head></head><body>");
+						for(var i in r){
+							res.write("<a href=\"/"+r[i].id+"\">"+r[i].name+"</a><br/>");
+						}
+						res.write("</body></html>");
+						res.end();
+					});
+				}else if(args.length == 1){
+					db.query("\
+						SELECT	id,\
+								name\
+						FROM channels\
+						WHERE s_id = ?\
+					",[args[0]],function(e,r){
+						if(e){
+							throw e;
+						}
+						res.write("<html><head></head><body><strong>"+db.querySync("select name from servers where id = ?",[args[0]])[0].name+"</strong><br/>");
+						for(var i in r){
+							res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
+						}
+						res.write("</body></html>");
+						res.end();
+					});
+				}else{
+					db.query("\
+						SELECT	m.id,\
+								u.name AS user,\
+								t.name AS type,\
+								m.text,\
+								DATE_FORMAT(m.date,'%k:%i:%s') as time\
+						FROM messages m\
+						JOIN types t\
+							ON t.id = m.t_id\
+						JOIN users u\
+							ON u.id = m.u_id\
+						WHERE m.date >= CURDATE()\
+						AND m.c_id = ?\
+					",[args[1]],function(e,r){
+						if(e){
+							throw e;
+						}
+						res.write("<html><head></head><body><pre>");
+						for(var i in r){
+							var m = r[i];
+							res.write(m.type+' ['+m.time+'] &lt;'+m.user+'&gt; '+m.text+"\n");
+						}
+						res.write("</pre></body></html>");
+						res.end();
+					});
+				}
 			break;
 		}
 	});
