@@ -170,12 +170,19 @@ if(serv._holds.length == 1){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+db.querySync("select name from servers where id = ?",[args[0]])[0].name+'</a> '+db.querySync("select name from channels where id = ?",[args[1]])[0].name+"</strong><pre>");
-						for(var i in r){
-							var m = r[i];
-							res.write('['+m.time+'] '+m.type+' &lt;'+m.user+'&gt; '+m.text+"\n");
+						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
+							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
+						if(server!==undefined&&channel!==undefined){
+								res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+"</strong><pre>");
+								for(var i in r){
+									var m = r[i];
+									res.write('['+m.time+'] '+m.type+' &lt;'+m.user+'&gt; '+m.text+"\n");
+								}
+								res.write("</pre></body></html>");
+						}else{
+							res.statusCode = 404;
+							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
 						}
-						res.write("</pre></body></html>");
 						res.end();
 					});
 				}
