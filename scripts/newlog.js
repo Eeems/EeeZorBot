@@ -223,6 +223,24 @@ server.on('servername',function(){
 			s_id: id.server(),
 			t_id: id.type('part')
 		});
+	})
+	.on('topic',function(old_topic,new_topic){
+		db.insert('messages',{
+			text: new_topic,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			s_id: id.server(),
+			t_id: id.type('topic')
+		});
+	})
+	.on('mode',function(mode,state,value){
+		db.insert('messages',{
+			text: (state?'+':'-')+mode+' '+value,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			s_id: id.server(),
+			t_id: id.type('mode')
+		});
 	});
 script.unload = function(){
 	serv.release(script);
