@@ -1,533 +1,259 @@
-//  /^(?:\x03[0-9]{1,2}([OC])\x0F|(#))<([^>]+)> (.*)/
-//  ^ handle OmnomIRC lines
-
-fs.mkdirParent("data/logs/");
-fs.mkdirParent('data/templates/');
-if(!fs.exists('data/templates/chatlog.html')){
-	var template = '<html><head><title>{Title}</title></head><body>{Item(<a href="{Link}" name="{Anchor}">{timestamp}</a>{Text}<br/>)}<a name="end"></a></body></html>';
-	fs.writeFile('data/templates/chatlog.html',template,function(err) {
-		if(err) {
-			disp.error(err);
-		}else{
-			disp.log("No chat log template found. Creating default.");
+/*jshint multistr: true */
+// Make sure database is set up. Create tables if missing
+// and create indexes if missing
+server.debug(' |  |  |- Setting up database');
+db.multiQuerySync([
+	"\
+		CREATE TABLE IF NOT EXISTS types (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			name varchar(10) UNIQUE KEY NOT NULL\
+		)\
+	",
+	"\
+		CREATE TABLE IF NOT EXISTS users (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			name varchar(30) UNIQUE KEY NOT NULL\
+		)\
+	",
+	"\
+		CREATE TABLE IF NOT EXISTS servers (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			name varchar(63) UNIQUE KEY NOT NULL,\
+			host varchar(400),\
+			port int\
+		)\
+	",
+	"\
+		CREATE TABLE IF NOT EXISTS channels (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			s_id int,\
+			name varchar(50) NOT NULL,\
+			INDEX i_channels_s_id(s_id),\
+			FOREIGN KEY(s_id)\
+				REFERENCES servers(id)\
+				ON DELETE CASCADE\
+				ON UPDATE CASCADE\
+		)\
+	",
+	"\
+		CREATE TABLE IF NOT EXISTS messages (\
+			id int AUTO_INCREMENT PRIMARY KEY,\
+			date datetime DEFAULT CURRENT_TIMESTAMP,\
+			t_id int,\
+			c_id int,\
+			u_id int,\
+			text varchar(512),\
+			INDEX i_logs_t_id(t_id),\
+			INDEX i_logs_c_id(c_id),\
+			INDEX i_logs_u_id(u_id),\
+			FOREIGN KEY (t_id)\
+				REFERENCES types(id)\
+				ON DELETE RESTRICT\
+				ON UPDATE CASCADE,\
+			FOREIGN KEY (c_id)\
+				REFERENCES channels(id)\
+				ON DELETE CASCADE\
+				ON UPDATE CASCADE,\
+			FOREIGN KEY (u_id)\
+				REFERENCES users(id)\
+				ON DELETE RESTRICT\
+				ON UPDATE CASCADE\
+		)\
+	",
+	"\
+		CREATE OR REPLACE VIEW messages_v AS\
+			SELECT	m.id,\
+					s.name AS server,\
+					c.name AS channel,\
+					u.name AS user,\
+					t.name AS type,\
+					m.text,\
+					m.date\
+			FROM messages m\
+			JOIN channels c\
+				ON c.id = m.c_id\
+			JOIN servers s\
+				ON s.id = c.s_id\
+			JOIN users u\
+				ON u.id = m.u_id\
+			JOIN types t\
+				ON t.id = m.t_id\
+			ORDER BY m.date ASC\
+	"
+]);
+// Start http server if it isn't running already
+var settings = require('../etc/config.json').logs.server,
+	serv = http.getServer(settings.host,settings.port).hold(script),
+	id = {
+		channel: function(name){
+			var sid = id.server(),
+				cid = db.querySync("select id from channels where name = ? and s_id = ?",[name,sid])[0];
+			return cid===undefined?db.insertSync('channels',{name:name,s_id:sid}):cid.id;
+		},
+		user: function(nick){
+			var uid = db.querySync("select id from users where name = ?",[nick])[0];
+			return uid===undefined?db.insertSync('users',{name:nick}):uid.id;
+		},
+		type: function(name){
+			var tid = db.querySync("select id from types where name = ?",[name])[0];
+			return tid===undefined?db.insertSync('types',{name:name}):tid.id;
+		},
+		server: function(){
+			var sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port])[0];
+			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid.id;
 		}
-	});
-}
-var Settings = regSettings('logServer',{
-	// Port to run the server on
-	port: 9002,
-	// How quickly to check if the port is in use
-	check_interval: 1000,
-	// how many times to check before failing to start
-	check_timeout: 10
-});
-listen(/^.+/i,function(match,data,replyTo,connection){
-	var nick,
-		data2,
-		type='privmsg',
-		d = new Date();
-	replyTo=replyTo===null?'':replyTo;
-	if(replyTo===''&&!/^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.test(data)){
-		replyTo = ". server .";
-	}else{
-		replyTo = replyTo.toLowerCase();
-		try{
-			data2 = /^:([^!]+)!.*(PRIVMSG|NOTICE) ([^ ]+) :(.+)$/i.exec(data);
-			nick = data2[1];
-			type = data2[2].toLowerCase();
-			if(type=='notice'){
-				replyTo = data2[3].trim().toLowerCase();
-			}
-			data = data2[4];
-			if(nick.toLowerCase() == 'omnomirc'){
-				if((data2 = (/\([#OC]\)[\W0-9]*<(.+)>(.+)$/).exec(data)) !== null){
-					nick = data2[1];
-					data = data2[2].trim();
-				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has left .+$/).exec(data)) !== null){
-					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
-						user: data2[1],
-						type: 'part'
-					});
-					return;
-				}else if((data2 = (/\([#OC]\)[\W0-9]* ?(.+) has joined .+$/).exec(data)) !== null){
-					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
-						user: data2[1],
-						type: 'join'
-					});
-					return;
-				}else if((data2 = (/\([#OC]\)[\W0-9]*\*(.+)$/).exec(data)) !== null){
-					save(connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString(),{
-						msg: data2[1],
-						type: 'action',
-						user: ''
-					});
-					return;
-				}else{
-					console.log('Invalid OmnomIRC Catch: ',JSON.stringify(data2));
-				}
-			}
-			replyTo = replyTo.trim().toLowerCase();
-		}catch(e){
-			disp.error(e);
-			disp.log("Defaulting to '. server .' replyTo");
-			replyTo = ". server .";
-		}
-	}
-	var p = connection.config.host+" "+connection.config.port+"/"+replyTo+"/"+d.toDateString();
-	if(replyTo == ". server ." && (new RegExp("^:(.+) 372 "+connection.config.nick+" :(.+)$")).exec(data) === null){
-		save(p,{
-			msg: ">>>	"+data,
-			type: type
-		});
-	}else if(data.indexOf("\x01ACTION ")!=-1){
-		save(p,{
-			msg: data.substr(data.indexOf("\x01ACTION ")+8,data.length-9),
-			user: nick,
-			type: 'action'
-		});
-	}else{
-		save(p,{
-			msg: data,
-			user: nick,
-			type: type
-		});
-	}
-});
-listen(/^:([^!]+).*PART ([^ ]+) :$/i,function(match,data,replyTo,connection){
-	replyTo = match[2].substr(1).trim().toLowerCase();
-	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/#"+replyTo+"/"+d.toDateString(),{
-		user: match[1],
-		type: 'part'
-	});
-});
-listen(/^:([^!]+).*JOIN :([^ ]+)$/i,function(match,data,replyTo,connection){
-	replyTo = match[2].substr(1).trim().toLowerCase();
-	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/#"+replyTo+"/"+d.toDateString(),{
-		type: 'join',
-		user: match[1]
-	});
-});
-listen(/^:([^!]+).*KICK \#(\w+) (\w+) :([^ ]+)$/i,function(match,data,replyTo,connection){
-	replyTo = match[2].trim().toLowerCase();
-	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/#"+replyTo+"/"+d.toDateString(),{
-		type: 'kick',
-		user: match[3],
-		op: match[1],
-		msg: match[4]
-	});
-});
-reply_listen(function(replyTo,msg,connection){
-	if(replyTo===null){
-		replyTo = ". server .";
-	}else{
-		replyTo = replyTo.trim().toLowerCase();
-	}
-	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/#"+replyTo+"/"+d.toDateString(),{
-		msg: msg,
-		user: connection.config.nick
-	});
-});
-send_listen(/^.+/i,function(match,msg,connection){
-	var d = new Date();
-	save(connection.config.host+" "+connection.config.port+"/. server ./"+d.toDateString(),{
-		msg: "<<<	"+msg
-	});
-});
-hook('quit',function(){
-	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
-		msg: "*Connection Quit*"
-	});
-});
-hook('reconnect',function(){
-	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
-		msg: "*Reconnected*"
-	});
-});
-hook('connect',function(){
-	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
-		msg: "*Connected*"
-	});
-});
-hook('timeout',function(){
-	var d = new Date();
-	save(this.config.host+" "+this.config.port+"/. server ./"+d.toDateString(),{
-		msg: "*Connection Timeout*"
-	});
-});
-disp.alert("Starting Log Server");
-function addZero(num){
-	return (String(num).length < 2) ? num = String("0" + num) :  num = String(num);
-}
-function save(log,o){
-	fs.mkdirParent('data/logs/'+path.dirname(log));
-	var d = new Date(),n = {};
-	if(typeof o.type === 'undefined'){
-		n.type = 'privmsg';
-	}else{
-		n.type = o.type;
-	}
-	if(typeof o.user === 'undefined'){
-		n.user = '. server .';
-	}else{
-		n.user = o.user;
-	}
-	if(typeof o.msg !== 'undefined'){
-		n.msg = o.msg;
-	}
-	if(typeof o.op !== 'undefined'){
-		n.op = o.op;
-	}
-	n.date = d.getTime()+d.getTimezoneOffset()*60*1000;
-	switch(config.logtype){
-		case 'listdb':
-				var l = listdb.getDB('logs/'+log);
-				l.add(JSON.stringify(n));
-				break;
-		case 'txt': default:
-			switch(n.type){
-				case 'part':
-					n.msg = "* "+n.user+" has left the channel";
-					break;
-				case 'join':
-					n.msg = "* "+n.user+" has joined the channel";
-					break;
-				case 'action':
-					n.msg = "* "+n.user+" "+n.msg;
-					break;
-				default:
-					n.msg = "<"+n.user+">	"+n.msg;
-			}
-			fs.createWriteStream('data/logs/'+log+'.log',{
-				flags: 'a',
-				encoding: 'ascii'
-			}).end("["+d.getHours()+":"+addZero(d.getMinutes())+":"+addZero(d.getSeconds())+"] "+n.msg);
-	}
-}
-function htmlEntities(str){
-	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,"\u00a0");
-}
-var count = 0,
-	server = global.logServer = http.createServer(function (req, res) {
-		function check(d){
-			try{
-				return fs.statSync(d).isDirectory();
-			}catch(er){
-				return false;
-			}
-		}
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,i,ext,url = require('url').parse(req.url,true),
-			logs = (function(){
-				var ret = [],
-					i,
-					c;
-				for(i=0;i<connections.length;i++){
-					try{
-						c = connections[i].config;
-						ret.push({
-							name: c.host+' '+c.port,
-							channels: c.channels
-						});
-					}catch(e){}
-				}
-				return ret;
-			})();
-		switch(config.logtype){
-			case 'listdb':
-				ext = '.db';
+	};
+if(serv._holds.length == 1){
+	serv.handle(function(req,res){
+		switch(req.method){
+			case 'POST':
+				var data = '';
+				req.on('data',function(chunk){
+					data += chunk;
+				});
+				req.on('end',function(){
+					log.debug('Request Body: '+data);
+				});
 			break;
-			case 'txt': default:
-				ext = '.log';
-		}
-		disp.log("Serving "+req.url+" to: "+ip);
-		if(req.url == '/'){
-			res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-			res.write("<!doctype html><html><head><link rel='icon' type='image/x-icon' href='favicon.ico' /><title>Logs</title><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script><script src='http://code.jquery.com/ui/1.10.3/jquery-ui.min.js'></script><link rel='stylesheet' href='http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css' type='text/css'>");
-			res.write("<script>$(function(){$('.accordion').accordion();$('.datepicker').datepicker({dateFormat:'D M dd yy',maxDate: new Date}).datepicker('setDate','0');$('.open').click(function(){location = '?server='+$(this).prev().prev().prev().val()+'&channel='+$(this).prev().prev().val().substr(1)+'&date='+$(this).prev().val();})})</script>");
-			res.write("</head><body><div class='accordion'>");
-			// New Method to only show active channels. Will need to add the option to show old logs here.
-			var j,
-				f,
-				log,
-				channel,
-				folder_size = function(){
-					var size =  function(file){
-							var size;
-							try{
-								size = fs.statSync('data/logs/'+log.name+'/'+channel+'/'+file).size;
-							}catch(e){console.log(e);}
-							return size|0;
-						},
-						total = 0,
-						ii,
-						i = -1,
-						files = fs.readdirSync('data/logs/'+log.name+'/'+channel+'/'),
-						units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
-					if(files){
-						for(ii=0;ii<files.length;ii++){
-							total += size(files[ii]);
+			case 'GET':
+				var args = req.url.split('/').filter(Boolean);
+				if(args.length === 0){
+					db.query("\
+						SELECT	id,\
+								name\
+						FROM servers\
+					",function(e,r){
+						if(e){
+							throw e;
 						}
-					}
-					do{
-						total = total / 1024;i++;
-					}while(total > 1024);
-					return Math.max(total, 0.1).toFixed(1) + units[i];
-				};
-			for(i=0;i<logs.length;i++){
-				log = logs[i];
-				res.write('<h3>'+log.name+'</h3><div><input type="hidden" value="'+log.name+'"/><select>');
-				for(j=0;j<log.channels.length;j++){
-					channel = log.channels[j];
-					res.write('<option value="'+channel+'">'+channel+' ('+folder_size()+')</option>');
-				}
-				// Need to expand to allow for limiting the dates on the datepicker.
-				res.write('</select><input class="datepicker"/><button class="open" value="Open">Open</button></div>');
-			}
-			/* // Old method that shows all logs in the directory, including invalid ones
-			var logs = fs.readdirSync('data/logs/');
-			if(logs){
-				var j,f;
-				for (i = 0; i < logs.length; i++){
-					if(check('data/logs/'+logs[i]) && ){
-						var logdirs = fs.readdirSync('data/logs/'+logs[i]);
-						if(logdirs && (logdirs.length != 1 || logdirs[0] != '. server .')){
-							res.write('<h3>'+logs[i]+'</h3><div><input type="hidden" value="'+logs[i]+'"/><select>');
-							for (j = 0; j < logdirs.length; j++){
-								if(check('data/logs/'+logs[i]+'/'+logdirs[j]) && logdirs[j] != '. server .' && logdirs[j].substr(0,1) == '#' && logdirs[j].length > 1){
-									res.write('<option value="'+logdirs[j]+'">'+logdirs[j]+'</option>');
+						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a></strong><br/>");
+						for(var i in r){
+							res.write("<a href=\"/"+r[i].id+"\">"+r[i].name+"</a><br/>");
+						}
+						res.write("</body></html>");
+						res.end();
+					});
+				}else if(args.length == 1){
+					db.query("\
+						SELECT	id,\
+								name\
+						FROM channels\
+						WHERE s_id = ?\
+						AND name like '#%'\
+					",[args[0]],function(e,r){
+						if(e){
+							throw e;
+						}
+						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> "+db.querySync("select name from servers where id = ?",[args[0]])[0].name+"</strong><br/>");
+						for(var i in r){
+							res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
+						}
+						res.write("</body></html>");
+						res.end();
+					});
+				}else{
+					db.query("\
+						SELECT	m.id,\
+								u.name AS user,\
+								t.name AS type,\
+								m.text,\
+								DATE_FORMAT(m.date,'%k:%i:%s') as time\
+						FROM messages m\
+						JOIN types t\
+							ON t.id = m.t_id\
+						JOIN users u\
+							ON u.id = m.u_id\
+						WHERE m.date >= CURDATE()\
+						AND m.c_id = ?\
+						ORDER BY m.date ASC\
+					",[args[1]],function(e,r){
+						if(e){
+							throw e;
+						}
+						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
+							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
+						if(server!==undefined&&channel!==undefined){
+								res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+"</strong><pre>");
+								for(var i in r){
+									var m = r[i];
+									res.write('['+m.time+'] '+m.type+' &lt;'+m.user+'&gt; '+m.text+"\n");
 								}
-							}
-							res.write('</select><input class="datepicker"/><button class="open" value="Open">Open</button></div>');
+								res.write("</pre></body></html>");
+						}else{
+							res.statusCode = 404;
+							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
 						}
-					}
+						res.end();
+					});
 				}
-			}*/
-			res.end("</div></body></html>");
-		}else if(req.url == '/favicon.ico'){
-			fs.readFile('data/favicon.ico', "binary", function (err,file) {
-				if (err) {
-					res.writeHead(500, {'Content-Type':'image/x-icon','Server':'NodeBot/Logs'});
-					res.write(err+"");
-					res.end();
-					return;
-				}
-				res.writeHead(200,{'Content-Type':'image/x-icon','Server':'NodeBot/Logs'});
-				res.write(file, "binary");
-				res.end();
-			});
+			break;
+		}
+	});
+}
+server.on('servername',function(){
+		var sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port])[0];
+		if(sid===undefined){
+			db.insert('servers',{name:server.name,host:server.config.host,port:server.config.port});
 		}else{
-			var log = url.query,
-				e,m,l,td,
-				d = new Date(),
-				n = log.date == 'today'?d.toDateString():log.date,
-				file_path = 'logs/'+log.server+'/#'+log.channel+'/'+n,
-				file_size = '0 b';
-			if((function(){
-				var i,ii;
-				for(i in logs){
-					if(log.server == logs[i].name){
-						for(ii in logs[i].channels){
-							if('#'+log.channel == logs[i].channels[ii]){
-								return false;
-							}
-						}
-					}
-				}
-				return true;
-			})()){
-				res.end("\"You aren't allowed to open this log\"");
-				return;
-			}
-			if(fs.existsSync('data/'+file_path+ext)){
-				file_size = (function(fileSizeInBytes){
-					var i = -1,
-					units = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
-					do{
-						fileSizeInBytes = fileSizeInBytes / 1024;i++;
-					}while(fileSizeInBytes > 1024);
-					return Math.max(fileSizeInBytes, 0.1).toFixed(1) + units[i];
-				})(fs.statSync('data/'+file_path+ext).size);
-			}
-			switch(config.logtype){
-				case 'listdb':
-					if(log.type == 'json'){
-						res.writeHead(200, {'Content-Type': 'application/json;','Server': 'NodeBot/Logs'});
-						try{
-							res.end(fs.readFileSync('data/'+file_path+ext,'ascii'));
-						}catch(e){
-							res.end("\"Error opening log: "+log.server+'/#'+log.channel+'/'+n+ext+'"');
-						}
-					}else{
-						res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8','Server': 'NodeBot/Logs'});
-						l = listdb.getDB(file_path).getAll();
-						res.write('<html><head><title>'+log.server+' #'+log.channel+' '+n+'</title><script src="http://code.jquery.com/jquery-1.10.2.min.js"></script></head><body><a name="start"></a><h1>Server: '+log.server+'</h1><h2>Channel: #'+log.channel+'</h2><h3>Date: '+n+'</h3><h3>Size: '+file_size+'</h3>');
-						res.write('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Bottom" onclick="location.hash=\'end\'">Bottom</button><br/>');
-						for(i in l){
-							try{
-								e = JSON.parse(l[i]);
-								var end = '';
-								e.msg = htmlEntities((typeof e.msg != 'undefined'?e.msg:'')).replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,function(m){
-									var style="",colour,background,type=m[0];
-									switch(type){
-										case "\x0f":
-											type = "\x03";
-											style="text-decoration:none;font-weight:normal;text-decoration:none;";
-											colour=1; // black
-											background=0; //white
-										break;
-										case "\x1f":
-											type = "\x03";
-											style="text-decoration:underline;";
-										break;
-										case "\x02":
-											type="\x03";
-											style="font-weight:bold;";
-										break;
-										case "\x03":
-											colour=m[1];
-											if(/\d/.test(m[2])){
-												colour+=m[2];
-												if(m[3] == ','){
-													background = m[4];
-													if(/\d/.test(m[5])){
-														background+=m[5];
-													}
-												}
-											}else if(m[2] == ','){
-												background = m[3];
-												if(/\d/.test(m[4])){
-													background+=m[4];
-												}
-											}
-										break;
-									}
-									if(type == "\x03"){
-										var getColour = function(num,def){
-											var c=def;
-											// Reference: http://www.mirc.com/colors.html
-											switch(parseInt(num,10)){
-												// 0 white
-												case 0:c='white';break;
-												// 1 black
-												case 1:c='black';break;
-												// 2 blue (navy)
-												case 2:c='blue';break;
-												// 3 green
-												case 3:c='green';break;
-												// 4 red
-												case 4:c='red';break;
-												// 5 brown (maroon)
-												case 5:c='brown';break;
-												// 6 purple
-												case 6:c='purple';break;
-												// 7 orange (olive)
-												case 7:c='orange';break;
-												// 8 yellow
-												case 8:c='yellow';break;
-												// 9 light green (lime)
-												case 9:c='lime';break;
-												// 10 teal (a green/blue cyan)
-												case 10:c='teal';break;
-												// 11 light cyan (cyan) (aqua)
-												case 11:c='aqua';break;
-												// 12 light blue (royal)
-												case 12:c='royalblue';break;
-												// 13 pink (light purple) (fuchsia)
-												case 13:c='fuchsia';break;
-												// 14 grey
-												case 14:c='grey';break;
-												// 15 light grey (silver)
-												case 15:c='silver';break;
-											}
-											return c;
-										};
-										end += '</span>';
-										return "<span style='color:"+getColour(colour,'inherit')+";background-color:"+getColour(background,'transparent')+";display:inline-block;"+style+"'>";
-									}
-									return '';
-								}).trim();
-								e.msg += end;
-								e.user = htmlEntities(e.user);
-								switch(e.type){
-									case 'join':
-										m = '<strong>*'+e.user+' joined the channel</strong>';
-									break;
-									case 'part':
-										m = '<strong>*'+e.user+' left the channel</strong>';
-									break;
-									case 'privmsg':
-										m = '&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg;
-									break;
-									case 'notice':
-										m = '<em>&lt;	<strong>'+e.user+'</strong>	&gt;	'+e.msg+'</em>';
-									break;
-									case 'action':
-										m = '<strong>*'+(' '+e.user+' '+e.msg).replace('&nbsp;',' ').trim().replace(' ','&nbsp;')+'</strong>';
-									break;
-									case 'kick':
-										m = '<strong>* '+e.op+' kicked '+e.user+' from the channel ('+e.msg+')</strong>';
-									break;
-									default:
-										m = 'error! '+e.type;
-								}
-								td = new Date(e.date);
-								res.write("<div class='log-entry'><a href=\"?server="+log.server+"&channel="+log.channel+"&date="+n+"#"+e.date+'" name="'+e.date+'">'+'['+addZero(td.getUTCHours())+':'+addZero(td.getUTCMinutes())+':'+addZero(td.getUTCSeconds())+']</a>'+m+"</div>");
-							}catch(e){
-								disp.log("Invalid character in log "+e);
-								res.write("*Please contact the owner of this bot. The logs have invalid characters*<br/>");
-							}
-						}
-						res.end('<button value="<- Back" onclick="location=window.location.protocol+\'//\'+window.location.host;"><- Back</button><button value="Top" onclick="location.hash=\'start\'">Top</button><a name="end"></a>'+"\n"+'<script>$(".log-entry").each(function(){$(this).html($(this).html().replace(/(\\b(https?|ftps?|file|irc):\\/\\/[-A-Z0-9+&@#\\/%?=~_|!:,.;]*[-A-Z0-9+&@#\\/%=~_|])/ig,"<a href='+"'$1'"+'>$1</a>"));});</script></body></html>');
-					}
-				break;
-				case 'txt': default:
-					res.writeHead(200, {'Content-Type': 'text/plain;','Server': 'NodeBot/Logs'});
-					try{
-						res.end(fs.readFileSync('data/'+file_path+ext,'ascii'));
-					}catch(e){
-						res.end("Error opening log: "+log.server+'/#'+log.channel+'/'+n+ext);
-					}
-			}
+			db.update('servers',sid.id,{name:server.name});
 		}
-	}).listen(Settings.port);
-server.on("close",function(){
-	disp.alert("Ending Log Server");
-});
-server.on('error',function(e){
-	if(e.code == 'EADDRINUSE'){
-		setTimeout(function(){
-			if(count < Settings.check_timeout){
-				count++;
-				disp.log("Port "+Settings.port+" in use, reconnect attempt: "+count);
-				try{
-					server.close();
-				}catch(e){}
-				server.listen(Settings.port);
-			}else{
-				count = 0;
-				disp.log('Port in use, stopping');
-			}
-		},Settings.check_interval);
-	}else{
-		disp.trace();
-		disp.error(e);
-	}
-});
-hook('unload',function(){
-	try{
-		server.close();
-		global.logServer = null;
-		addZero = null;
-		save = null;
-		htmlEntities = null;
-	}catch(e){
-		disp.alert("Log Server Already Ended");
-	}
-});
-disp.alert("Logging enabled");
+	})
+	.on('message',function(text){
+		db.insert('messages',{
+			text: text,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('message')
+		});
+	})
+	.on('join',function(){
+		db.insert('messages',{
+			text: '',
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('join')
+		});
+	})
+	.on('part',function(){
+		db.insert('messages',{
+			text: '',
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('part')
+		});
+	})
+	.on('topic',function(old_topic,new_topic){
+		db.insert('messages',{
+			text: new_topic,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('topic')
+		});
+	})
+	.on('mode',function(mode,state,value){
+		db.insert('messages',{
+			text: (state?'+':'-')+mode+' '+value,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('mode')
+		});
+	})
+	.on('action',function(text){
+		db.insert('messages',{
+			text: text,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('action')
+		});
+	})
+	.on('notice',function(text){
+		db.insert('messages',{
+			text: text,
+			c_id: id.channel(this.channel.name),
+			u_id: id.user(this.user.nick),
+			t_id: id.type('notice')
+		});
+	});
+script.unload = function(){
+	serv.release(script);
+};

@@ -42,7 +42,7 @@
 			"scripts": [
 				"scripts/manager-server.js",
 				"scripts/topic.js",
-				"scripts/newlog.js"
+				"scripts/log.js"
 			],
 			"showping": false
 		},
@@ -57,11 +57,12 @@
 				"password": "password"
 			},
 			"channels": [
-				"#irp"
+				"#irp",
+				"#omnimaga"
 			],
 			"scripts": [
 				"scripts/manager-server.js",
-				"scripts/newlog.js"
+				"scripts/log.js"
 			],
 			"showping": false
 		}
