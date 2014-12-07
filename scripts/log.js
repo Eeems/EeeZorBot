@@ -78,7 +78,7 @@ db.multiQuerySync([
 				ON u.id = m.u_id\
 			JOIN types t\
 				ON t.id = m.t_id\
-			ORDER BY m.date ASC\
+			ORDER BY m.date ASC, m.id ASC\
 	"
 ]);
 // Start http server if it isn't running already
@@ -144,11 +144,17 @@ if(serv._holds.length == 1){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> "+db.querySync("select name from servers where id = ?",[args[0]])[0].name+"</strong><br/>");
-						for(var i in r){
-							res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
+						var server = db.querySync("select name from servers where id = ?",[args[0]])[0];
+						if(server!==undefined){
+							res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
+							for(var i in r){
+								res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
+							}
+							res.write("</body></html>");
+						}else{
+							res.statusCode = 404;
+							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
 						}
-						res.write("</body></html>");
 						res.end();
 					});
 				}else{
