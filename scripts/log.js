@@ -259,6 +259,18 @@ server.on('servername',function(){
 			u_id: id.user(this.user.nick),
 			t_id: id.type('notice')
 		});
+	})
+	.on('quit',function(text,channels){
+		for(var i in channels){
+			if(channels[i].active){
+				db.insert('messages',{
+					text: text,
+					c_id: id.channel(channels[i].name),
+					u_id: id.user(this.user.nick),
+					t_id: id.type('quit')
+				});
+			}
+		}
 	});
 script.unload = function(){
 	serv.release(script);
