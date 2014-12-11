@@ -102,7 +102,75 @@ var settings = require('../etc/config.json').logs.server,
 			var sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port])[0];
 			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid.id;
 		}
-	};
+	},
+	hooks = [
+		{	// PART
+			regex: /^\([#OC]\)([\W0-9])*\* [^ ]+ has left ([^ ]+) \((.*)\)$/i,
+			fn: function(m){
+				// 1 - colour
+				// 2 - nick
+				// 3 - reason
+				db.insert('messages',{
+					text: m[1]+m[3],
+					c_id: id.channel(this.channel.name),
+					u_id: id.user(m[2]),
+					t_id: id.type('part')
+				});
+			}
+		},
+		{	// JOIN
+			regex: /^\([#OC]\)[\W0-9]*\* ([^ ]+) has joined [^ ]+/i,
+			fn: function(m){
+				// 1 - nick
+				db.insert('messages',{
+					text: '',
+					c_id: id.channel(this.channel.name),
+					u_id: id.user(m[1]),
+					t_id: id.type('join')
+				});
+			}
+		},
+		{	// MODE
+			regex: /^\([#OC]\)([\W0-9]*)\* ([^ ]+) set [^ ]+ mode (.+)/i,
+			fn: function(m){
+				// 1 - colour
+				// 2 - nick
+				// 3 - mode/args
+				db.insert('messages',{
+					text: m[1]+m[3],
+					c_id: id.channel(this.channel.name),
+					u_id: id.user(m[2]),
+					t_id: id.type('mode')
+				});
+			}
+		},
+		{	// PRIVMSG
+			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<([^ ]+)> (.+)$/i,
+			fn: function(m){
+				// 1 - nick
+				// 2 - text
+				db.insert('messages',{
+					text: m[2],
+					c_id: id.channel(this.channel.name),
+					u_id: id.user(m[1]),
+					t_id: id.type('message')
+				});
+			}
+		},
+		{	// ACTION
+			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*\* ([^ ]+) (.+)/i,
+			fn: function(m){
+				// 1 - nick
+				// 2 - text
+				db.insert('messages',{
+					text: m[2],
+					c_id: id.channel(this.channel.name),
+					u_id: id.user(m[1]),
+					t_id: id.type('action')
+				});
+			}
+		}
+	];
 if(serv._holds.length == 1){
 	serv.handle(function(req,res){
 		switch(req.method){
@@ -180,11 +248,84 @@ if(serv._holds.length == 1){
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
 								res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+"</strong><pre>");
-								for(var i in r){
-									var m = r[i];
-									res.write('['+m.time+'] '+m.type+' &lt;'+m.user+'&gt; '+m.text+"\n");
-								}
-								res.write("</pre></body></html>");
+								var i,m,t,
+									end = '',
+									htmlent = function(text){
+										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,"&nbsp;");
+									},
+									parse = function(m){
+									var style="",
+										c,
+										bg,
+										t=m[0];
+									switch(t){
+										case "\x0f":
+											t = "\x03";
+											style="text-decoration:none;font-weight:normal;text-decoration:none;";
+											c=1; // black
+											bg=0; //white
+										break;
+										case "\x1f":
+											t = "\x03";
+											style="text-decoration:underline;";
+										break;
+										case "\x02":
+											t="\x03";
+											style="font-weight:bold;";
+										break;
+										case "\x03":
+											c=m[1];
+											if(/\d/.test(m[2])){
+												c+=m[2];
+												if(m[3] == ','){
+													bg = m[4];
+													if(/\d/.test(m[5])){
+														bg+=m[5];
+													}
+												}
+											}else if(m[2] == ','){
+												bg = m[3];
+												if(/\d/.test(m[4])){
+													bg+=m[4];
+												}
+											}
+										break;
+									}
+									if(t == "\x03"){
+										var getColour = function(num,def){
+											var c = [
+												'white',
+												'black',
+												'blue',
+												'green',
+												'red',
+												'brown',
+												'purple',
+												'orange',
+												'yellow',
+												'lime',
+												'teal',
+												'aqua',
+												'royalblue',
+												'fuchsia',
+												'grey',
+												'silver'
+											][num];
+											return c===undefined?def:c;
+										};
+										end += '</span>';
+										return "<span style='color:"+getColour(c,'inherit')+";background-color:"+getColour(bg,'transparent')+";display:inline-block;"+style+"'>";
+									}
+									return '';
+							};
+							for(i in r){
+								m = r[i],
+								t = htmlent(m.text)
+									.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
+									.trim();
+								res.write('['+m.time+'] '+m.type+' &lt;'+htmlent(m.user)+'&gt; '+t+end+"\n");
+							}
+							res.write("</pre></body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
@@ -205,6 +346,14 @@ server.on('servername',function(){
 		}
 	})
 	.on('message',function(text){
+		var i,
+			m;
+		for(i in hooks){
+			if((m = hooks[i].regex.exec(text))){
+				hooks[i].fn.call(this,m);
+				return;
+			}
+		}
 		db.insert('messages',{
 			text: text,
 			c_id: id.channel(this.channel.name),
