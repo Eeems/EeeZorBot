@@ -94,7 +94,7 @@ var settings = require('../etc/config.json').logs.server,
 	},
 	toUrl = function(href){
 		var u = url.parse(href);
-		if(typeof hostname!='string'){
+		if(typeof u.hostname!='string'){
 			u = url.parse('http://'+href);
 		}
 		return url.format(u);
@@ -269,12 +269,16 @@ if(serv._holds.length == 1){
 						a,
 						date,
 						controls;
+					if(args[2]===undefined){
+						res.writeHead(302,{
+							Location: req.url+'/'+ts(d)
+						});
+					}
 					args[2] = args[2]===undefined?ts(d):args[2];
 					a = args[2].split('-');
 					date = new Date(a[0],a[1],a[2]);
 					pastDate.setDate(date.getDate()-1);
 					nextDate.setDate(date.getDate()+1);
-					controls = "<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>";
 					db.query("\
 						SELECT	m.id,\
 								u.name AS user,\
@@ -298,7 +302,8 @@ if(serv._holds.length == 1){
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
-								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>"+server.name+channel.name+"</title><style>html,body{width:100%;margin:0;padding:0;text-align:left;}span{color:black;background-color:wite;text-decoration:none;font-weight:normal;text-decoration:none;}div.line:target{width:100%;background-color:yellow;}div.pre{width:100%;}div.line{display: table;white-space:pre-wrap;width:100%;}div.pre>div.line>span{display: table-cell;}span.date{width:80px;}</style></head>\n<body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/>"+controls+"<div class=\"pre\">\n");								var i,m,t,
+								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>"+server.name+channel.name+"</title><style>html,body{width:100%;margin:0;padding:0;text-align:left;}#controls{position:fixed;top:0;left:0;}span{color:black;background-color:wite;text-decoration:none;font-weight:normal;text-decoration:none;}div.line:target{width:100%;background-color:yellow;}div.pre{width:100%;position:absolute;top:45px;bottom:0;overflow:auto;}div.line{display: table;white-space:pre-wrap;width:100%;}div.pre>div.line>span{display: table-cell;}span.date{width:80px;}.type-notice,.type-topic,.type-datechange{background-color:#C0DBFF;}</style></head>\n<body><div id=\"controls\"><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/><a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a></div><div class=\"pre\">\n");
+								var m,t,
 									htmlent = function(text){
 										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 									},
@@ -339,6 +344,22 @@ if(serv._holds.length == 1){
 										}
 										return '</span>'+chunk(c,bg,style);
 								},
+								colourNick = function(nick){
+									nick = htmlent(nick);
+									var hash = (function(){
+											var h = 0,
+												i;
+											for(i=0;i<nick.length;i++){
+												h = nick.charCodeAt(i)+(h<<6)+(h<<16)-h;
+											}
+											return h;
+										})(),
+										deg = hash%360,
+										hue = deg<0?360+deg:deg,
+										light = hue>=30&&hue<=210?30:50,
+										saturation = 20+Math.abs(hash)%80;
+									return '<span style="color:hsl('+hue+','+saturation+'%,'+light+'%)">'+nick+'</span>';
+								},
 								getColour = function(num,def){
 									var c = [
 										'white',
@@ -368,7 +389,8 @@ if(serv._holds.length == 1){
 									return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
 								},
 								ds = {},
-								id;
+								id,
+								i;
 							for(i in r){
 								m = r[i],
 								t = htmlent(m.text)
@@ -380,35 +402,35 @@ if(serv._holds.length == 1){
 									id = id+'-'+m.id;
 								}
 								ds[id] = true;
-								res.write('<div class="line" id="'+id+'"><span class="date">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] </span>'+chunk());
+								res.write('<div class="line type-'+m.type+'" id="'+id+'"><span class="date">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] </span><span>'+chunk());
 								switch(m.type){
 									case 'topic':case 'datechange':
-										res.write('<strong>Topic:</strong> '+t+' <em>set by '+htmlent(m.user)+'</em>');
+										res.write('<strong>Topic:</strong> '+t+' <em>set by '+colourNick(m.user)+'</em>');
 									break;
 									case 'join':
-										res.write('<em>* '+htmlent(m.user)+' joined the channel</em>');
+										res.write('<em>* '+colourNick(m.user)+' joined the channel</em>');
 									break;
 									case 'part':
-										res.write('<em>* '+htmlent(m.user)+' left the channel</em>');
+										res.write('<em>* '+colourNick(m.user)+' left the channel</em>');
 									break;
 									case 'quit':
-										res.write('<em>* '+htmlent(m.user)+' quit ('+t+')</em>');
+										res.write('<em>* '+colourNick(m.user)+' quit ('+t+')</em>');
 									break;
 									case 'action':
-										res.write('<em>* '+htmlent(m.user)+' '+t+'</em>');
+										res.write('<em>* '+colourNick(m.user)+' '+t+'</em>');
 									break;
 									case 'mode':
-										res.write('<em>* '+htmlent(m.user)+' set mode '+channel.name+' '+t+'</em>');
+										res.write('<em>* '+colourNick(m.user)+' set mode '+channel.name+' '+t+'</em>');
 									break;
 									case 'notice':
-										res.write('<strong>NOTICE</strong> '+htmlent(m.user)+': '+t);
+										res.write('<strong>NOTICE</strong> '+colourNick(m.user)+': '+t);
 									break;
 									default:
-										res.write('&lt;'+htmlent(m.user)+'&gt; '+t);
+										res.write('&lt;'+colourNick(m.user)+'&gt; '+t);
 								}
-								res.write("</span></div>\n");
+								res.write("</span></span></div>\n");
 							}
-							res.write("</div>"+controls+"</body></html>");
+							res.write("</div></body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
