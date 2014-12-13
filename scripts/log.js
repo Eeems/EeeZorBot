@@ -84,6 +84,39 @@ db.multiQuerySync([
 // Start http server if it isn't running already
 var settings = require('../etc/config.json').logs.server,
 	serv = http.getServer(settings.host,settings.port).hold(script),
+	dns = require('dns'),
+	url = require('url'),
+	deasync = require('deasync'),
+	realdomains = {},
+	hostname = function(href){
+		var hostname = url.parse(href).hostname;
+		return typeof hostname!='string'?url.parse('http://'+href).hostname:hostname;
+	},
+	toUrl = function(href){
+		var u = url.parse(href);
+		if(typeof hostname!='string'){
+			u = url.parse('http://'+href);
+		}
+		return url.format(u);
+	},
+	isdomain = function(href){
+		href = hostname(href);
+		var sync = true,
+				data;
+			if(realdomains[href]===undefined){
+				dns.lookup(hostname,function(e,a){
+					data = typeof a=='string';
+					sync = false;
+				});
+				while(sync){
+					deasync.sleep(1);
+				}
+				realdomains[href] = data;
+			}else{
+				data = true;
+			}
+			return data;
+		},
 	id = {
 		channel: function(name){
 			var sid = id.server(),
@@ -251,7 +284,7 @@ if(serv._holds.length == 1){
 								var i,m,t,
 									end = '',
 									htmlent = function(text){
-										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,"&nbsp;");
+										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 									},
 									parse = function(m){
 										var style="",
@@ -310,19 +343,22 @@ if(serv._holds.length == 1){
 													'fuchsia',
 													'grey',
 													'silver'
-												][parseInt(num)];
-												console.log(num,c,def);
+												][parseInt(num,0)];
 												return c===undefined?def:c;
 											};
 											end += '</span>';
 											return "<span style='color:"+getColour(c,'inherit')+";background-color:"+getColour(bg,'transparent')+";display:inline-block;"+style+"'>";
 										}
 										return '';
+								},
+								links = function(href){
+									return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
 								};
 							for(i in r){
 								m = r[i],
 								t = htmlent(m.text)
 									.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
+									.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~]*)\b/g,links)
 									.trim();
 								res.write('['+m.time+'] '+m.type+' &lt;'+htmlent(m.user)+'&gt; '+t+end+"\n");
 							}
