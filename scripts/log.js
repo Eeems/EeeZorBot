@@ -227,7 +227,7 @@ if(serv._holds.length == 1){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head></head><body><strong><a href=\"/\">Logs</a></strong><br/>");
+						res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"></head><body><strong><a href=\"/\">Logs</a></strong><br/>");
 						for(var i in r){
 							res.write("<a href=\"/"+r[i].id+"\">"+r[i].name+"</a><br/>");
 						}
@@ -247,7 +247,7 @@ if(serv._holds.length == 1){
 						}
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0];
 						if(server!==undefined){
-							res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
+							res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
 							for(var i in r){
 								res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
 							}
@@ -298,9 +298,7 @@ if(serv._holds.length == 1){
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
-								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><title>"+server.name+channel.name+"</title><style>span.line:target{display:inline-block;width:100%;background-color:yellow;}</style></head>\n<body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/>"+controls+"<pre>");
-								var i,m,t,
-									end = '',
+								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>"+server.name+channel.name+"</title><style>html,body{width:100%;margin:0;padding:0;text-align:left;}span{color:black;background-color:wite;text-decoration:none;font-weight:normal;text-decoration:none;}div.line:target{width:100%;background-color:yellow;}div.pre{width:100%;}div.line{display: table;white-space:pre-wrap;width:100%;}div.pre>div.line>span{display: table-cell;}span.date{width:80px;}</style></head>\n<body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/>"+controls+"<div class=\"pre\">\n");								var i,m,t,
 									htmlent = function(text){
 										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 									},
@@ -312,9 +310,6 @@ if(serv._holds.length == 1){
 										switch(t){
 											case "\x0f":
 												t = "\x03";
-												style="text-decoration:none;font-weight:normal;text-decoration:none;";
-												c=1; // black
-												bg=0; //white
 											break;
 											case "\x1f":
 												t = "\x03";
@@ -342,32 +337,32 @@ if(serv._holds.length == 1){
 												}
 											break;
 										}
-										if(t == "\x03"){
-											var getColour = function(num,def){
-												var c = [
-													'white',
-													'black',
-													'blue',
-													'green',
-													'red',
-													'brown',
-													'purple',
-													'orange',
-													'yellow',
-													'lime',
-													'teal',
-													'aqua',
-													'royalblue',
-													'fuchsia',
-													'grey',
-													'silver'
-												][parseInt(num,0)];
-												return c===undefined?def:c;
-											};
-											end += '</span>';
-											return "<span style='color:"+getColour(c,'inherit')+";background-color:"+getColour(bg,'transparent')+";display:inline-block;"+style+"'>";
-										}
-										return '';
+										return '</span>'+chunk(c,bg,style);
+								},
+								getColour = function(num,def){
+									var c = [
+										'white',
+										'black',
+										'blue',
+										'green',
+										'red',
+										'brown',
+										'purple',
+										'orange',
+										'yellow',
+										'lime',
+										'teal',
+										'aqua',
+										'royalblue',
+										'fuchsia',
+										'grey',
+										'silver'
+									][parseInt(num,0)];
+									return c===undefined?def:c;
+								},
+								chunk = function(c,bg,style){
+									style = style===undefined?'':style;
+									return "<span style='color:"+getColour(c,'black')+";background-color:"+getColour(bg,'transparent')+";"+style+"'>";
 								},
 								links = function(href){
 									return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
@@ -377,17 +372,43 @@ if(serv._holds.length == 1){
 							for(i in r){
 								m = r[i],
 								t = htmlent(m.text)
+									.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~]*#?[A-Za-z0-9_.-~]*)\b/g,links)
 									.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
-									.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~]*)\b/g,links)
 									.trim();
 								id = m.time;
 								if(ds[id]!==undefined){
 									id = id+'-'+m.id;
 								}
 								ds[id] = true;
-								res.write('<span class="line" id="'+id+'">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] '+m.type+' &lt;<span style="color:black;background-color:wite;display:inline-block;text-decoration:none;font-weight:normal;text-decoration:none;">'+htmlent(m.user)+'&gt; '+t+end+"</span></span>\n");
+								res.write('<div class="line" id="'+id+'"><span class="date">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] </span>'+chunk());
+								switch(m.type){
+									case 'topic':case 'datechange':
+										res.write('<strong>Topic:</strong> '+t+' <em>set by '+htmlent(m.user)+'</em>');
+									break;
+									case 'join':
+										res.write('<em>* '+htmlent(m.user)+' joined the channel</em>');
+									break;
+									case 'part':
+										res.write('<em>* '+htmlent(m.user)+' left the channel</em>');
+									break;
+									case 'quit':
+										res.write('<em>* '+htmlent(m.user)+' quit ('+t+')</em>');
+									break;
+									case 'action':
+										res.write('<em>* '+htmlent(m.user)+' '+t+'</em>');
+									break;
+									case 'mode':
+										res.write('<em>* '+htmlent(m.user)+' set mode '+channel.name+' '+t+'</em>');
+									break;
+									case 'notice':
+										res.write('<strong>NOTICE</strong> '+htmlent(m.user)+': '+t);
+									break;
+									default:
+										res.write('&lt;'+htmlent(m.user)+'&gt; '+t);
+								}
+								res.write("</span></div>\n");
 							}
-							res.write("</pre>"+controls+"</body></html>");
+							res.write("</div>"+controls+"</body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
