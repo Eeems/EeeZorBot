@@ -254,70 +254,71 @@ if(serv._holds.length == 1){
 										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\s/g,"&nbsp;");
 									},
 									parse = function(m){
-									var style="",
-										c,
-										bg,
-										t=m[0];
-									switch(t){
-										case "\x0f":
-											t = "\x03";
-											style="text-decoration:none;font-weight:normal;text-decoration:none;";
-											c=1; // black
-											bg=0; //white
-										break;
-										case "\x1f":
-											t = "\x03";
-											style="text-decoration:underline;";
-										break;
-										case "\x02":
-											t="\x03";
-											style="font-weight:bold;";
-										break;
-										case "\x03":
-											c=m[1];
-											if(/\d/.test(m[2])){
-												c+=m[2];
-												if(m[3] == ','){
-													bg = m[4];
-													if(/\d/.test(m[5])){
-														bg+=m[5];
+										var style="",
+											c,
+											bg,
+											t=m[0];
+										switch(t){
+											case "\x0f":
+												t = "\x03";
+												style="text-decoration:none;font-weight:normal;text-decoration:none;";
+												c=1; // black
+												bg=0; //white
+											break;
+											case "\x1f":
+												t = "\x03";
+												style="text-decoration:underline;";
+											break;
+											case "\x02":
+												t="\x03";
+												style="font-weight:bold;";
+											break;
+											case "\x03":
+												c=m[1];
+												if(/\d/.test(m[2])){
+													c+=m[2];
+													if(m[3] == ','){
+														bg = m[4];
+														if(/\d/.test(m[5])){
+															bg+=m[5];
+														}
+													}
+												}else if(m[2] == ','){
+													bg = m[3];
+													if(/\d/.test(m[4])){
+														bg+=m[4];
 													}
 												}
-											}else if(m[2] == ','){
-												bg = m[3];
-												if(/\d/.test(m[4])){
-													bg+=m[4];
-												}
-											}
-										break;
-									}
-									if(t == "\x03"){
-										var getColour = function(num,def){
-											var c = [
-												'white',
-												'black',
-												'blue',
-												'green',
-												'red',
-												'brown',
-												'purple',
-												'orange',
-												'yellow',
-												'lime',
-												'teal',
-												'aqua',
-												'royalblue',
-												'fuchsia',
-												'grey',
-												'silver'
-											][num];
-											return c===undefined?def:c;
-										};
-										end += '</span>';
-										return "<span style='color:"+getColour(c,'inherit')+";background-color:"+getColour(bg,'transparent')+";display:inline-block;"+style+"'>";
-									}
-									return '';
-							};
+											break;
+										}
+										if(t == "\x03"){
+											var getColour = function(num,def){
+												var c = [
+													'white',
+													'black',
+													'blue',
+													'green',
+													'red',
+													'brown',
+													'purple',
+													'orange',
+													'yellow',
+													'lime',
+													'teal',
+													'aqua',
+													'royalblue',
+													'fuchsia',
+													'grey',
+													'silver'
+												][parseInt(num)];
+												console.log(num,c,def);
+												return c===undefined?def:c;
+											};
+											end += '</span>';
+											return "<span style='color:"+getColour(c,'inherit')+";background-color:"+getColour(bg,'transparent')+";display:inline-block;"+style+"'>";
+										}
+										return '';
+								};
 							for(i in r){
 								m = r[i],
 								t = htmlent(m.text)
