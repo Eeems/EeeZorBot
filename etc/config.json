@@ -57,7 +57,8 @@
 				"password": "password"
 			},
 			"channels": [
-				"#irp"
+				"#irp",
+				"#omnimaga"
 			],
 			"scripts": [
 				"scripts/manager-server.js",

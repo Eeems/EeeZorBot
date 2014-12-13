@@ -38,7 +38,7 @@ db.multiQuerySync([
 	"\
 		CREATE TABLE IF NOT EXISTS messages (\
 			id int AUTO_INCREMENT PRIMARY KEY,\
-			date datetime DEFAULT CURRENT_TIMESTAMP,\
+			date timestamp DEFAULT CURRENT_TIMESTAMP,\
 			t_id int,\
 			c_id int,\
 			u_id int,\
@@ -259,28 +259,46 @@ if(serv._holds.length == 1){
 						res.end();
 					});
 				}else{
+					var ts = function(d){
+							return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+						},
+						d = new Date(+new Date),
+						today = new Date(d.getFullYear(),d.getMonth()+1,d.getDate()),
+						pastDate = new Date(),
+						nextDate = new Date(),
+						a,
+						date,
+						controls;
+					args[2] = args[2]===undefined?ts(d):args[2];
+					a = args[2].split('-');
+					date = new Date(a[0],a[1],a[2]);
+					pastDate.setDate(date.getDate()-1);
+					nextDate.setDate(date.getDate()+1);
+					controls = "<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>";
 					db.query("\
 						SELECT	m.id,\
 								u.name AS user,\
 								t.name AS type,\
 								m.text,\
-								DATE_FORMAT(m.date,'%k:%i:%s') as time\
+								DATE_FORMAT(m.date,'%H:%i:%s') as time,\
+								DATE_FORMAT(m.date,'%Y-%m-%dT%H:%i:%sZ') as datetime\
 						FROM messages m\
 						JOIN types t\
 							ON t.id = m.t_id\
 						JOIN users u\
 							ON u.id = m.u_id\
-						WHERE m.date >= CURDATE()\
+						WHERE m.date >= STR_TO_DATE(?,'%Y-%m-%d')\
+						AND m.date <= STR_TO_DATE(?,'%Y-%m-%d')+1\
 						AND m.c_id = ?\
 						ORDER BY m.date ASC\
-					",[args[1]],function(e,r){
+					",[args[2],args[2],args[1]],function(e,r){
 						if(e){
 							throw e;
 						}
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
-								res.write("<html><head></head><body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+"</strong><pre>");
+								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><title>"+server.name+channel.name+"</title><style>span.line:target{display:inline-block;width:100%;background-color:yellow;}</style></head>\n<body><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/>"+controls+"<pre>");
 								var i,m,t,
 									end = '',
 									htmlent = function(text){
@@ -353,16 +371,23 @@ if(serv._holds.length == 1){
 								},
 								links = function(href){
 									return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
-								};
+								},
+								ds = {},
+								id;
 							for(i in r){
 								m = r[i],
 								t = htmlent(m.text)
 									.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
 									.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~]*)\b/g,links)
 									.trim();
-								res.write('['+m.time+'] '+m.type+' &lt;'+htmlent(m.user)+'&gt; '+t+end+"\n");
+								id = m.time;
+								if(ds[id]!==undefined){
+									id = id+'-'+m.id;
+								}
+								ds[id] = true;
+								res.write('<span class="line" id="'+id+'">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] '+m.type+' &lt;<span style="color:black;background-color:wite;display:inline-block;text-decoration:none;font-weight:normal;text-decoration:none;">'+htmlent(m.user)+'&gt; '+t+end+"</span></span>\n");
 							}
-							res.write("</pre></body></html>");
+							res.write("</pre>"+controls+"</body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
@@ -445,6 +470,22 @@ server.on('servername',function(){
 			u_id: id.user(this.user.nick),
 			t_id: id.type('notice')
 		});
+	})
+	.on('datechange',function(){
+		var i,
+			channels = server.channels,
+			c;
+		for(i in channels){
+			c = channels[i];
+			if(c.active){
+				db.insert('messages',{
+					text: c.topic,
+					c_id: id.channel(c.name),
+					u_id: id.user(server.name),
+					t_id: id.type('datechange')
+				});
+			}
+		}
 	})
 	.on('quit',function(text,channels){
 		for(var i in channels){
