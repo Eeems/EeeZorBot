@@ -150,6 +150,12 @@ module.exports = function(server,name){
 	 */
 	self.name = name;
 	/**
+	 * Is the bot in the channel?
+	 * @type {boolean}
+	 * @property active
+	 */
+	self.active = false;
+	/**
 	 * Channel modes
 	 * @type {Array}
 	 * @property modes
@@ -257,6 +263,7 @@ module.exports = function(server,name){
 	 */
 	self.part = function(){
 		self.server.send(&#x27;part &#x27;+self.name);
+		self.active = false;
 		return self;
 	};
 	/**
@@ -266,6 +273,7 @@ module.exports = function(server,name){
 	 */
 	self.join = function(){
 		self.server.send(&#x27;join &#x27;+self.name);		// join channel
+		self.active = true;
 		return self;
 	};
 	/**

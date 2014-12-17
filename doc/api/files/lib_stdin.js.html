@@ -136,6 +136,7 @@
  */
 var fs = require(&#x27;fs&#x27;),
 	vm = require(&#x27;vm&#x27;),
+	Script = require(&#x27;./script.js&#x27;),
 	api,
 	commands = [],
 	i,
@@ -237,10 +238,8 @@ var fs = require(&#x27;fs&#x27;),
 		 * @chainable
 		 */
 		console: function(method){
-			if(config.levels[method] &amp;&amp; global.console[method] !== undefined){
-				if(global.console !== undefined){
-					global.console[method].apply(global.console,[].slice.call(arguments,1));
-				}
+			if(config.levels[method] &amp;&amp; global.console !== undefined &amp;&amp; global.console[method] !== undefined){
+				global.console[method].apply(global.console,[].slice.call(arguments,1));
 			}
 			return this;
 		},
@@ -249,7 +248,13 @@ var fs = require(&#x27;fs&#x27;),
 		 * @type {object}
 		 * @property config
 		 */
-		config: config
+		config: config,
+		scripts: [],
+		run: function(id,fn){
+			fn();
+		},
+		off: function(id){},
+		remove: function(id){}
 	};
 module.exports = stdin;
 process.stdin.on(&#x27;data&#x27;,function(d){
@@ -383,28 +388,38 @@ stdin.add(&#x27;help&#x27;,function(argv){
 			}else{
 				stdin.console(&#x27;log&#x27;,&#x27;Channels:&#x27;);
 				for(i=0;i&lt;server.channels.length;i++){
-					stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+server.channels[i].name);
+					if(server.channels[i].active){
+						stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+server.channels[i].name);
+					}
 				}
 				stdin.console(&#x27;log&#x27;,&#x27;Users:&#x27;);
 				for(i=0;i&lt;server.users.length;i++){
 					stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+server.users[i].nick);
 				}
+				stdin.console(&#x27;log&#x27;,&#x27;Scripts:&#x27;);
+				for(i=0;i&lt;server.scripts.length;i++){
+					stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+server.scripts[i].sid+&#x27;) &#x27;+server.scripts[i].path);
+				}
 			}
 		}else{
-			stdin.console(&#x27;log&#x27;,&#x27;Servers:&#x27;);
-			for(i=0;i&lt;api.servers.length;i++){
-				stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+i+&#x27;) &#x27;+servers[i].config.nick+&#x27;@&#x27;+servers[i].config.host);
+			stdin.console(&#x27;log&#x27;,&#x27;IRC Servers:&#x27;);
+			var serv;
+			for(i=0;i&lt;servers.length;i++){
+				serv = servers[i].config;
+				stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+i+&#x27;) &#x27;+serv.nick+&#x27;@&#x27;+serv.host);
+			}
+			stdin.console(&#x27;log&#x27;,&#x27;HTTP Servers:&#x27;);
+			for(i=0;i&lt;http.servers.length;i++){
+				serv = http.servers[i];
+				stdin.console(&#x27;log&#x27;,&#x27;	&#x27;+i+&#x27;) &#x27;+serv.host+&#x27;:&#x27;+serv.port);
 			}
 		}
 	},&#x27;Displays information on the servers/channels/users&#x27;);
-api = require(&#x27;./api.js&#x27;);
-api.stdin = stdin;
 for(i=0;i&lt;config.scripts.length;i++){
 	try{
 		path = config.scripts[i];
 		stdin.console(&#x27;info&#x27;,&#x27; |- &#x27;+path);
-		d = fs.readFileSync(path);
-		vm.runInNewContext(d,api,path);
+		stdin.scripts[i] = new Script(path,stdin,i);
 	}catch(e){
 		stdin.console(&#x27;trace&#x27;);
 		stdin.console(&#x27;error&#x27;,e);

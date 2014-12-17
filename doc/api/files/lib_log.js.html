@@ -163,7 +163,6 @@ var config = (function(){
 	path = require(&#x27;path&#x27;),
 	fs = require(&#x27;fs&#x27;),
 	Listdb = require(&#x27;./listdb.js&#x27;),
-	stdin = require(&#x27;./stdin.js&#x27;),
 	write = function(msg,type){
 		var d = new Date();
 		type = type === undefined?&#x27;log&#x27;:type;
@@ -174,7 +173,7 @@ var config = (function(){
 		for(var i in msg){
 			if(!isNaN(parseInt(i,10))){
 				log.save(d.toDateString(),msg[i]);
-				stdin.console(type,msg[i]);
+				console[type](msg[i]);
 			}
 		}
 		return msg;

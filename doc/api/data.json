@@ -210,7 +210,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\log.js",
-            "line": 52,
+            "line": 51,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "itemtype": "main",
             "static": 1
@@ -252,7 +252,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\server.js",
-            "line": 14,
+            "line": 10,
             "description": "IRC Server object",
             "is_constructor": 1,
             "params": [
@@ -376,7 +376,7 @@
             "module": "log",
             "namespace": "",
             "file": "lib\\log.js",
-            "line": 52,
+            "line": 51,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "mainName": "",
             "tag": "main",
@@ -440,7 +440,7 @@
             "module": "server",
             "namespace": "",
             "file": "lib\\server.js",
-            "line": 14,
+            "line": 10,
             "description": "IRC Server object"
         },
         "stdin": {
@@ -569,16 +569,6 @@
         {
             "file": "lib\\api.js",
             "line": 41,
-            "description": "Provides the stdin module",
-            "static": 1,
-            "itemtype": "property",
-            "name": "stdin",
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 47,
             "description": "Provides the Listdb class",
             "static": 1,
             "itemtype": "property",
@@ -589,7 +579,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 54,
+            "line": 48,
             "description": "Provides the db class",
             "static": 1,
             "itemtype": "property",
@@ -600,7 +590,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 61,
+            "line": 55,
             "description": "Provides the debug module",
             "static": 1,
             "itemtype": "property",
@@ -610,7 +600,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 67,
+            "line": 61,
             "description": "Provides the owners interface",
             "static": 1,
             "itemtype": "property",
@@ -621,7 +611,28 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 74,
+            "line": 68,
+            "description": "Provides the http interface",
+            "static": 1,
+            "itemtype": "property",
+            "name": "http",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 75,
+            "description": "Provides the stdin module",
+            "static": 1,
+            "itemtype": "property",
+            "name": "stdin",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 81,
             "description": "Provides a circular reference to API",
             "static": 1,
             "itemtype": "property",
@@ -631,7 +642,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 80,
+            "line": 87,
             "description": "Provides access to the global console object",
             "static": 1,
             "itemtype": "property",
@@ -641,7 +652,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 86,
+            "line": 93,
             "description": "Provides access to the global process object",
             "static": 1,
             "itemtype": "property",
@@ -651,7 +662,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 95,
+            "line": 102,
             "description": "Provides access to all servers",
             "static": 1,
             "itemtype": "property",
@@ -661,7 +672,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 108,
+            "line": 115,
             "description": "The API version",
             "itemtype": "property",
             "name": "version",
@@ -684,6 +695,16 @@
         {
             "file": "lib\\channel.js",
             "line": 22,
+            "description": "Is the bot in the channel?",
+            "type": "{boolean}",
+            "itemtype": "property",
+            "name": "active",
+            "class": "Channel",
+            "module": "channel"
+        },
+        {
+            "file": "lib\\channel.js",
+            "line": 28,
             "description": "Channel modes",
             "type": "{Array}",
             "itemtype": "property",
@@ -693,7 +714,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 28,
+            "line": 34,
             "description": "Contains the topic of the channel and tries to change it if set",
             "type": "{String}",
             "itemtype": "property",
@@ -703,7 +724,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 42,
+            "line": 48,
             "description": "Interface for setting the topic internally",
             "itemtype": "property",
             "name": "_topic",
@@ -714,7 +735,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 53,
+            "line": 59,
             "description": "Parent server",
             "type": "{Server}",
             "itemtype": "property",
@@ -725,7 +746,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 63,
+            "line": 69,
             "description": "Runs a /who on the channel, refreshing user data",
             "itemtype": "method",
             "name": "who",
@@ -735,7 +756,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 78,
+            "line": 84,
             "description": "Returns an array of all the users in the channel",
             "itemtype": "property",
             "name": "users",
@@ -748,7 +769,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 98,
+            "line": 104,
             "description": "Sets the mode of the channel, or users in the channel",
             "itemtype": "method",
             "name": "mode",
@@ -771,7 +792,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 123,
+            "line": 129,
             "description": "Leave the channel",
             "itemtype": "method",
             "name": "part",
@@ -781,7 +802,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 132,
+            "line": 139,
             "description": "Join the channel",
             "itemtype": "method",
             "name": "join",
@@ -791,7 +812,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 141,
+            "line": 149,
             "description": "Send a message to the channel",
             "itemtype": "method",
             "name": "send",
@@ -918,7 +939,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 60,
+            "line": 59,
             "description": "Does an alert message (\"=> \"+message)",
             "itemtype": "method",
             "name": "alert",
@@ -935,7 +956,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 79,
+            "line": 78,
             "description": "Outputs an log signifying that the message was sent to an external server (\"-> \"+message)",
             "itemtype": "method",
             "name": "out",
@@ -952,7 +973,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 98,
+            "line": 97,
             "description": "Outputs an log signifying that the message was recieved from an external server (\"<- \"+message)",
             "itemtype": "method",
             "name": "in",
@@ -969,7 +990,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 117,
+            "line": 116,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -986,7 +1007,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 134,
+            "line": 133,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -1003,7 +1024,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 151,
+            "line": 150,
             "description": "Log an debug message (\"debug: \"+message)",
             "itemtype": "method",
             "name": "debug",
@@ -1020,7 +1041,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 163,
+            "line": 162,
             "description": "Log an debug message (\"Info: \"+message)",
             "itemtype": "method",
             "name": "info",
@@ -1037,7 +1058,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 180,
+            "line": 179,
             "description": "Saves a line to a named log",
             "itemtype": "method",
             "name": "save",
@@ -1060,7 +1081,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 207,
+            "line": 206,
             "description": "Returns the listdb object for a specific log",
             "itemtype": "method",
             "name": "get",
@@ -1080,7 +1101,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 216,
+            "line": 215,
             "description": "Logs a message and saves the output to a log",
             "itemtype": "method",
             "name": "log",
@@ -1098,7 +1119,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 226,
+            "line": 225,
             "description": "Outputs a trace log",
             "itemtype": "method",
             "name": "trace",
@@ -1107,7 +1128,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 235,
+            "line": 234,
             "description": "log config",
             "type": "{object}",
             "itemtype": "property",
@@ -1278,7 +1299,18 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 36,
+            "line": 38,
+            "description": "stores the script global identifier",
+            "itemtype": "property",
+            "name": "sid",
+            "type": "{number}",
+            "static": 1,
+            "class": "Script",
+            "module": "script"
+        },
+        {
+            "file": "lib\\script.js",
+            "line": 49,
             "description": "stores the script identifier",
             "itemtype": "property",
             "name": "sid",
@@ -1289,7 +1321,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 46,
+            "line": 59,
             "description": "Stores a reference to the server that this script is used on",
             "itemtype": "property",
             "name": "server",
@@ -1300,7 +1332,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 56,
+            "line": 69,
             "description": "The path to the script that is run",
             "itemtype": "property",
             "name": "path",
@@ -1310,7 +1342,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 62,
+            "line": 75,
             "description": "Boolean determining if the script is currently active",
             "itemtype": "property",
             "name": "enabled",
@@ -1320,7 +1352,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 68,
+            "line": 81,
             "description": "reloads the script from the disk",
             "itemtype": "method",
             "name": "reload",
@@ -1330,7 +1362,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 84,
+            "line": 97,
             "description": "Disables the script (hooks, commands etc)",
             "itemtype": "method",
             "name": "disable",
@@ -1340,7 +1372,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 98,
+            "line": 114,
             "description": "Description",
             "itemtype": "method",
             "name": "enable",
@@ -1350,7 +1382,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 118,
+            "line": 136,
             "description": "Disables and removes the script from the server.",
             "itemtype": "method",
             "name": "remove",
@@ -1360,7 +1392,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 129,
+            "line": 147,
             "description": "Function to run when the script is unloaded",
             "itemtype": "event",
             "name": "",
@@ -1370,7 +1402,29 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 42,
+            "line": 40,
+            "description": "stores the server identifier",
+            "itemtype": "property",
+            "name": "id",
+            "type": "{number}",
+            "static": 1,
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 51,
+            "description": "Gives the servers name",
+            "itemtype": "property",
+            "name": "name",
+            "type": "{string}",
+            "static": 1,
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "lib\\server.js",
+            "line": 58,
             "description": "Array of channels on the server",
             "itemtype": "property",
             "name": "channels",
@@ -1380,7 +1434,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 48,
+            "line": 64,
             "description": "Array of users on the server that are known",
             "itemtype": "property",
             "name": "users",
@@ -1390,7 +1444,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 54,
+            "line": 70,
             "description": "Array of all hooks installed on the server",
             "itemtype": "property",
             "name": "hooks",
@@ -1400,7 +1454,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 60,
+            "line": 76,
             "description": "Array of all the scripts installed on the server",
             "itemtype": "property",
             "name": "scripts",
@@ -1410,7 +1464,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 66,
+            "line": 82,
             "description": "Array of all the commands on the server",
             "itemtype": "property",
             "name": "commands",
@@ -1420,7 +1474,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 72,
+            "line": 88,
             "description": "Server config",
             "itemtype": "property",
             "name": "config",
@@ -1430,7 +1484,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 78,
+            "line": 94,
             "description": "Run function in the context of a specific script",
             "itemtype": "method",
             "name": "run",
@@ -1452,7 +1506,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 100,
+            "line": 116,
             "description": "Log something in the context of the server",
             "itemtype": "method",
             "name": "log",
@@ -1469,7 +1523,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 110,
+            "line": 126,
             "description": "Log something in the context of the server",
             "itemtype": "method",
             "name": "info",
@@ -1486,7 +1540,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 120,
+            "line": 136,
             "description": "Log something in the context of the server",
             "itemtype": "method",
             "name": "debug",
@@ -1503,7 +1557,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 130,
+            "line": 146,
             "description": "Log something in the context of the server",
             "itemtype": "method",
             "name": "error",
@@ -1520,7 +1574,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 140,
+            "line": 156,
             "description": "log.in something in the context of the server",
             "itemtype": "method",
             "name": "logIn",
@@ -1537,7 +1591,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 150,
+            "line": 166,
             "description": "log.out something in the context of the server",
             "itemtype": "method",
             "name": "logOut",
@@ -1554,7 +1608,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 160,
+            "line": 176,
             "description": "log.error something in the context of the server",
             "itemtype": "method",
             "name": "logError",
@@ -1571,7 +1625,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 170,
+            "line": 186,
             "description": "Connect to the IRC server",
             "itemtype": "method",
             "name": "connect",
@@ -1581,7 +1635,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 266,
+            "line": 288,
             "description": "Send a message to the IRC server",
             "itemtype": "method",
             "name": "send",
@@ -1598,7 +1652,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 290,
+            "line": 312,
             "description": "Install a hook on the server.",
             "itemtype": "method",
             "name": "on",
@@ -1627,7 +1681,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 320,
+            "line": 342,
             "description": "Uninstall a hook from the server",
             "itemtype": "method",
             "name": "off",
@@ -1650,7 +1704,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 352,
+            "line": 375,
             "description": "Add a command to the server",
             "itemtype": "method",
             "name": "add",
@@ -1677,7 +1731,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 371,
+            "line": 394,
             "description": "Remove a command listener from the server",
             "itemtype": "method",
             "name": "remove",
@@ -1694,7 +1748,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 397,
+            "line": 420,
             "description": "Fire an event on the IRC server",
             "itemtype": "method",
             "name": "fire",
@@ -1721,7 +1775,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 422,
+            "line": 445,
             "description": "Join a channel",
             "itemtype": "method",
             "name": "join",
@@ -1738,7 +1792,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 439,
+            "line": 473,
             "description": "Leave a channel",
             "itemtype": "method",
             "name": "part",
@@ -1755,7 +1809,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 452,
+            "line": 486,
             "description": "Check if in a channel",
             "itemtype": "method",
             "name": "in",
@@ -1775,7 +1829,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 467,
+            "line": 501,
             "description": "Get a channel based on it's name",
             "itemtype": "method",
             "name": "channel",
@@ -1795,7 +1849,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 481,
+            "line": 515,
             "description": "Gets the user or syncs a user on the server",
             "itemtype": "method",
             "name": "user",
@@ -1815,7 +1869,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 514,
+            "line": 548,
             "description": "Gets a script based on the sid",
             "itemtype": "method",
             "name": "script",
@@ -1835,7 +1889,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 524,
+            "line": 558,
             "description": "Reconnects to the IRC server",
             "itemtype": "method",
             "name": "reconnect",
@@ -1845,7 +1899,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 536,
+            "line": 578,
             "description": "Quits from the IRC server",
             "itemtype": "method",
             "name": "quit",
@@ -1864,7 +1918,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 45,
+            "line": 46,
             "description": "Start listening for user input",
             "itemtype": "method",
             "name": "start",
@@ -1874,7 +1928,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 57,
+            "line": 58,
             "description": "Stop waiting for user input",
             "itemtype": "method",
             "name": "stop",
@@ -1884,7 +1938,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 68,
+            "line": 69,
             "description": "Register an event listener",
             "itemtype": "method",
             "name": "on",
@@ -1906,7 +1960,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 83,
+            "line": 84,
             "description": "Adds a command to the stdin",
             "itemtype": "method",
             "name": "add",
@@ -1934,7 +1988,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 102,
+            "line": 103,
             "description": "Calls a console output method",
             "itemtype": "method",
             "name": "console",
@@ -1958,7 +2012,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 117,
+            "line": 116,
             "description": "stdin config",
             "type": "{object}",
             "itemtype": "property",
