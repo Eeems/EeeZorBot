@@ -12,7 +12,7 @@
 		},
 		"type": "listdb",
 		"server":{
-			"host": "192.168.1.120",
+			"host": "localhost",
 			"port": 9003
 		}
 	},
