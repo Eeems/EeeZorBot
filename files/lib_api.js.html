@@ -169,18 +169,19 @@ var api = {
 		 */
 		Server: require(&#x27;./server.js&#x27;),
 		/**
-		 * Provides the stdin module
-		 * @static
-		 * @property stdin
-		 */
-		stdin: require(&#x27;./stdin.js&#x27;),
-		/**
 		 * Provides the Listdb class
 		 * @static
 		 * @property Listdb
 		 * @constructor
 		 */
 		Listdb: require(&#x27;./listdb.js&#x27;),
+		/**
+		 * Provides the db class
+		 * @static
+		 * @property db
+		 * @constructor
+		 */
+		db: require(&#x27;./db.js&#x27;),
 		/**
 		 * Provides the debug module
 		 * @static
@@ -194,6 +195,19 @@ var api = {
 		 * @constructor
 		 */
 		owners: require(&#x27;./owners.js&#x27;),
+		/**
+		 * Provides the http interface
+		 * @static
+		 * @property http
+		 * @constructor
+		 */
+		http: require(&#x27;./http.js&#x27;),
+		/**
+		 * Provides the stdin module
+		 * @static
+		 * @property stdin
+		 */
+		stdin: require(&#x27;./stdin.js&#x27;),
 		/**
 		 * Provides a circular reference to API
 		 * @static

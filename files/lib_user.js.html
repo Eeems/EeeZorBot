@@ -139,6 +139,7 @@
  * @param {string} realname
  * @constructor
  */
+var owners = require(&#x27;./owners.js&#x27;);
 module.exports = function(nick,username,host,realname,server){
 	var self = this;
 	/**
@@ -204,6 +205,26 @@ module.exports = function(nick,username,host,realname,server){
 	Object.defineProperty(self,&#x27;hostmask&#x27;,{
 		get: function(){
 			return self.nick+&#x27;!&#x27;+self.username+&#x27;@&#x27;+self.host;
+		}
+	});
+	/**
+	 * Get the owner object for this user if it exists
+	 * @property owner
+	 * @type {String}
+	 */
+	Object.defineProperty(self,&#x27;owner&#x27;,{
+		get: function(){
+			var owner = owners.match(self.hostmask);
+			if(owner === undefined){
+				owner = {
+					nick: self.nick,
+					hostmasks: [
+						self.hostmask
+					],
+					flags: &#x27;&#x27;
+				};
+			}
+			return owner;
 		}
 	});
 	return self;
