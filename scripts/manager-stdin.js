@@ -1,4 +1,4 @@
-stdin
+server
 	.add('test',function(argv){
-		stdin.console('log','test');
+		server.console('log','test');
 	},'Runs a test command');

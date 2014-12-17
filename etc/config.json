@@ -22,7 +22,8 @@
 			"debug": true
 		},
 		"scripts": [
-			"scripts/manager-stdin.js"
+			"scripts/manager-stdin.js",
+			"scripts/logviewer.js"
 		]
 	},
 	"servers": [
