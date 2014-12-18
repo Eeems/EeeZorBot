@@ -165,7 +165,7 @@ var settings = (function(){
 						}
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0];
 						if(server!==undefined){
-							res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"><title>"+server.name"</title></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
+							res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"><title>"+server.name+"</title></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
 							for(var i in r){
 								res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
 							}
