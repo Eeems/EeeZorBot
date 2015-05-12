@@ -110,10 +110,15 @@ var settings = (function(){
 		var sync = true,
 			data;
 		if(realdomains[href]===undefined){
-			dns.lookup(hostname,function(e,a){
-				data = typeof a=='string';
+			try{
+				dns.lookup(hostname,function(e,a){
+					data = typeof a=='string';
+					sync = false;
+				});
+			}catch(e){
 				sync = false;
-			});
+				data = false;
+			}
 			while(sync){
 				deasync.sleep(1);
 			}
