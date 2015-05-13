@@ -377,7 +377,7 @@ for(i in settings.listeners){
 			s = http.getServer(l.host,l.port).hold(script).handle(handle);
 		servers.push(s);
 	}catch(e){
-		log.error(e);
+		log.trace(e);
 	}
 }
 script.unload = function(){

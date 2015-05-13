@@ -10,7 +10,7 @@ server.add('uptime',function(){
 	},'Makes the bot quit from the current server')
 	.on('join',function(){
 		var f = function(flag,mode){
-				if(this.user.owner.flags.indexOf(flag) != -1){
+				if(this.user && this.user.owner && this.user.owner.flags && this.user.owner.flags.indexOf(flag) != -1){
 					this.channel.mode(mode,this.user);
 				}
 			};
