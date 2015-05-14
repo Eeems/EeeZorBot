@@ -34,26 +34,6 @@
 	},
 	"servers": [
 		{
-			"host": "localhost",
-			"name": "NodeBotServe3.0",
-			"nick": "nodebot",
-			"username": "nodebot",
-			"prefix": "`",
-			"nickserv": {
-				"nick": "nodebot",
-				"password": "password"
-			},
-			"channels": [
-				"#irp"
-			],
-			"scripts": [
-				"scripts/manager-server.js",
-				"scripts/topic.js",
-				"scripts/log.js"
-			],
-			"showping": false
-		},
-		{
 			"host": "irc.omnimaga.org",
 			"name": "NodeBotServe3.0",
 			"nick": "nodebot",

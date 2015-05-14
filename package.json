@@ -18,7 +18,9 @@
 	"dependencies": {
 		"node-persist": "0.0.x",
 		"mysql": "2.4.x",
-		"deasync": "0.0.x"
+		"deasync": "0.0.x",
+		"iconv": "x",
+		"chardet": "x"
 	},
 	"devDependencies": {
 		"tape": "2.x"
