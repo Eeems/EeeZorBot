@@ -5,6 +5,11 @@
 		"password": "ircbot",
 		"database": "ircbot"
 	},
+	"mods": [
+		"log",
+		"manager",
+		"test"
+	],
 	"logs": {
 		"levels": {
 			"in": false,
@@ -26,11 +31,7 @@
 		"console": true,
 		"levels": {
 			"debug": true
-		},
-		"scripts": [
-			"scripts/manager-stdin.js",
-			"scripts/logviewer.js"
-		]
+		}
 	},
 	"servers": [
 		{
@@ -45,10 +46,6 @@
 			},
 			"channels": [
 				"#irp"
-			],
-			"scripts": [
-				"scripts/manager-server.js",
-				"scripts/log.js"
 			],
 			"showping": false
 		}

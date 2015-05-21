@@ -3,7 +3,10 @@ server.add('test',function(){
 	},'lets you know if scripts are working correctly')
 	.add('timeout',function(){
 		this.server.socket.emit('timeout');
-	},'simulates a timeout on the IRC server socket');
+	},'simulates a timeout on the IRC server socket')
+	.on('topic',function(oldT,newT){
+		console.log('topic changed from '+oldT+' to '+newT);
+	});
 script.unload = function(){
 	console.log('Script unloading. Running cleanup');
 };
