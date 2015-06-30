@@ -115,7 +115,7 @@ var settings = (function(){
 					});
 				}else{
 					var ts = function(d){
-							return d.getFullYear()+'-'+(d.getMonth())+'-'+d.getDate();
+							return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 						},
 						d = new Date(+new Date),
 						today = new Date(d.getFullYear(),d.getMonth()+1,d.getDate()),
@@ -133,9 +133,9 @@ var settings = (function(){
 					a = args[2].split('-');
 					date = new Date(a[0],a[1],a[2]);
 					pastDate = new Date(date.getTime());
-					pastDate.setDate(date.getDate()-1);
+					pastDate.setDate(a[2]-1);
 					nextDate = new Date(date.getTime());
-					nextDate.setDate(date.getDate()+1);
+					nextDate.setDate(a[2]+1);
 					db.query("\
 						SELECT	m.id,\
 								u.name AS user,\
