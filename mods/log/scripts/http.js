@@ -119,8 +119,8 @@ var settings = (function(){
 						},
 						d = new Date(+new Date),
 						today = new Date(d.getFullYear(),d.getMonth()+1,d.getDate()),
-						pastDate = new Date(),
-						nextDate = new Date(),
+						pastDate,
+						nextDate,
 						a,
 						date,
 						controls;
@@ -132,7 +132,9 @@ var settings = (function(){
 					args[2] = args[2]===undefined?ts(d):args[2];
 					a = args[2].split('-');
 					date = new Date(a[0],a[1],a[2]);
+					pastDate = newDate(date.getTime());
 					pastDate.setDate(date.getDate()-1);
+					nextDate = newDate(date.getTime());
 					nextDate.setDate(date.getDate()+1);
 					db.query("\
 						SELECT	m.id,\
