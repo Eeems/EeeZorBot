@@ -132,9 +132,9 @@ var settings = (function(){
 					args[2] = args[2]===undefined?ts(d):args[2];
 					a = args[2].split('-');
 					date = new Date(a[0],a[1],a[2]);
-					pastDate = newDate(date.getTime());
+					pastDate = new Date(date.getTime());
 					pastDate.setDate(date.getDate()-1);
-					nextDate = newDate(date.getTime());
+					nextDate = new Date(date.getTime());
 					nextDate.setDate(date.getDate()+1);
 					db.query("\
 						SELECT	m.id,\
