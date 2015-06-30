@@ -132,10 +132,8 @@ var settings = (function(){
 					args[2] = args[2]===undefined?ts(d):args[2];
 					a = args[2].split('-');
 					date = new Date(a[0],a[1],a[2]);
-					pastDate = new Date(date.getTime());
-					pastDate.setDate(a[2]-1);
-					nextDate = new Date(date.getTime());
-					nextDate.setDate(a[2]+1);
+					pastDate = new Date(date.getTime()-(24*60*60*1000));
+					nextDate = new Date(date.getTime()+(24*60*60*1000));
 					db.query("\
 						SELECT	m.id,\
 								u.name AS user,\
