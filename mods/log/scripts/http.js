@@ -133,6 +133,7 @@ var settings = (function(){
 					date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
 					pastDate = new Date(date.getTime()-(24*60*60*1000));
 					nextDate = new Date(date.getTime()+(24*60*60*1000));
+					d= new Date(d.getFullYear(),d.getMonth(),d.getDate());
 					db.query("\
 						SELECT	m.id,\
 								u.name AS user,\
