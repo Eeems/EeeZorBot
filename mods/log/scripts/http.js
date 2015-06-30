@@ -147,7 +147,7 @@ var settings = (function(){
 						JOIN users u\
 							ON u.id = m.u_id\
 						WHERE m.date >= STR_TO_DATE(?,'%Y-%m-%d')\
-						AND m.date <= STR_TO_DATE(?,'%Y-%m-%d')+1\
+						AND m.date <= DATE_ADD(STR_TO_DATE(?,'%Y-%m-%d'),INTERVAL 1 DAY)\
 						AND m.c_id = ?\
 						ORDER BY m.date ASC\
 					",[args[2],args[2],args[1]],function(e,r){
