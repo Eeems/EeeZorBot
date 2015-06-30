@@ -115,7 +115,7 @@ var settings = (function(){
 					});
 				}else{
 					var ts = function(d){
-							return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+							return d.getFullYear()+'-'+(d.getMonth())+'-'+d.getDate();
 						},
 						d = new Date(+new Date),
 						today = new Date(d.getFullYear(),d.getMonth()+1,d.getDate()),
@@ -159,7 +159,66 @@ var settings = (function(){
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
-								res.write("<!doctype html><html>\n<head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>"+server.name+channel.name+"</title><style>html,body{width:100%;margin:0;padding:0;text-align:left;}#controls{position:fixed;top:0;left:0;}span{color:black;background-color:wite;text-decoration:none;font-weight:normal;text-decoration:none;}div.line:target{width:100%;background-color:yellow;}div.pre{width:100%;position:absolute;top:45px;bottom:0;overflow:auto;}div.line{display: table;white-space:pre-wrap;width:100%;}div.pre>div.line>span{display: table-cell;}span.date{width:80px;}.type-notice,.type-topic,.type-datechange{background-color:#C0DBFF;}</style></head>\n<body><div id=\"controls\"><strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong><br/><a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a></div><div class=\"pre\">\n");
+								res.write("<!doctype html>\
+									<html>\n\
+										<head>\
+											<meta charset='utf-8'/>\
+											<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
+											<title>"+server.name+channel.name+"</title>\
+											<style>\
+												html,body{\
+													width:100%;\
+													margin:0;\
+													padding:0;\
+													text-align:left;\
+												}\
+												#controls{\
+													position:fixed;\
+													top:0;\
+													left:0;\
+												}\
+												span{\
+													color:black;\
+													background-color:wite;\
+													text-decoration:none;\
+													font-weight:normal;\
+													text-decoration:none;\
+												}\
+												div.line:target{\
+													width:100%;\
+													background-color:yellow;\
+												}\
+												div.pre{\
+													width:100%;\
+													position:absolute;\
+													top:45px;\
+													bottom:0;\
+													overflow:auto;\
+												}\
+												div.line{\
+													display:table;\
+													white-space:pre-wrap;\
+													width:100%;\
+												}\
+												div.pre>div.line>span{\
+													display: table-cell;\
+												}\
+												span.date{\
+													width:80px;\
+												}\
+												.type-notice,.type-topic,.type-datechange{\
+													background-color:#C0DBFF;\
+												}\
+											</style>\
+										</head>\n\
+										<body>\
+											<div id=\"controls\">\
+												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
+												<br/>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>\
+											</div>\
+										<div class=\"pre\">\n\
+								");
 								var m,t,
 									htmlent = function(text){
 										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
