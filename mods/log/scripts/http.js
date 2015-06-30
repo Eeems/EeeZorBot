@@ -118,7 +118,6 @@ var settings = (function(){
 							return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 						},
 						d = new Date(+new Date),
-						today = new Date(d.getFullYear(),d.getMonth()+1,d.getDate()),
 						pastDate,
 						nextDate,
 						a,
@@ -131,7 +130,7 @@ var settings = (function(){
 					}
 					args[2] = args[2]===undefined?ts(d):args[2];
 					a = args[2].split('-');
-					date = new Date(a[0],a[1],a[2]);
+					date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
 					pastDate = new Date(date.getTime()-(24*60*60*1000));
 					nextDate = new Date(date.getTime()+(24*60*60*1000));
 					db.query("\
@@ -213,7 +212,7 @@ var settings = (function(){
 											<div id=\"controls\">\
 												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
 												<br/>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==today.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(today)+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==d.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>\
 											</div>\
 										<div class=\"pre\">\n\
 								");
