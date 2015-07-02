@@ -213,15 +213,25 @@ var settings = (function(){
 												span.date{\
 													width: 80px;\
 												}\
+												span.user{\
+													cursor: pointer;\
+												}\
 												.type-notice,.type-topic,.type-datechange{\
 													background-color: #C0DBFF;\
 												}\
 											</style>\
 											<script>\
 												window.onload = function(){\
+													NodeList.prototype.forEach = Array.prototype.forEach;\
 													document.querySelector('#controls>span.right>a.reload').onclick = function(){\
 														location.reload();\
 													};\
+													var cache = {};\
+													document.querySelectorAll('span.user').forEach(function(span){\
+														span.onclick = function(){\
+															window.open('http://stats.irc.omnimaga.org/index.php/user/nick:'+span.innerHTML+'/profile');\
+														};\
+													});\
 												}\
 											</script>\
 										</head>\n\
@@ -299,7 +309,7 @@ var settings = (function(){
 										hue = deg<0?360+deg:deg,
 										light = hue>=30&&hue<=210?30:50,
 										saturation = 20+Math.abs(hash)%80;
-									return '<span style="color:hsl('+hue+','+saturation+'%,'+light+'%)">'+nick+'</span>';
+									return '<span class="user" title="View user '+nick+'" style="color:hsl('+hue+','+saturation+'%,'+light+'%)">'+nick+'</span>';
 								},
 								getColour = function(num,def){
 									var c = [
@@ -333,7 +343,7 @@ var settings = (function(){
 								id,
 								i;
 							for(i in r){
-								m = r[i],
+								m = r[i];
 								t = htmlent(m.text)
 									.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~\-]*#?[A-Za-z0-9_.\-~\-]*)\b/g,links)
 									.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
