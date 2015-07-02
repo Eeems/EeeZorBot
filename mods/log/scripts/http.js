@@ -357,7 +357,7 @@ var settings = (function(){
 								}
 								res.write("</span></span></div>\n");
 							}
-							res.write("</div><span id=\"end\"></span></body></html>");
+							res.write("<span id=\"end\"></span></div></body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
