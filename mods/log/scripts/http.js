@@ -174,6 +174,15 @@ var settings = (function(){
 													position: fixed;\
 													top: 0;\
 													left: 0;\
+													width: 100%;\
+												}\
+												#controls>a,#controls>span>a{\
+													cursor: pointer;\
+													text-decoration: none;\
+													color: black;\
+												}\
+												#controls>span.right{\
+													float: right;\
 												}\
 												span{\
 													color:black;\
@@ -207,25 +216,30 @@ var settings = (function(){
 												.type-notice,.type-topic,.type-datechange{\
 													background-color: #C0DBFF;\
 												}\
-												#controls>span.right{\
-													top: 0;\
-													right: 0;\
-													position: fixed;\
-												}\
 											</style>\
+											<script>\
+												window.onload = function(){\
+													document.querySelector('#controls>span.right>a.reload').onclick = function(){\
+														location.reload();\
+													};\
+												}\
+											</script>\
 										</head>\n\
 										<body>\
 											<div id=\"controls\">\
-												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
-												<br/>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&#8678;</a>"+
-												(date.getTime()==d.getTime()?'&#128198;':"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"#end\">&#128198;</a>")+
-												"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&#8680;</a>\
 												<span class=\"right\">\
 													<a href=\"#start\">&#8679;</a>\
 													<br/>\
 													<a href=\"#end\">&#8681;</a>\
 												</span>\
+												<span class=\"right\">\
+													<a class=\"reload\">&#8634;</a>\
+												</span>\
+												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
+												<br/>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&#8678;</a>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"#end\">&#128198;</a>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&#8680;</a>\
 											</div>\
 											<div class=\"pre\">\n\
 												<span id=\"start\"></span>\n\
