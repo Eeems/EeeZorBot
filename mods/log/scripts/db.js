@@ -43,6 +43,7 @@ db.multiQuerySync([
 			c_id int,\
 			u_id int,\
 			text varchar(512),\
+			FULLTEXT i_logs_text (text),\
 			INDEX i_logs_t_id(t_id),\
 			INDEX i_logs_c_id(c_id),\
 			INDEX i_logs_u_id(u_id),\
