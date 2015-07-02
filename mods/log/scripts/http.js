@@ -165,47 +165,52 @@ var settings = (function(){
 											<title>"+server.name+channel.name+"</title>\
 											<style>\
 												html,body{\
-													width:100%;\
-													margin:0;\
-													padding:0;\
-													text-align:left;\
+													width: 100%;\
+													margin: 0;\
+													padding: 0;\
+													text-align: left;\
 												}\
 												#controls{\
-													position:fixed;\
-													top:0;\
-													left:0;\
+													position: fixed;\
+													top: 0;\
+													left: 0;\
 												}\
 												span{\
 													color:black;\
-													background-color:wite;\
-													text-decoration:none;\
-													font-weight:normal;\
-													text-decoration:none;\
+													background-color: wite;\
+													text-decoration: none;\
+													font-weight: normal;\
+													text-decoration: none;\
 												}\
 												div.line:target{\
-													width:100%;\
-													background-color:yellow;\
+													width: 100%;\
+													background-color: yellow;\
 												}\
 												div.pre{\
-													width:100%;\
-													position:absolute;\
-													top:45px;\
-													bottom:0;\
-													overflow:auto;\
+													width: 100%;\
+													position: absolute;\
+													top: 45px;\
+													bottom: 0;\
+													overflow: auto;\
 												}\
 												div.line{\
-													display:table;\
-													white-space:pre-wrap;\
-													width:100%;\
+													display: table;\
+													white-space: pre-wrap;\
+													width: 100%;\
 												}\
 												div.pre>div.line>span{\
 													display: table-cell;\
 												}\
 												span.date{\
-													width:80px;\
+													width: 80px;\
 												}\
 												.type-notice,.type-topic,.type-datechange{\
-													background-color:#C0DBFF;\
+													background-color: #C0DBFF;\
+												}\
+												#controls>span.right{\
+													top: 0;\
+													right: 0;\
+													position: fixed;\
 												}\
 											</style>\
 										</head>\n\
@@ -213,9 +218,17 @@ var settings = (function(){
 											<div id=\"controls\">\
 												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
 												<br/>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&lt;&lt</a> "+(date.getTime()==d.getTime()?'today':"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"\">today</a>")+" <a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&gt;&gt</a>\
+												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&#8678;</a>"+
+												(date.getTime()==d.getTime()?'&#128198;':"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"#end\">&#128198;</a>")+
+												"<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&#8680;</a>\
+												<span class=\"right\">\
+													<a href=\"#start\">&#8679;</a>\
+													<br/>\
+													<a href=\"#end\">&#8681;</a>\
+												</span>\
 											</div>\
-										<div class=\"pre\">\n\
+											<div class=\"pre\">\n\
+												<span id=\"start\"></span>\n\
 								");
 								var m,t,
 									htmlent = function(text){
@@ -344,7 +357,7 @@ var settings = (function(){
 								}
 								res.write("</span></span></div>\n");
 							}
-							res.write("</div></body></html>");
+							res.write("</div><span id=\"end\"></span></body></html>");
 						}else{
 							res.statusCode = 404;
 							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
