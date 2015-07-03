@@ -12,6 +12,24 @@ var settings = (function(){
 	url = require('url'),
 	deasync = require('deasync'),
 	listdb = require('./listdb.js'),
+	templates = {
+		index: template(_dirname+'/../www/index.html'),
+		server: template(_dirname+'/../www/server.html'),
+		log: template(_dirname+'/../www/log.html'),
+		user: template(_dirname+'/../www/log/user.html'),
+		'404': template(_dirname+'/../www/404.html'),
+		types: {
+			action: template(_dirname+'/../www/log/types/action.html'),
+			datechange: template(_dirname+'/../www/log/types/datechange.html'),
+			join: template(_dirname+'/../www/log/types/join.html'),
+			message: template(_dirname+'/../www/log/types/message.html'),
+			mode: template(_dirname+'/../www/log/types/mode.html'),
+			notice: template(_dirname+'/../www/log/types/notice.html'),
+			part: template(_dirname+'/../www/log/types/part.html'),
+			quit: template(_dirname+'/../www/log/types/quit.html'),
+			topic: template(_dirname+'/../www/log/types/topic.html')
+		}
+	},
 	realdomains = (function(){
 		var i,
 			rd = new Listdb('realdomains').all(),
@@ -82,17 +100,16 @@ var settings = (function(){
 						if(e){
 							throw e;
 						}
-						res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"><title>IRC Logs</title></head><body><strong><a href=\"/\">Logs</a></strong><br/>");
-						for(var i in r){
-							res.write("<a href=\"/"+r[i].id+"\">"+r[i].name+"</a><br/>");
-						}
-						res.write("</body></html>");
+						res.write(templates.index.compile({
+							servers: r
+						}));
 						res.end();
 					});
 				}else if(args.length == 1){
 					db.query("\
 						SELECT	id,\
-								name\
+								name,\
+								s_id\
 						FROM channels\
 						WHERE s_id = ?\
 						AND name like '#%'\
@@ -102,14 +119,13 @@ var settings = (function(){
 						}
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0];
 						if(server!==undefined){
-							res.write("<html><head><meta charset='utf-8'/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"><title>"+server.name+"</title></head><body><strong><a href=\"/\">Logs</a> "+server.name+"</strong><br/>");
-							for(var i in r){
-								res.write("<a href=\"/"+args[0]+'/'+r[i].id+"\">"+r[i].name+"</a><br/>");
-							}
-							res.write("</body></html>");
+							res.write(templates.server.compile({
+								name: server.name,
+								channels: r
+							}));
 						}else{
 							res.statusCode = 404;
-							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
+							res.write(templates['404'].compile({}));
 						}
 						res.end();
 					});
@@ -157,104 +173,18 @@ var settings = (function(){
 						var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 							channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 						if(server!==undefined&&channel!==undefined){
-								res.write("<!doctype html>\
-									<html>\n\
-										<head>\
-											<meta charset='utf-8'/>\
-											<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
-											<title>"+server.name+channel.name+"</title>\
-											<style>\
-												html,body{\
-													width: 100%;\
-													margin: 0;\
-													padding: 0;\
-													text-align: left;\
-												}\
-												#controls{\
-													position: fixed;\
-													top: 0;\
-													left: 0;\
-													width: 100%;\
-												}\
-												#controls>a,#controls>span>a{\
-													cursor: pointer;\
-													text-decoration: none;\
-													color: black;\
-												}\
-												#controls>span.right{\
-													float: right;\
-												}\
-												span{\
-													color:black;\
-													background-color: wite;\
-													text-decoration: none;\
-													font-weight: normal;\
-													text-decoration: none;\
-												}\
-												div.line:target{\
-													width: 100%;\
-													background-color: yellow;\
-												}\
-												div.pre{\
-													width: 100%;\
-													position: absolute;\
-													top: 45px;\
-													bottom: 0;\
-													overflow: auto;\
-												}\
-												div.line{\
-													display: table;\
-													white-space: pre-wrap;\
-													width: 100%;\
-												}\
-												div.pre>div.line>span{\
-													display: table-cell;\
-												}\
-												span.date{\
-													width: 80px;\
-												}\
-												span.user{\
-													cursor: pointer;\
-												}\
-												.type-notice,.type-topic,.type-datechange{\
-													background-color: #C0DBFF;\
-												}\
-											</style>\
-											<script>\
-												window.onload = function(){\
-													NodeList.prototype.forEach = Array.prototype.forEach;\
-													document.querySelector('#controls>span.right>a.reload').onclick = function(){\
-														location.reload();\
-													};\
-													var cache = {};\
-													document.querySelectorAll('span.user').forEach(function(span){\
-														span.onclick = function(){\
-															window.open('http://stats.irc.omnimaga.org/index.php/user/nick:'+span.innerHTML+'/profile');\
-														};\
-													});\
-												}\
-											</script>\
-										</head>\n\
-										<body>\
-											<div id=\"controls\">\
-												<span class=\"right\">\
-													<a href=\"#start\">&#8679;</a>\
-													<br/>\
-													<a href=\"#end\">&#8681;</a>\
-												</span>\
-												<span class=\"right\">\
-													<a class=\"reload\">&#8634;</a>\
-												</span>\
-												<strong><a href=\"/\">Logs</a> <a href=\"/"+args[0]+"\">"+server.name+'</a> '+channel.name+' '+args[2]+"</strong>\
-												<br/>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(pastDate)+"\">&#8678;</a>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(d)+"#end\">&#128198;</a>\
-												<a href=\"/"+args[0]+'/'+args[1]+'/'+ts(nextDate)+"\">&#8680;</a>\
-											</div>\
-											<div class=\"pre\">\n\
-												<span id=\"start\"></span>\n\
-								");
-								var m,t,
+								var data = {
+										s_id: args[0],
+										server: server.name,
+										c_id: args[1],
+										channel: args[1],
+										date: args[2],
+										pastDate: ts(pastDate),
+										todayDate: ts(d),
+										nextDate: ts(nextDate),
+										messages: []
+									},
+									m,t,
 									htmlent = function(text){
 										return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 									},
@@ -309,7 +239,12 @@ var settings = (function(){
 										hue = deg<0?360+deg:deg,
 										light = hue>=30&&hue<=210?30:50,
 										saturation = 20+Math.abs(hash)%80;
-									return '<span class="user" title="View user '+nick+'" style="color:hsl('+hue+','+saturation+'%,'+light+'%)">'+nick+'</span>';
+									return templates.user.compile({
+										nick: nick,
+										hue: hue,
+										saturation: saturation,
+										light: light
+									});
 								},
 								getColour = function(num,def){
 									var c = [
@@ -353,38 +288,23 @@ var settings = (function(){
 									id = id+'-'+m.id;
 								}
 								ds[id] = true;
-								res.write('<div class="line type-'+m.type+'" id="'+id+'"><span class="date">[<a href="#'+id+'"><time datetime="'+m.datetime+'">'+m.time+'</time></a>] </span><span>'+chunk());
-								switch(m.type){
-									case 'topic':case 'datechange':
-										res.write('<strong>Topic:</strong> '+t+' <em>set by '+colourNick(m.user)+'</em>');
-									break;
-									case 'join':
-										res.write('<em>* '+colourNick(m.user)+' joined the channel</em>');
-									break;
-									case 'part':
-										res.write('<em>* '+colourNick(m.user)+' left the channel</em>');
-									break;
-									case 'quit':
-										res.write('<em>* '+colourNick(m.user)+' quit ('+t+')</em>');
-									break;
-									case 'action':
-										res.write('<em>* '+colourNick(m.user)+' '+t+'</em>');
-									break;
-									case 'mode':
-										res.write('<em>* '+colourNick(m.user)+' set mode '+channel.name+' '+t+'</em>');
-									break;
-									case 'notice':
-										res.write('<strong>NOTICE</strong> '+colourNick(m.user)+': '+t);
-									break;
-									default:
-										res.write('&lt;'+colourNick(m.user)+'&gt; '+t);
-								}
-								res.write("</span></span></div>\n");
+								data.messages.push({
+									id: id,
+									type: m.type,
+									datetime: m.datetime,
+									time: m.time,
+									body: chunk()+(templates.types[m.type]?templates.types[m.type]:templates.types.message).compile({
+										user: colourNick(m.user),
+										text: t,
+										channel: channel.name,
+										server: server.name,
+									})+'</span>'
+								});
 							}
-							res.write("<span id=\"end\"></span></div></body></html>");
+							res.write(templates.log.compile(data));
 						}else{
 							res.statusCode = 404;
-							res.write("<html><head></head><body><a href=\"/\">Logs</a><br/>Not found</body></html>");
+							res.write(templates['404'].compile({}));
 						}
 						res.end();
 					});
