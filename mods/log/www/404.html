@@ -5,6 +5,10 @@
 	<body>
 		<a href="/">Logs</a>
 		<br/>
-		Not found
+		{#exist message}
+			{message}
+		{#else message}
+			Not found
+		{/exist message}
 	</body>
 </html>

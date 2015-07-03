@@ -125,7 +125,9 @@ var settings = (function(){
 							}));
 						}else{
 							res.statusCode = 404;
-							res.write(templates['404'].compile({}));
+							res.write(templates['404'].compile({
+								message: 'Server does not exist'
+							}));
 						}
 						res.end();
 					});
@@ -304,7 +306,9 @@ var settings = (function(){
 							res.write(templates.log.compile(data));
 						}else{
 							res.statusCode = 404;
-							res.write(templates['404'].compile({}));
+							res.write(templates['404'].compile({
+								message: 'Channel does not exist'
+							}));
 						}
 						res.end();
 					});
