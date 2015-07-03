@@ -179,7 +179,7 @@ var settings = (function(){
 										s_id: args[0],
 										server: server.name,
 										c_id: args[1],
-										channel: args[1],
+										channel: channel.name,
 										date: args[2],
 										pastDate: ts(pastDate),
 										todayDate: ts(d),
