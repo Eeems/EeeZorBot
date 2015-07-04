@@ -3,16 +3,19 @@
 	<head>
 		<meta charset='utf-8'/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>404 not found</title>
+		<title>Stats</title>
 	</head>
 	<body>
 		<a href="/stats">Stats</a>
 		<a href="/">Logs</a>
 		<br/>
-		{#exist message}
-			{message}
-		{#else message}
-			Not found
-		{/exist message}
+		<h2>Servers</h2>
+		<ul>
+			{#each servers}
+				<li>
+					<a href="stats/server/{id}">{name}</a>
+				</li>
+			{/each servers}
+		</ul>
 	</body>
 </html>

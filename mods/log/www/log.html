@@ -57,10 +57,11 @@
 			span.date{
 				width: 80px;
 			}
-			span.user{
+			a.user{
+				text-decoration: none;
 				cursor: pointer;
 			}
-			span.user:hover{
+			a.user:hover{
 				text-decoration: underline;
 			}
 			.type-notice,.type-topic,.type-datechange{
@@ -73,12 +74,6 @@
 				document.querySelector('#controls>span.right>a.reload').onclick = function(){
 					location.reload();
 				};
-				var cache = {};
-				document.querySelectorAll('span.user').forEach(function(span){
-					span.onclick = function(){
-						window.open('http://stats.irc.omnimaga.org/index.php/user/nick:'+span.innerHTML+'/profile');
-					};
-				});
 			}
 		</script>
 	</head>
@@ -93,6 +88,7 @@
 				<a class="reload">&#8634;</a>
 			</span>
 			<strong>
+				<a href="/stats">Stats</a>
 				<a href="/">Logs</a>
 				<a href="/{s_id}">{server}</a>
 				{channel} {date}

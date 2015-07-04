@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Stats</title>
+	</head>
+	<body>
+		<a href="/stats">Stats</a>
+		<a href="/">Logs</a>
+		<br/>
+		<h2>Stats for: {name}</h2>
+		<h3><a href="http://stats.irc.omnimaga.org/index.php/user/nick:{name}/profile" target="_blank">Omninet stats</a></h3>
+		<h3>Channels</h3>
+		<ul>
+			{#each channels}
+				<li>
+					<a href="/stats/server/{s_id}">{server}</a> <a href="/stats/channel/{id}">{name}</a>: {lines} lines
+				</li>	
+			{/each channels}
+		</ul>
+	</body>
+</html>

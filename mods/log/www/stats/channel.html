@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Stats</title>
+	</head>
+	<body>
+		<a href="/stats">Stats</a>
+		<a href="/">Logs</a>
+		<br/>
+		<h2>Stats for: {name}</h2>
+		<h3>Server: <a href="/stats/user/{s_id}">{server}</a></h3>
+		<h3>Users</h3>
+		<ul>
+			{#each users}
+				<li>
+					<a href="/stats/user/{id}">{name}</a>: {lines} lines
+				</li>	
+			{/each users}
+		</ul>
+	</body>
+</html>
