@@ -13,9 +13,12 @@
 		</strong>
 		<br/>
 		<h2>Channels</h2>
-		{#each channels}
-			<a href="{s_id}/{id}">{name}</a>
-			<br/>
-		{/each channels}
+		<ul>
+			{#each channels}
+				<li>
+					<a href="{s_id}/{id}">{name}</a>
+				</li>
+			{/each channels}
+		</ul>
 	</body>
 </html>

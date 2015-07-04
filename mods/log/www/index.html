@@ -12,9 +12,12 @@
 		</strong>
 		<br/>
 		<h2>Servers</h2>
-		{#each servers}
-			<a href="{id}">{name}</a>
-			<br/>
-		{/each servers}
+		<ul>
+			{#each servers}
+				<li>
+					<a href="{id}">{name}</a>
+				</li>
+			{/each servers}
+		</ul>
 	</body>
 </html>
