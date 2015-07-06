@@ -178,13 +178,12 @@ server.on('servername',function(){
 	})
 	.on('quit',function(text,channels){
 		for(var i in channels){
-			if(channels[i].active){
-				db.insert('messages',{
-					text: text,
-					c_id: id.channel(channels[i].name),
-					u_id: id.user(this.user.nick),
-					t_id: id.type('quit')
-				});
-			}
+			db.insertSync('messages',{
+				text: text,
+				c_id: id.channel(channels[i].name),
+				u_id: id.user(this.user.nick),
+				t_id: id.type('quit')
+			});
+			server.debug('Logged quit for '+channels[i].name);
 		}
 	});
