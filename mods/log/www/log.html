@@ -4,78 +4,8 @@
 		<meta charset='utf-8'/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{server}{channel}</title>
-		<style>
-			html,body{
-				width: 100%;
-				margin: 0;
-				padding: 0;
-				text-align: left;
-			}
-			#controls{
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-			}
-			#controls a{
-				cursor: pointer;
-				text-decoration: none;
-				color: black;
-			}
-			#controls a:hover{
-				text-decoration: underline;
-			}
-			#controls>span.right{
-				float: right;
-			}
-			span{
-				color:black;
-				background-color: wite;
-				text-decoration: none;
-				font-weight: normal;
-				text-decoration: none;
-			}
-			div.line:target{
-				width: 100%;
-				background-color: yellow;
-			}
-			div.pre{
-				width: 100%;
-				position: absolute;
-				top: 45px;
-				bottom: 0;
-				overflow: auto;
-			}
-			div.line{
-				display: table;
-				white-space: pre-wrap;
-				width: 100%;
-			}
-			div.pre>div.line>span{
-				display: table-cell;
-			}
-			span.date{
-				width: 80px;
-			}
-			a.user{
-				text-decoration: none;
-				cursor: pointer;
-			}
-			a.user:hover{
-				text-decoration: underline;
-			}
-			.type-notice,.type-topic,.type-datechange{
-				background-color: #C0DBFF;
-			}
-		</style>
-		<script>
-			window.onload = function(){
-				NodeList.prototype.forEach = Array.prototype.forEach;
-				document.querySelector('#controls>span.right>a.reload').onclick = function(){
-					location.reload();
-				};
-			}
-		</script>
+		<link href="/scripts/app.css" rel="stylesheet" />
+		<script src="/scripts/app.js"></script>
 	</head>
 	<body>
 		<div id="controls">

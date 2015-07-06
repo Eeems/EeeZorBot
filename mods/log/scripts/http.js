@@ -40,7 +40,9 @@ var settings = (function(){
 		}
 	},
 	scripts = {
-		'socket.js': tools.file.subscribe(_dirname+'/../www/scripts/socket.js')
+		'socket.js': tools.file.subscribe(_dirname+'/../www/scripts/socket.js'),
+		'app.js': tools.file.subscribe(_dirname+'/../www/scripts/app.js'),
+		'app.css': tools.file.subscribe(_dirname+'/../www/scripts/app.css')
 	},
 	realdomains = (function(){
 		var i,
