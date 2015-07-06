@@ -17,7 +17,10 @@ var settings = (function(){
 		server: template(_dirname+'/../www/server.html'),
 		log: template(_dirname+'/../www/log.html'),
 		user: template(_dirname+'/../www/log/user.html'),
-		'404': template(_dirname+'/../www/404.html'),
+		errors: {
+			'401': template(_dirname+'/../www/errors/401.html'),
+			'404': template(_dirname+'/../www/errors/404.html')
+		},
 		stats: {
 			index: template(_dirname+'/../www/stats/index.html'),
 			server: template(_dirname+'/../www/stats/server.html'),
@@ -35,6 +38,9 @@ var settings = (function(){
 			quit: template(_dirname+'/../www/log/types/quit.html'),
 			topic: template(_dirname+'/../www/log/types/topic.html')
 		}
+	},
+	scripts = {
+		'socket.js': tools.file.subscribe(_dirname+'/../www/scripts/socket.js')
 	},
 	realdomains = (function(){
 		var i,
@@ -113,6 +119,20 @@ var settings = (function(){
 					});
 				}else if(args.length > 0){
 					switch(args[0]){
+						case 'scripts':
+							if(args.length == 1){
+								res.statusCode = 401;
+								res.write(templates.errors['401'].compile({
+									path: 'scripts/'
+								}));
+							}else if(args.length == 2 && scripts[args[1]]){
+								res.write(scripts[args[1]].data);
+							}else{
+								res.statusCode = 404;
+								res.write(templates.errors['404'].compile());
+							}
+							res.end();
+						break;
 						case 'stats':
 							if(args.length == 1){
 								db.query("\
@@ -257,14 +277,14 @@ var settings = (function(){
 										break;
 										default:
 											res.statusCode = 404;
-											res.write(templates['404'].compile({
+											res.write(templates.errors['404'].compile({
 												message: 'Not Implemented'
 											}));
 											res.end();
 									}
 								}else{
 									res.statusCode = 404;
-									res.write(templates['404'].compile({
+									res.write(templates.errors['404'].compile({
 										message: 'Invalid arguments'
 									}));
 									res.end();
@@ -292,7 +312,7 @@ var settings = (function(){
 										}));
 									}else{
 										res.statusCode = 404;
-										res.write(templates['404'].compile({
+										res.write(templates.errors['404'].compile({
 											message: 'Server does not exist'
 										}));
 									}
@@ -475,7 +495,7 @@ var settings = (function(){
 										res.write(templates.log.compile(data));
 									}else{
 										res.statusCode = 404;
-										res.write(templates['404'].compile({
+										res.write(templates.errors['404'].compile({
 											message: 'Channel does not exist'
 										}));
 									}
