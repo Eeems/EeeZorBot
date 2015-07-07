@@ -20,6 +20,13 @@ var settings = require('../etc/config.json').logs.server,
 			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid.id;
 		}
 	},
+	log = function(type,payload){
+		db.insert('messages',payload);
+		pubsub.pub('log',{
+			type: type,
+			payload: payload
+		});
+	},
 	hooks = [
 		{	// PART
 			regex: /^\([#OC]\)([\W0-9])*\* [^ ]+ has left ([^ ]+) \((.*)\)$/i,
@@ -27,7 +34,7 @@ var settings = require('../etc/config.json').logs.server,
 				// 1 - colour
 				// 2 - nick
 				// 3 - reason
-				db.insert('messages',{
+				log('part',{
 					text: m[1]+m[3],
 					c_id: id.channel(this.channel.name),
 					u_id: id.user(m[2]),
@@ -39,7 +46,7 @@ var settings = require('../etc/config.json').logs.server,
 			regex: /^\([#OC]\)[\W0-9]*\* ([^ ]+) has joined [^ ]+/i,
 			fn: function(m){
 				// 1 - nick
-				db.insert('messages',{
+				log('join',{
 					text: '',
 					c_id: id.channel(this.channel.name),
 					u_id: id.user(m[1]),
@@ -53,7 +60,7 @@ var settings = require('../etc/config.json').logs.server,
 				// 1 - colour
 				// 2 - nick
 				// 3 - mode/args
-				db.insert('messages',{
+				log('mode',{
 					text: m[1]+m[3],
 					c_id: id.channel(this.channel.name),
 					u_id: id.user(m[2]),
@@ -66,7 +73,7 @@ var settings = require('../etc/config.json').logs.server,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text
-				db.insert('messages',{
+				log('message',{
 					text: m[2],
 					c_id: id.channel(this.channel.name),
 					u_id: id.user(m[1]),
@@ -79,7 +86,7 @@ var settings = require('../etc/config.json').logs.server,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text
-				db.insert('messages',{
+				log('action',{
 					text: m[2],
 					c_id: id.channel(this.channel.name),
 					u_id: id.user(m[1]),
@@ -97,15 +104,14 @@ server.on('servername',function(){
 		}
 	})
 	.on('message',function(text){
-		var i,
-			m;
+		var i,m;
 		for(i in hooks){
 			if((m = hooks[i].regex.exec(text))){
 				hooks[i].fn.call(this,m);
 				return;
 			}
 		}
-		db.insert('messages',{
+		log('message',{
 			text: text,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -113,7 +119,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('join',function(){
-		db.insert('messages',{
+		handle('join',{
 			text: '',
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -121,7 +127,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('part',function(){
-		db.insert('messages',{
+		log('part',{
 			text: '',
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -129,7 +135,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('topic',function(old_topic,new_topic){
-		db.insert('messages',{
+		log('topic',{
 			text: new_topic,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -137,7 +143,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('mode',function(mode,state,value){
-		db.insert('messages',{
+		log('mode',{
 			text: (state?'+':'-')+mode+' '+value,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -145,7 +151,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('action',function(text){
-		db.insert('messages',{
+		log('action',{
 			text: text,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -153,7 +159,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('notice',function(text){
-		db.insert('messages',{
+		log('notice',{
 			text: text,
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),
@@ -167,7 +173,7 @@ server.on('servername',function(){
 		for(i in channels){
 			c = channels[i];
 			if(c.active){
-				db.insert('messages',{
+				log('datechange',{
 					text: c.topic,
 					c_id: id.channel(c.name),
 					u_id: id.user(server.name),
@@ -177,12 +183,18 @@ server.on('servername',function(){
 		}
 	})
 	.on('quit',function(text,channels){
-		for(var i in channels){
-			db.insertSync('messages',{
+		var i,p;
+		for(i in channels){
+			p = {
 				text: text,
 				c_id: id.channel(channels[i].name),
 				u_id: id.user(this.user.nick),
 				t_id: id.type('quit')
+			};
+			db.insertSync('messages',p);
+			pubsub.pub('log',{
+				type: 'quit',
+				payload: p
 			});
 			server.debug('Logged quit for '+channels[i].name);
 		}

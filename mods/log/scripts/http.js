@@ -340,7 +340,7 @@ var settings = (function(){
 								date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
 								pastDate = new Date(date.getTime()-(24*60*60*1000));
 								nextDate = new Date(date.getTime()+(24*60*60*1000));
-								d= new Date(d.getFullYear(),d.getMonth(),d.getDate());
+								d = new Date(d.getFullYear(),d.getMonth(),d.getDate());
 								db.query("\
 									SELECT	m.id,\
 											m.u_id,\
@@ -373,6 +373,7 @@ var settings = (function(){
 													date: args[2],
 													pastDate: ts(pastDate),
 													todayDate: ts(d),
+													thisDate: ts(date),
 													nextDate: ts(nextDate),
 													messages: []
 												},
@@ -540,3 +541,9 @@ for(i in settings.listeners){
 		log.trace(e);
 	}
 }
+self.unload = function(){
+	for(var i in servers){
+		servers[i].close();
+	}
+	servers = [];
+};

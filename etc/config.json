@@ -19,12 +19,12 @@
 		"server":{
 			"host": "localhost",
 			"port": 9003,
-			"listeners": [
-				{
-					"host": "192.168.1.120",
-					"port": 9003
-				}
-			]
+			"listeners": []
+		},
+		"websocket": {
+			"host": "localhost",
+			"port": 9004,
+			"listeners": []
 		}
 	},
 	"stdin": {

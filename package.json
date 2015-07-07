@@ -20,7 +20,8 @@
 		"mysql": "2.4.x",
 		"deasync": "0.0.x",
 		"iconv": "x",
-		"chardet": "x"
+		"chardet": "x",
+		"ws": "x"
 	},
 	"devDependencies": {
 		"tape": "2.x"
