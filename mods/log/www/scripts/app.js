@@ -14,10 +14,7 @@ window.onload = function(){
 			.message(function(e){
 				var d = JSON.parse(e.data);
 				switch(d.type){
-					case 'pub':
-						console.log(data.payload);
-					break;
-					case 'date':
+					case 'datechange':
 						ws.close();
 					break;
 					default:
