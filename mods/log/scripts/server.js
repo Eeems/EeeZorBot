@@ -119,7 +119,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('join',function(){
-		handle('join',{
+		log('join',{
 			text: '',
 			c_id: id.channel(this.channel.name),
 			u_id: id.user(this.user.nick),

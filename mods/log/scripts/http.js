@@ -541,7 +541,7 @@ for(i in settings.listeners){
 		log.trace(e);
 	}
 }
-self.unload = function(){
+script.unload = function(){
 	for(var i in servers){
 		servers[i].close();
 	}

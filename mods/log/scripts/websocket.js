@@ -38,7 +38,7 @@ for(i in settings.listeners){
 	}
 }
 pubsub.sub('log',handlePub);
-self.unload = function(){
+script.unload = function(){
 	servers.forEach(function(){
 		s.close();
 	});
