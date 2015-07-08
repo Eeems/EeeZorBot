@@ -11,6 +11,7 @@
 			window.channel = '{channel}';
 		</script>
 		<script src="/scripts/socket.js"></script>
+		<script src="/scripts/template.js"></script>
 		<script src="/scripts/app.js"></script>
 	</head>
 	<body>
@@ -34,7 +35,7 @@
 			<a href="/{s_id}/{c_id}/{todayDate}#end">&#128198;</a>
 			<a href="/{s_id}/{c_id}/{nextDate}">&#8680;</a>
 		</div>
-		<div class="pre">
+		<div id="content" class="pre">
 			<span id="start"></span>
 			{#each messages}
 				<div class="line type-{type}" id="{id}">
@@ -44,5 +45,13 @@
 			{/each messages}
 			<span id="end"></span>
 		</div>
+		<template id="template-message">
+			{#ignore}
+				<div class="line type-{type}" id="{id}">
+					<span class="date">[<a href="#{id}"><time datetime="{datetime}">{time}</time></a>]</span>
+					<span>{body}</span>
+				</div>
+			{/ignore}
+		</template>
 	</body>
 </html>

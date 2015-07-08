@@ -12,6 +12,118 @@ var settings = (function(){
 	url = require('url'),
 	deasync = require('deasync'),
 	listdb = require('./listdb.js'),
+	html = (function(){
+		this.htmlent = function(text){
+			return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+		};
+		this.getColour = function(num,def){
+			var c = [
+				'white',
+				'black',
+				'blue',
+				'green',
+				'red',
+				'brown',
+				'purple',
+				'orange',
+				'yellow',
+				'lime',
+				'teal',
+				'aqua',
+				'royalblue',
+				'fuchsia',
+				'grey',
+				'silver'
+			][parseInt(num,0)];
+			return c===undefined?def:c;
+		};
+		this.chunk = function(c,bg,style){
+			style = style===undefined?'':style;
+			return "<span style='color:"+this.getColour(c,'black')+";background-color:"+this.getColour(bg,'transparent')+";"+style+"'>";
+		};
+		this.parse = function(m){
+			var style="",
+				c,
+				bg,
+				t=m[0];
+			switch(t){
+				case "\x0f":
+					t = "\x03";
+				break;
+				case "\x1f":
+					t = "\x03";
+					style="text-decoration:underline;";
+				break;
+				case "\x02":
+					t="\x03";
+					style="font-weight:bold;";
+				break;
+				case "\x03":
+					c=m[1];
+					if(/\d/.test(m[2])){
+						c+=m[2];
+						if(m[3] == ','){
+							bg = m[4];
+							if(/\d/.test(m[5])){
+								bg+=m[5];
+							}
+						}
+					}else if(m[2] == ','){
+						bg = m[3];
+						if(/\d/.test(m[4])){
+							bg+=m[4];
+						}
+					}
+				break;
+			}
+			return '</span>'+chunk(c,bg,style);
+		};
+		this.colourNick = function(nick,id,template){
+			nick = html.htmlent(nick);
+			var hash = (function(){
+					var h = 0,
+						i;
+					for(i=0;i<nick.length;i++){
+						h = nick.charCodeAt(i)+(h<<6)+(h<<16)-h;
+					}
+					return h;
+				})(),
+				deg = hash%360,
+				hue = deg<0?360+deg:deg,
+				light = hue>=30&&hue<=210?30:50,
+				saturation = 20+Math.abs(hash)%80;
+			return template.compile({
+				nick: nick,
+				hue: hue,
+				saturation: saturation,
+				light: light,
+				id: id
+			});
+		};
+		this.ts = function(d){
+			return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+		};
+		this.line_json = function(m,id){
+			id = id===undefined?m.id:id;
+			var t = html.htmlent(m.text)
+				.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~\-]*#?[A-Za-z0-9_.\-~\-]*)\b/g,links)
+				.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,html.parse)
+				.trim();
+			return {
+				id: id,
+				type: m.type,
+				datetime: m.datetime,
+				time: m.time,
+				body: html.chunk()+(templates.types[m.type]?templates.types[m.type]:templates.types.message).compile({
+					user: html.colourNick(m.user,m.u_id,templates.user),
+					text: t,
+					channel: m.channel,
+					server: m.server,
+				})+'</span>'
+			};
+		};
+		return this;
+	})(),
 	templates = {
 		index: template(_dirname+'/../www/index.html'),
 		server: template(_dirname+'/../www/server.html'),
@@ -42,7 +154,8 @@ var settings = (function(){
 	scripts = {
 		'socket.js': tools.file.subscribe(_dirname+'/../www/scripts/socket.js'),
 		'app.js': tools.file.subscribe(_dirname+'/../www/scripts/app.js'),
-		'app.css': tools.file.subscribe(_dirname+'/../www/scripts/app.css')
+		'app.css': tools.file.subscribe(_dirname+'/../www/scripts/app.css'),
+		'template.js': tools.file.subscribe(_dirname+'/../www/scripts/template.js'),
 	},
 	realdomains = (function(){
 		var i,
@@ -91,6 +204,9 @@ var settings = (function(){
 			data = true;
 		}
 		return data;
+	},
+	links = function(href){
+		return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
 	},
 	handle = function(req,res){
 		switch(req.method){
@@ -293,6 +409,85 @@ var settings = (function(){
 								}
 							}
 						break;
+						case 'api':
+							res.setHeader('Content-Type','application/json');
+							if(args.length < 3){
+								res.statusCode = 401;
+								res.write(JSON.stringify({
+									msg: 'Access Denied'
+								}));
+								res.end();
+							}else{
+								try{
+									switch(args[1]){
+										case 'get':
+											if(args.length < 4){
+												res.statusCode = 401;
+												res.write(JSON.stringify({
+													msg: 'Access Denied'
+												}));
+												res.end();
+											}else{
+												switch(args[2]){
+													case 'line':
+														db.query("\
+															SELECT	CONCAT(\
+																		DATE_FORMAT(m.date,'%H:%i:%s'),\
+																		IFNULL(\
+																			(\
+																				SELECT CONCAT('-',sm.id)\
+																				FROM messages sm\
+																				WHERE DATE_FORMAT(m.date,'%H:%i:%s') = DATE_FORMAT(sm.date,'%H:%i:%s')\
+																				AND sm.id < m.id\
+																				LIMIT 0,1\
+																			),\
+																			''\
+																		)\
+																	) as id,\
+																	m.u_id,\
+																	u.name AS user,\
+																	t.name AS type,\
+																	m.text,\
+																	DATE_FORMAT(m.date,'%H:%i:%s') as time,\
+																	DATE_FORMAT(m.date,'%Y-%m-%dT%H:%i:%sZ') as datetime,\
+																	c.name as channel,\
+																	s.name as server\
+															FROM messages m\
+															JOIN types t\
+																ON t.id = m.t_id\
+															JOIN users u\
+																ON u.id = m.u_id\
+															JOIN channels c\
+																ON c.id = m.c_id\
+															JOIN servers s\
+																ON s.id = c.s_id\
+															WHERE m.id = ?\
+															ORDER BY m.date ASC\
+														",[args[3]],function(e,r){
+															if(e){
+																throw e;
+															}
+															if(!r[0]){
+																throw new Error('Could not find line '+args[3]);
+															}
+															res.write(JSON.stringify(html.line_json(r[0])));
+															res.end();
+														});
+													break;
+												}
+											}
+										break;
+									}
+								}catch(e){
+									res.write(JSON.stringify({
+										type: 'error',
+										msg: e
+									}));
+									res.end();
+									console.log(e);
+								}
+							}
+						break;
 						default:
 							if(args.length == 1){
 								db.query("\
@@ -321,10 +516,7 @@ var settings = (function(){
 									res.end();
 								});
 							}else{
-								var ts = function(d){
-										return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-									},
-									d = new Date(+new Date),
+								var d = new Date(+new Date),
 									pastDate,
 									nextDate,
 									a,
@@ -332,10 +524,10 @@ var settings = (function(){
 									controls;
 								if(args[2]===undefined){
 									res.writeHead(302,{
-										Location: req.url+'/'+ts(d)
+										Location: req.url+'/'+html.ts(d)
 									});
 								}
-								args[2] = args[2]===undefined?ts(d):args[2];
+								args[2] = args[2]===undefined?html.ts(d):args[2];
 								a = args[2].split('-');
 								date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
 								pastDate = new Date(date.getTime()-(24*60*60*1000));
@@ -365,135 +557,32 @@ var settings = (function(){
 									var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
 										channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 									if(server!==undefined&&channel!==undefined){
-											var data = {
-													s_id: args[0],
-													server: server.name,
-													c_id: args[1],
-													channel: channel.name,
-													date: args[2],
-													pastDate: ts(pastDate),
-													todayDate: ts(d),
-													thisDate: ts(date),
-													nextDate: ts(nextDate),
-													messages: []
-												},
-												m,t,
-												htmlent = function(text){
-													return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-												},
-												parse = function(m){
-													var style="",
-														c,
-														bg,
-														t=m[0];
-													switch(t){
-														case "\x0f":
-															t = "\x03";
-														break;
-														case "\x1f":
-															t = "\x03";
-															style="text-decoration:underline;";
-														break;
-														case "\x02":
-															t="\x03";
-															style="font-weight:bold;";
-														break;
-														case "\x03":
-															c=m[1];
-															if(/\d/.test(m[2])){
-																c+=m[2];
-																if(m[3] == ','){
-																	bg = m[4];
-																	if(/\d/.test(m[5])){
-																		bg+=m[5];
-																	}
-																}
-															}else if(m[2] == ','){
-																bg = m[3];
-																if(/\d/.test(m[4])){
-																	bg+=m[4];
-																}
-															}
-														break;
-													}
-													return '</span>'+chunk(c,bg,style);
+										var data = {
+												s_id: args[0],
+												server: server.name,
+												c_id: args[1],
+												channel: channel.name,
+												date: args[2],
+												pastDate: html.ts(pastDate),
+												todayDate: html.ts(d),
+												thisDate: html.ts(date),
+												nextDate: html.ts(nextDate),
+												messages: []
 											},
-											colourNick = function(nick,id){
-												nick = htmlent(nick);
-												var hash = (function(){
-														var h = 0,
-															i;
-														for(i=0;i<nick.length;i++){
-															h = nick.charCodeAt(i)+(h<<6)+(h<<16)-h;
-														}
-														return h;
-													})(),
-													deg = hash%360,
-													hue = deg<0?360+deg:deg,
-													light = hue>=30&&hue<=210?30:50,
-													saturation = 20+Math.abs(hash)%80;
-												return templates.user.compile({
-													nick: nick,
-													hue: hue,
-													saturation: saturation,
-													light: light,
-													id: id
-												});
-											},
-											getColour = function(num,def){
-												var c = [
-													'white',
-													'black',
-													'blue',
-													'green',
-													'red',
-													'brown',
-													'purple',
-													'orange',
-													'yellow',
-													'lime',
-													'teal',
-													'aqua',
-													'royalblue',
-													'fuchsia',
-													'grey',
-													'silver'
-												][parseInt(num,0)];
-												return c===undefined?def:c;
-											},
-											chunk = function(c,bg,style){
-												style = style===undefined?'':style;
-												return "<span style='color:"+getColour(c,'black')+";background-color:"+getColour(bg,'transparent')+";"+style+"'>";
-											},
-											links = function(href){
-												return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
-											},
+											m,
 											ds = {},
 											id,
 											i;
 										for(i in r){
 											m = r[i];
-											t = htmlent(m.text)
-												.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~\-]*#?[A-Za-z0-9_.\-~\-]*)\b/g,links)
-												.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,parse)
-												.trim();
+											m.channel = channel.name;
+											m.server = server.name;
 											id = m.time;
 											if(ds[id]!==undefined){
 												id = id+'-'+m.id;
 											}
 											ds[id] = true;
-											data.messages.push({
-												id: id,
-												type: m.type,
-												datetime: m.datetime,
-												time: m.time,
-												body: chunk()+(templates.types[m.type]?templates.types[m.type]:templates.types.message).compile({
-													user: colourNick(m.user,m.u_id),
-													text: t,
-													channel: channel.name,
-													server: server.name,
-												})+'</span>'
-											});
+											data.messages.push(html.line_json(m,id));
 										}
 										res.write(templates.log.compile(data));
 									}else{
@@ -543,7 +632,7 @@ for(i in settings.listeners){
 }
 script.unload = function(){
 	for(var i in servers){
-		servers[i].close();
+		servers[i].release(script);
 	}
 	servers = [];
 };

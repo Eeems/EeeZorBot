@@ -26,12 +26,15 @@ var settings = require('../etc/config.json').logs.server,
 			c_id: id.channel(channel),
 			u_id: id.user(user),
 			t_id: id.type(type)
-		});
-		pubsub.pub('log',{
-			type: type,
-			text: text,
-			channel: channel,
-			user: user
+		},function(e,id){
+			if(e){
+				throw e;
+			}
+			pubsub.pub('log',{
+				type: type,
+				channel: channel,
+				id: id
+			});
 		});
 	},
 	hooks = [

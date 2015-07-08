@@ -1,13 +1,19 @@
 var settings = (function(){
-		var s = require('../etc/config.json').logs.websocket;
+		var s = require('../etc/config.json').logs.websocket,
+			ss = require('../etc/config.json').logs.server;
 		if(s.listeners === undefined){
 			s.listeners = [];
+		}
+		s.api = {
+			host: ss.host,
+			port: ss.port
 		}
 		return s;
 	})(),
 	i,
 	servers = [],
 	channels = {},
+	request = require('http').request,
 	handleConnect = function(c){
 		console.log('Websocket connection');
 		c.on('message',function(data){
@@ -20,6 +26,26 @@ var settings = (function(){
 					if(channels[data.channel].indexOf(c) == -1){
 						channels[data.channel].push(c);
 					}
+				break;
+				case 'get/line':
+					request({
+						host: settings.api.host,
+						port: settings.api.port,
+						path: '/api/get/line/'+data.id
+					},function(res){
+						var data = '';
+						res.on('data',function(chunk){
+							data += chunk;
+						});
+						res.on('end',function(){
+							c.send(JSON.stringify({
+								type: 'pub',
+								payload: JSON.parse(data)
+							}));
+						});
+					}).on('error',function(e){
+						console.error(e);
+					}).end();
 				break;
 			}
 		});
