@@ -79,6 +79,17 @@ var settings = require('../etc/config.json').logs.server,
 				log('action',this.channel.name,m[1],m[2]);
 			}
 		}
+	],
+	sendhooks = [
+		{
+			// PRIVMSG
+			regex: /^PRIVMSG\s(\#?\w+)\s:?([^\x01].+?[^\x01])$/i,
+			fn: function(m){
+				// 1 - channel
+				// 2 - text
+				log('message',m[1],server.config.nick,m[2]);
+			}
+		}
 	];
 server.on('servername',function(){
 		var sid = db.querySync("select id from servers where host = ? and port = ?",[server.config.host,server.config.port])[0];
@@ -142,5 +153,14 @@ server.on('servername',function(){
 				payload: p
 			});
 			server.debug('Logged quit for '+channels[i].name);
+		}
+	})
+	.on('send',function(text){
+		var i,m;
+		for(i in sendhooks){
+			if((m = sendhooks[i].regex.exec(text))){
+				sendhooks[i].fn.call(this,m);
+				return;
+			}
 		}
 	});
