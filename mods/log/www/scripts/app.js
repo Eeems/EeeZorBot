@@ -4,7 +4,7 @@ window.onload = function(){
 		location.reload();
 	};
 	if(todayDate == thisDate){
-		var ws = socket.create('ws://'+location.hostname+':9004');
+		var ws = socket.create('ws://'+window.socketHost+':'+window.socketPort);
 		ws.open(function(e){
 				console.log('Connected to websocket');
 				ws.send(JSON.stringify({
