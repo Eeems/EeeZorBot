@@ -43,29 +43,29 @@ var settings = (function(){
 			return c===undefined?def:c;
 		};
 		this.chunk = function(c,bg,style){
-			style = style===undefined?'':style;
-			return "<span style='color:"+this.getColour(c,'black')+";background-color:"+this.getColour(bg,'transparent')+";"+style+"'>";
+			this.style = style===undefined?'':style;
+			return "<span style='color:"+this.getColour(c,'black')+";background-color:"+this.getColour(bg,'transparent')+";"+this.style+"'>";
 		};
 		this.parse = function(m){
-			var style="",
-				c,
+			var c,
 				bg,
 				t=m[0];
 			switch(t){
 				case "\x0f":
 					t = "\x03";
+					this.style = '';
 				break;
 				case "\x1f":
 					t = "\x03";
-					style="text-decoration:underline;";
+					this.style += "text-decoration:underline;";
 				break;
 				case "\x02":
 					t="\x03";
-					style="font-weight:bold;";
+					this.style += "font-weight:bold;";
 				break;
 				case "\x1D":case "\x16":
 					t="\x03";
-					style="font-style:italic;";
+					this.style += "font-style:italic;";
 				break;
 				case "\x03":
 					c=m[1];
@@ -85,7 +85,7 @@ var settings = (function(){
 					}
 				break;
 			}
-			return '</span>'+chunk(c,bg,style);
+			return '</span>'+chunk(c,bg,this.style);
 		};
 		this.colourNick = function(nick,id,template){
 			nick = html.htmlent(nick);
