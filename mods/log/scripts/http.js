@@ -63,6 +63,10 @@ var settings = (function(){
 					t="\x03";
 					style="font-weight:bold;";
 				break;
+				case "\x1D":case "\x16":
+					t="\x03";
+					style="font-style:italic;";
+				break;
 				case "\x03":
 					c=m[1];
 					if(/\d/.test(m[2])){
