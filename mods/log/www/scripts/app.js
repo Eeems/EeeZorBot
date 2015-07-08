@@ -7,6 +7,10 @@ window.onload = function(){
 		var ws = socket.create('ws://'+location.hostname+':9004');
 		ws.open(function(e){
 				console.log('Connected to websocket');
+				ws.send(JSON.stringify({
+					type: 'sub',
+					channel: window.channel
+				}));
 			})
 			.close(function(e){
 				console.error(e);

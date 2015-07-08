@@ -20,11 +20,18 @@ var settings = require('../etc/config.json').logs.server,
 			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.config.host,port:server.config.port}):sid.id;
 		}
 	},
-	log = function(type,payload){
-		db.insert('messages',payload);
+	log = function(type,channel,user,text){
+		db.insert('messages',{
+			text: text,
+			c_id: id.channel(channel),
+			u_id: id.user(user),
+			t_id: id.type(type)
+		});
 		pubsub.pub('log',{
 			type: type,
-			payload: payload
+			text: text,
+			channel: channel,
+			user: user
 		});
 	},
 	hooks = [
@@ -34,24 +41,14 @@ var settings = require('../etc/config.json').logs.server,
 				// 1 - colour
 				// 2 - nick
 				// 3 - reason
-				log('part',{
-					text: m[1]+m[3],
-					c_id: id.channel(this.channel.name),
-					u_id: id.user(m[2]),
-					t_id: id.type('part')
-				});
+				log('part',this.channel.name,m[2],m[1]+m[3]);
 			}
 		},
 		{	// JOIN
 			regex: /^\([#OC]\)[\W0-9]*\* ([^ ]+) has joined [^ ]+/i,
 			fn: function(m){
 				// 1 - nick
-				log('join',{
-					text: '',
-					c_id: id.channel(this.channel.name),
-					u_id: id.user(m[1]),
-					t_id: id.type('join')
-				});
+				log('join',this.channel.name,m[1],'');
 			}
 		},
 		{	// MODE
@@ -60,12 +57,7 @@ var settings = require('../etc/config.json').logs.server,
 				// 1 - colour
 				// 2 - nick
 				// 3 - mode/args
-				log('mode',{
-					text: m[1]+m[3],
-					c_id: id.channel(this.channel.name),
-					u_id: id.user(m[2]),
-					t_id: id.type('mode')
-				});
+				log('mode',this.channel.name,m[2],m[1]+m[3]);
 			}
 		},
 		{	// PRIVMSG
@@ -73,12 +65,7 @@ var settings = require('../etc/config.json').logs.server,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text
-				log('message',{
-					text: m[2],
-					c_id: id.channel(this.channel.name),
-					u_id: id.user(m[1]),
-					t_id: id.type('message')
-				});
+				log('message',this.channel.name,m[1],m[2]);
 			}
 		},
 		{	// ACTION
@@ -86,12 +73,7 @@ var settings = require('../etc/config.json').logs.server,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text
-				log('action',{
-					text: m[2],
-					c_id: id.channel(this.channel.name),
-					u_id: id.user(m[1]),
-					t_id: id.type('action')
-				});
+				log('action',this.channel.name,m[1],m[2]);
 			}
 		}
 	];
@@ -111,60 +93,25 @@ server.on('servername',function(){
 				return;
 			}
 		}
-		log('message',{
-			text: text,
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('message')
-		});
+		log('message',this.channel.name,this.user.nick,text);
 	})
 	.on('join',function(){
-		log('join',{
-			text: '',
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('join')
-		});
+		log('join',this.channel.name,this.user.nick,'');
 	})
 	.on('part',function(){
-		log('part',{
-			text: '',
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('part')
-		});
+		log('part',this.channel.name,this.user.nick,'');
 	})
 	.on('topic',function(old_topic,new_topic){
-		log('topic',{
-			text: new_topic,
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('topic')
-		});
+		log('topic',this.channel.name,this.user.nick,new_topic);
 	})
 	.on('mode',function(mode,state,value){
-		log('mode',{
-			text: (state?'+':'-')+mode+' '+value,
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('mode')
-		});
+		log('mode',this.channel.name,this.user.nick,(state?'+':'-')+mode+' '+value);
 	})
 	.on('action',function(text){
-		log('action',{
-			text: text,
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('action')
-		});
+		log('action',this.channel.name,this.user.nick,text);
 	})
 	.on('notice',function(text){
-		log('notice',{
-			text: text,
-			c_id: id.channel(this.channel.name),
-			u_id: id.user(this.user.nick),
-			t_id: id.type('notice')
-		});
+		log('notice',this.channel.name,this.user.nick,text);
 	})
 	.on('datechange',function(){
 		var i,
@@ -173,12 +120,7 @@ server.on('servername',function(){
 		for(i in channels){
 			c = channels[i];
 			if(c.active){
-				log('datechange',{
-					text: c.topic,
-					c_id: id.channel(c.name),
-					u_id: id.user(server.name),
-					t_id: id.type('datechange')
-				});
+				log('datechange',c.name,server.name,c.topic);
 			}
 		}
 	})
