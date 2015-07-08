@@ -1,10 +1,15 @@
 /*jshint multistr: true */
 // Start http server if it isn't running already
 var settings = (function(){
-		var s = require('../etc/config.json').logs.server;
+		var s = require('../etc/config.json').logs.server,
+			ss = require('../etc/config.json').logs.websocket;
 		if(s.listeners === undefined){
 			s.listeners = [];
 		}
+		s.websocket = {
+			host: ss.host,
+			port: ss.port
+		};
 		return s;
 	})(),
 	servers = [],
@@ -567,7 +572,9 @@ var settings = (function(){
 												todayDate: html.ts(d),
 												thisDate: html.ts(date),
 												nextDate: html.ts(nextDate),
-												messages: []
+												messages: [],
+												socketHost: settings.websocket.host,
+												socketPort: settings.websocket.port
 											},
 											m,
 											ds = {},
