@@ -139,20 +139,23 @@ server.on('servername',function(){
 		}
 	})
 	.on('quit',function(text,channels){
-		var i,p;
+		var i,p,c;
 		for(i in channels){
-			p = {
-				text: text,
-				c_id: id.channel(channels[i].name),
-				u_id: id.user(this.user.nick),
-				t_id: id.type('quit')
-			};
-			db.insertSync('messages',p);
-			pubsub.pub('log',{
-				type: 'quit',
-				payload: p
-			});
-			server.debug('Logged quit for '+channels[i].name);
+			c = server.channel(channels[i].name);
+			if(c && c.active){
+				p = {
+					text: text,
+					c_id: id.channel(channels[i].name),
+					u_id: id.user(this.user.nick),
+					t_id: id.type('quit')
+				};
+				db.insertSync('messages',p);
+				pubsub.pub('log',{
+					type: 'quit',
+					payload: p
+				});
+				server.debug('Logged quit for '+channels[i].name);
+			}
 		}
 	})
 	.on('send',function(text){
