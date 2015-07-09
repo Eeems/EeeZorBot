@@ -64,7 +64,7 @@ var settings = require('../etc/config.json').logs.server,
 			}
 		},
 		{	// PRIVMSG
-			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<([^ ]+)> (.+)$/i,
+			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<([^>]+)> (.+)$/i,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text

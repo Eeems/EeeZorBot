@@ -266,6 +266,7 @@ var settings = (function(){
 									SELECT	id,\
 											name\
 									FROM servers\
+									ORDER BY name ASC\
 								",function(e,servers){
 									if(e){
 										throw e;
@@ -284,6 +285,7 @@ var settings = (function(){
 														id\
 												from users\
 												where id = ?\
+												ORDER BY name ASC\
 											",[args[2]],function(e,user){
 												if(e){
 													throw e;
@@ -303,6 +305,7 @@ var settings = (function(){
 													where m.u_id = ?\
 														and left(c.name,1) = '#'\
 													group by c.s_id,c.id\
+													ORDER BY name ASC\
 												",[user.id],function(e,channels){
 													if(e){
 														throw e;
@@ -323,6 +326,7 @@ var settings = (function(){
 												join servers s\
 													on s.id = c.s_id\
 												where c.id = ?\
+												ORDER BY name ASC\
 											",[args[2]],function(e,channel){
 												if(e){
 													throw e;
@@ -339,6 +343,7 @@ var settings = (function(){
 														on u.id = m.u_id\
 													where c.id = ?\
 													group by u.id\
+													ORDER BY name ASC\
 												",[channel.id],function(e,users){
 													if(e){
 														throw e;
@@ -355,6 +360,7 @@ var settings = (function(){
 														id\
 												from servers\
 												where id = ?\
+												ORDER BY name ASC\
 											",[args[2]],function(e,server){
 												if(e){
 													throw e;
@@ -373,6 +379,7 @@ var settings = (function(){
 													where c.s_id = ?\
 														and left(c.name,1) = '#'\
 													group by c.id\
+													ORDER BY name ASC\
 												",[server.id],function(e,channels){
 													if(e){
 														throw e;
@@ -391,6 +398,7 @@ var settings = (function(){
 														where c.s_id = ?\
 															and left(c.name,1) = '#'\
 														group by u.id\
+														ORDER BY name ASC\
 													",[server.id],function(e,users){
 														if(e){
 															throw e;
