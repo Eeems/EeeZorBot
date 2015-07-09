@@ -11,11 +11,15 @@
 			<a href="/">Logs</a>
 		</strong>
 		<br/>
+		<h1>Logs</h1>
 		<h2>Servers</h2>
 		<ul>
 			{#each servers}
 				<li>
 					<a href="{id}">{name}</a>
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>
 			{/each servers}
 		</ul>

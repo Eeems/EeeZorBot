@@ -12,11 +12,15 @@
 			{name}
 		</strong>
 		<br/>
+		<h1>Logs</h1>
 		<h2>Channels</h2>
 		<ul>
 			{#each channels}
 				<li>
 					<a href="{s_id}/{id}">{name}</a>
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>
 			{/each channels}
 		</ul>

@@ -239,6 +239,13 @@ var settings = (function(){
 						if(e){
 							throw e;
 						}
+						r.forEach(function(v,i){
+							require('./api.js').servers.forEach(function(server,i){
+								if(v.name == server.name){
+									v.online = true;
+								}
+							});
+						});
 						res.write(templates.index.compile({
 							servers: r
 						}));
@@ -567,6 +574,16 @@ var settings = (function(){
 									}
 									var server = db.querySync("select name from servers where id = ?",[args[0]])[0];
 									if(server!==undefined){
+										r.forEach(function(v,i){
+											require('./api.js').servers.forEach(function(s,i){
+												if(server.name == s.name){
+													var c = s.channel(v.name);
+													if(c && c.active){
+														v.online = true;
+													}
+												}
+											});
+										});
 										res.write(templates.server.compile({
 											name: server.name,
 											channels: r
