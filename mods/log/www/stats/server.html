@@ -15,6 +15,9 @@
 			{#each channels}
 				<li>
 					<a href="/stats/channel/{id}">{name}</a>: {lines} lines, {users} users
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>	
 			{/each channels}
 		</ul>
@@ -23,6 +26,9 @@
 			{#each users}
 				<li>
 					<a href="/stats/user/{id}">{name}</a>: {lines} lines, {channels} channels
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>	
 			{/each users}
 		</ul>

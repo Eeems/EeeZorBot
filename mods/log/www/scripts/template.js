@@ -3,7 +3,7 @@ window.template = function(id,data){
 	var template = document.getElementById(id).innerHTML,
 		re = {
 			each: /\{#each ([^}]*)\}([\S\s]*)\{\/each \1\}/gi,
-			match: /\{([^#][^}\n]+?)\}/gi,
+			match: /\{([^#\/][^}\n]+?)\}/gi,
 			exist: /\{#exist ([^}]*)\}([\S\s]*)\{\/exist \1\}/gi,
 			existelse: /\{#exist ([^}]*)\}([\S\s]*)\{#else \1\}([\S\s]*)\{\/exist \1\}/gi,
 			ignore: /\{#ignore\}([\S\s]*)\{\/ignore\}/gi,

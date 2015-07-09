@@ -14,6 +14,9 @@
 			{#each servers}
 				<li>
 					<a href="stats/server/{id}">{name}</a>
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>
 			{/each servers}
 		</ul>

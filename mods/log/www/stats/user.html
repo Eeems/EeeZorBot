@@ -16,6 +16,9 @@
 			{#each channels}
 				<li>
 					<a href="/stats/server/{s_id}">{server}</a> <a href="/stats/channel/{id}">{name}</a>: {lines} lines
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
 				</li>	
 			{/each channels}
 		</ul>

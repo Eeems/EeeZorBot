@@ -271,6 +271,13 @@ var settings = (function(){
 									if(e){
 										throw e;
 									}
+									servers.forEach(function(v,i){
+										require('./api.js').servers.forEach(function(server,i){
+											if(v.name == server.name){
+												v.online = true;
+											}
+										});
+									});
 									res.write(templates.stats.index.compile({
 										servers: servers
 									}));
@@ -305,11 +312,21 @@ var settings = (function(){
 													where m.u_id = ?\
 														and left(c.name,1) = '#'\
 													group by c.s_id,c.id\
-													ORDER BY name ASC\
+													ORDER BY s.name,c.name ASC\
 												",[user.id],function(e,channels){
 													if(e){
 														throw e;
 													}
+													channels.forEach(function(v,i){
+														require('./api.js').servers.forEach(function(server,i){
+															if(server.name == v.server){
+																var c = server.channel(v.name);
+																if(c && c.active){
+																	v.online = true;
+																}
+															}
+														});
+													});
 													user.channels = channels;
 													res.write(templates.stats.user.compile(user));
 													res.end();
@@ -348,6 +365,16 @@ var settings = (function(){
 													if(e){
 														throw e;
 													}
+													require('./api.js').servers.forEach(function(server,i){
+														if(server.name == channel.server){
+															users.forEach(function(user,i){
+																var u = server.user(user.name);
+																if(u && u.channels.length > 0){
+																	user.online = true;
+																}
+															});
+														}
+													});
 													channel.users = users;
 													res.write(templates.stats.channel.compile(channel));
 													res.end();
@@ -384,6 +411,16 @@ var settings = (function(){
 													if(e){
 														throw e;
 													}
+													channels.forEach(function(v,i){
+														require('./api.js').servers.forEach(function(s,i){
+															if(s.name == server.name){
+																var c = s.channel(v.name);
+																if(c && c.active){
+																	v.online = true;
+																}
+															}
+														});
+													});
 													server.channels = channels;
 													db.query("\
 														select	u.id,\
@@ -403,6 +440,16 @@ var settings = (function(){
 														if(e){
 															throw e;
 														}
+														require('./api.js').servers.forEach(function(s,i){
+															if(s.name == server.name){
+																users.forEach(function(user,i){
+																	var u = s.user(user.name);
+																	if(u && u.channels.length > 0){
+																		user.online = true;
+																	}
+																});
+															}
+														});
 														server.users = users;
 														res.write(templates.stats.server.compile(server));
 														res.end();
@@ -651,7 +698,7 @@ for(i in settings.listeners){
 }
 script.unload = function(){
 	for(var i in servers){
-		servers[i].release(script);
+		servers[i].close();
 	}
 	servers = [];
 };
