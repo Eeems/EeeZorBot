@@ -1,10 +1,17 @@
 /*jshint multistr: true */
 // Start http server if it isn't running already
 var settings = (function(){
-		var s = require('../etc/config.json').logs.server,
-			ss = require('../etc/config.json').logs.websocket;
+		var c = JSON.parse(JSON.stringify(require('../etc/config.json'))),
+			s = c.logs.server,
+			ss = c.logs.websocket;
 		if(s.listeners === undefined){
 			s.listeners = [];
+		}
+		if(s.host && s.port){
+			s.listeners.unshift({
+				host: s.host,
+				port: s.port
+			});
 		}
 		s.websocket = {
 			host: ss.host,
@@ -12,11 +19,12 @@ var settings = (function(){
 		};
 		return s;
 	})(),
-	servers = [],
 	dns = require('dns'),
 	url = require('url'),
 	deasync = require('deasync'),
 	listdb = require('./listdb.js'),
+	deasync = require('deasync'),
+	http = require('http'),
 	html = (function(){
 		this.htmlent = function(text){
 			return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -217,7 +225,7 @@ var settings = (function(){
 	links = function(href){
 		return isdomain(href)?'<a href="'+toUrl(href)+'">'+href+'</a>':href;
 	},
-	handle = function(req,res){
+	httpserver = http.createServer(function(req,res){
 		switch(req.method){
 			case 'POST':
 				var data = '';
@@ -681,7 +689,7 @@ var settings = (function(){
 				}
 			break;
 		}
-	},
+	}),
 	i;
 Object.observe(realdomains,function(){
 	var rn = new Listdb('realdomains'),
@@ -698,24 +706,14 @@ Object.observe(realdomains,function(){
 		}
 	}
 });
-if(settings.host!==undefined&&settings.port!==undefined){
-	settings.listeners.push({
-		host: settings.host,
-		port: settings.port
-	});
-}
 for(i in settings.listeners){
 	try{
-		var l = settings.listeners[i],
-			s = http.getServer(l.host,l.port).hold(script).handle(handle);
-		servers.push(s);
+		var l = settings.listeners[i];
+		httpserver.listen(l.port,l.host);
 	}catch(e){
 		log.trace(e);
 	}
 }
 script.unload = function(){
-	for(var i in servers){
-		servers[i].close();
-	}
-	servers = [];
+	httpserver.close();
 };
