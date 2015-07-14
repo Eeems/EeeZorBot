@@ -12,7 +12,6 @@ var settings = (function(){
 	})(),
 	deasync = require('deasync'),
 	i,
-	servers = [],
 	channels = {},
 	request = require('http').request,
 	handleConnect = function(c){
@@ -68,30 +67,24 @@ var settings = (function(){
 				c.send(json);
 			});
 		}
-	};
+	},
+	ws = new websocket.WebSocketServer();
+ws.on('connection',handleConnect);
 if(settings.host!==undefined&&settings.port!==undefined){
 	settings.listeners.push({
 		host: settings.host,
 		port: settings.port
 	});
 }
-for(i in settings.listeners){
+settings.listeners.forEach(function(l){
 	try{
-
-		var l = settings.listeners[i];
-		if(websocket.isRunning(l.host,l.port)){
-			websocket.getServer(l.host,l.port).close();
-		}
-		servers.push(websocket.getServer(l.host,l.port).on('connection',handleConnect));
+		ws.listen(l.host,l.port);
 	}catch(e){
 		log.trace(e);
 	}
-}
+});
 pubsub.sub('log',handlePub);
 script.unload = function(){
-	servers.forEach(function(s,i){
-		s.close();
-	});
-	servers = [];
 	pubsub.unsub('log',handlePub);
+	ws.destroy();
 };
