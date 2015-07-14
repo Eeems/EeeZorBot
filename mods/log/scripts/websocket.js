@@ -7,15 +7,16 @@ var settings = (function(){
 		s.api = {
 			host: ss.host,
 			port: ss.port
-		}
+		};
 		return s;
 	})(),
+	deasync = require('deasync'),
 	i,
 	servers = [],
 	channels = {},
 	request = require('http').request,
 	handleConnect = function(c){
-		console.log('Websocket connection');
+		console.log('Websocket connected');
 		c.on('message',function(data){
 			data = JSON.parse(data);
 			switch(data.type){
@@ -50,6 +51,7 @@ var settings = (function(){
 			}
 		});
 		c.on('close',function(){
+			console.log('Websocket disconnected');
 			var channel,i;
 			for(i in channels){
 				channel = channels[i];
@@ -75,19 +77,20 @@ if(settings.host!==undefined&&settings.port!==undefined){
 }
 for(i in settings.listeners){
 	try{
-		var l = settings.listeners[i],
-			s = websocket.getServer(l.host,l.port)
-				.hold(script)
-				.on('connection',handleConnect);
-		servers.push(s);
+
+		var l = settings.listeners[i];
+		if(websocket.isRunning(l.host,l.port)){
+			websocket.getServer(l.host,l.port).close();
+		}
+		servers.push(websocket.getServer(l.host,l.port).on('connection',handleConnect));
 	}catch(e){
 		log.trace(e);
 	}
 }
 pubsub.sub('log',handlePub);
 script.unload = function(){
-	servers.forEach(function(){
-		s.release(script);
+	servers.forEach(function(s,i){
+		s.close();
 	});
 	servers = [];
 	pubsub.unsub('log',handlePub);

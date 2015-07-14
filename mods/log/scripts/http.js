@@ -25,6 +25,7 @@ var settings = (function(){
 	listdb = require('./listdb.js'),
 	deasync = require('deasync'),
 	http = require('http'),
+	template = template.template,
 	html = (function(){
 		this.htmlent = function(text){
 			return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -166,13 +167,8 @@ var settings = (function(){
 			part: template(_dirname+'/../www/log/types/part.html'),
 			quit: template(_dirname+'/../www/log/types/quit.html'),
 			topic: template(_dirname+'/../www/log/types/topic.html')
-		}
-	},
-	scripts = {
-		'socket.js': tools.file.subscribe(_dirname+'/../www/scripts/socket.js'),
-		'app.js': tools.file.subscribe(_dirname+'/../www/scripts/app.js'),
-		'app.css': tools.file.subscribe(_dirname+'/../www/scripts/app.css'),
-		'template.js': tools.file.subscribe(_dirname+'/../www/scripts/template.js'),
+		},
+		scripts: tools.folder.watch(_dirname+'/../www/scripts/')
 	},
 	realdomains = (function(){
 		var i,
@@ -267,8 +263,8 @@ var settings = (function(){
 								res.write(templates.errors['401'].compile({
 									path: 'scripts/'
 								}));
-							}else if(args.length == 2 && scripts[args[1]]){
-								res.write(scripts[args[1]].data);
+							}else if(args.length == 2){
+								res.write(templates.scripts.file(args[1]).data);
 							}else{
 								res.statusCode = 404;
 								res.write(templates.errors['404'].compile());

@@ -4,7 +4,8 @@ window.onload = function(){
 		location.reload();
 	};
 	if(todayDate == thisDate){
-		var ws = socket.create('ws://'+window.socketHost+':'+window.socketPort);
+		var ws = socket.create('ws://'+window.socketHost+':'+window.socketPort),
+			tries = 0;
 		ws.open(function(e){
 				console.log('Connected to websocket');
 				ws.send(JSON.stringify({
@@ -12,8 +13,16 @@ window.onload = function(){
 					channel: window.channel
 				}));
 			})
+			.error(function(e){
+				console.log(e);
+				if(++tries <= 5){
+					setTimeout(function(){
+						ws.open();
+					},1000);
+				}
+			})
 			.close(function(e){
-				console.error(e);
+				console.log('Connection closed');
 			})
 			.message(function(e){
 				var d = JSON.parse(e.data);
