@@ -8,8 +8,10 @@ window.onload = function(){
 		return false;
 	};
 	var results = document.getElementById('results');
-	results.innerHTML = results.innerHTML.replace(
-		new RegExp(">([^<]*)?("+RegExp.quote(window.term)+")([^>]*)?<",'gi'),
-		'>$1<span class="highlight">$2</span>$3<'
-	);
+	window.term.split(' ').forEach(function(term,i){
+		results.innerHTML = results.innerHTML.replace(
+			new RegExp(">([^<]*)?("+RegExp.quote(term)+")([^>]*)?<",'gi'),
+			'>$1<span class="highlight">$2</span>$3<'
+		);
+	});
 };

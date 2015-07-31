@@ -588,6 +588,7 @@ var settings = (function(){
 								WHERE MATCH(m.text) AGAINST(?)\
 								OR lower(u.name) like lower(?)\
 								ORDER BY m.date DESC\
+								LIMIT 0,200\
 							",[args[1],args[1]],function(e,r){
 								if(e){
 									throw e;
@@ -595,17 +596,12 @@ var settings = (function(){
 								var lines = [];
 								r.forEach(function(v,i){
 									var done = false;
-									console.log(v.id+' get');
-									console.log('http://'+settings.listeners[0].host+':'+settings.listeners[0].port+'/api/get/line/'+v.id);
 									http.get('http://'+settings.listeners[0].host+':'+settings.listeners[0].port+'/api/get/line/'+v.id,function(res){
-										console.log(v.id+' callback');
 										var data = '';
 										res.on('data',function(chunk){
-											console.log(v.id+' chunk');
 											data += chunk;
 										});
 										res.on('end',function(){
-											console.log(v.id+' done');
 											data = JSON.parse(data);
 											data.url = v.url+'#'+data.id;
 											lines.push(data);
