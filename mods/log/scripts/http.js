@@ -588,7 +588,7 @@ var settings = (function(){
 									ON u.id = m.u_id\
 								WHERE MATCH(m.text) AGAINST(? IN BOOLEAN MODE)\
 								OR lower(u.name) like lower(?)\
-								ORDER BY relevance DESC\
+								ORDER BY relevance DESC, date DESC\
 								LIMIT 0,200\
 							",[args[1],args[1],args[1]],function(e,r){
 								if(e){
