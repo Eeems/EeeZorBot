@@ -30,7 +30,8 @@
 			{#each lines}
 				<li>
 					<a href="/{url}">Goto</a>
-					{body}
+					<span class="date">[<time datetime="{datetime}">{time}</time>]</span>
+					<span>{body}</span>
 				</li>
 			{/each lines}
 		</ul>
