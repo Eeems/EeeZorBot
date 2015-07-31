@@ -147,6 +147,7 @@ var settings = (function(){
 		server: template(_dirname+'/../www/server.html'),
 		log: template(_dirname+'/../www/log.html'),
 		user: template(_dirname+'/../www/log/user.html'),
+		search: template(_dirname+'/../www/search.html'),
 		errors: {
 			'401': template(_dirname+'/../www/errors/401.html'),
 			'404': template(_dirname+'/../www/errors/404.html')
@@ -562,6 +563,68 @@ var settings = (function(){
 									console.log(e);
 								}
 							}
+						break;
+						case 'search':
+							args[1] = decodeURIComponent(args[1]===undefined?'':args[1]);
+							db.query("\
+								SELECT	m.id,\
+										CONCAT(c.s_id,\
+											CONCAT('/',\
+												CONCAT(\
+													m.c_id,\
+													CONCAT(\
+														'/',\
+														DATE_FORMAT(m.date,'%Y-%m-%d')\
+													)\
+												)\
+											)\
+										) as url\
+								FROM messages m\
+								JOIN channels c\
+									on c.id = m.c_id\
+									and c.name like '#%'\
+								JOIN users u\
+									ON u.id = m.u_id\
+								WHERE MATCH(m.text) AGAINST(?)\
+								OR lower(u.name) like lower(?)\
+								ORDER BY m.date DESC\
+							",[args[1],args[1]],function(e,r){
+								if(e){
+									throw e;
+								}
+								var lines = [];
+								r.forEach(function(v,i){
+									var done = false;
+									console.log(v.id+' get');
+									console.log('http://'+settings.listeners[0].host+':'+settings.listeners[0].port+'/api/get/line/'+v.id);
+									http.get('http://'+settings.listeners[0].host+':'+settings.listeners[0].port+'/api/get/line/'+v.id,function(res){
+										console.log(v.id+' callback');
+										var data = '';
+										res.on('data',function(chunk){
+											console.log(v.id+' chunk');
+											data += chunk;
+										});
+										res.on('end',function(){
+											console.log(v.id+' done');
+											data = JSON.parse(data);
+											data.url = v.url+'#'+data.id;
+											lines.push(data);
+											done = true;
+										})
+									}).on('error',function(){
+										done = true;
+									});
+									while(!done){
+										deasync.sleep(1);
+									}
+								});
+								console.log('done');
+								res.write(templates.search.compile({
+									term: html.htmlent(args[1]),
+									lines: lines
+								}));
+								res.end();
+							});
 						break;
 						default:
 							if(args.length == 1){

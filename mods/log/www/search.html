@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<script>
+			window.term = "{term}";
+		</script>
+		<script src="/scripts/search.js"></script>
+		<style>
+			span.highlight{
+				background-color: yellow;
+			}
+		</style>
+		<title>Search {term}</title>
+	</head>
+	<body>
+		<strong>
+			<a href="/stats">Stats</a>
+			<a href="/search">Search</a>
+			<a href="/">Logs</a>
+			Search: {term}
+		</strong>
+		<br/>
+		<form id="search">
+			<input name="term" value="{term}"/>
+			<input type="submit" value="Search"/>
+		</form>
+		<ul id="results">
+			{#each lines}
+				<li>
+					<a href="/{url}">Goto</a>
+					{body}
+				</li>
+			{/each lines}
+		</ul>
+	</body>
+</html>
