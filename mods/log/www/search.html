@@ -3,16 +3,11 @@
 	<head>
 		<meta charset='utf-8'/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link href="/scripts/app.css" rel="stylesheet" />
 		<script>
 			window.term = "{term}";
 		</script>
 		<script src="/scripts/search.js"></script>
-		<style>
-			span.highlight{
-				background-color: yellow;
-				color: black;
-			}
-		</style>
 		<title>Search {term}</title>
 	</head>
 	<body>
@@ -36,5 +31,12 @@
 				</li>
 			{/each lines}
 		</ul>
+		{#exist previousPage}
+			<a href="/search/{term}/{previousPage}">Previous</a>
+		{/exist previousPage}
+		{page}
+		{#exist nextPage}
+			<a href="/search/{term}/{nextPage}">Next</a>
+		{/exist nextPage}
 	</body>
 </html>

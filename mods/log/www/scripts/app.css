@@ -60,3 +60,7 @@ a.user:hover{
 .type-notice,.type-topic,.type-datechange{
 	background-color: #C0DBFF;
 }
+span.highlight{
+	background-color: yellow;
+	color: black;
+}

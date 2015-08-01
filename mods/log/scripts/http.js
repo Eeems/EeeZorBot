@@ -566,6 +566,8 @@ var settings = (function(){
 						break;
 						case 'search':
 							args[1] = decodeURIComponent(args[1]===undefined?'':args[1]);
+							args[2] = args[2]===undefined?0:parseInt(args[2],10);
+							var amount = 40;
 							db.query("\
 								SELECT	m.id,\
 										MATCH(m.text) AGAINST (? IN BOOLEAN MODE) AS relevance,\
@@ -589,8 +591,8 @@ var settings = (function(){
 								WHERE MATCH(m.text) AGAINST(? IN BOOLEAN MODE)\
 								OR lower(u.name) like lower(?)\
 								ORDER BY relevance DESC, date DESC\
-								LIMIT 0,200\
-							",[args[1],args[1],args[1]],function(e,r){
+								LIMIT ?,?\
+							",[args[1],args[1],args[1],args[2]*amount,amount],function(e,r){
 								if(e){
 									throw e;
 								}
@@ -615,10 +617,18 @@ var settings = (function(){
 										deasync.sleep(1);
 									}
 								});
-								res.write(templates.search.compile({
+								var scope = {
 									term: html.htmlent(args[1]),
-									lines: lines
-								}));
+									lines: lines,
+									page: args[2]
+								};
+								if(args[2]>0){
+									scope.previousPage= args[2]-1;
+								}
+								if(r.length == amount){
+									scope.nextPage = args[2]+1;
+								}
+								res.write(templates.search.compile(scope));
 								res.end();
 							});
 						break;
