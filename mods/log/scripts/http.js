@@ -176,12 +176,12 @@ var settings = (function(){
 			rd = new Listdb('realdomains').all(),
 			realdomains = [],
 			item;
-		for(i in rd){
+		rd.forEach(function(d,i){
 			try{
-				item = JSON.parse(rd[i]);
+				item = JSON.parse(d);
 				realdomains[item.domain] = item.valid;
 			}catch(e){}
-		}
+		});
 		return realdomains;
 	})(),
 	hostname = function(href){
@@ -725,21 +725,17 @@ var settings = (function(){
 												socketHost: settings.websocket.host,
 												socketPort: settings.websocket.port
 											},
-											m,
-											ds = {},
-											id,
-											i;
-										for(i in r){
-											m = r[i];
+											ds = {};
+										r.forEach(function(m,i){
 											m.channel = channel.name;
 											m.server = server.name;
-											id = m.time;
+											var id = m.time;
 											if(ds[id]!==undefined){
 												id = id+'-'+m.id;
 											}
 											ds[id] = true;
 											data.messages.push(html.line_json(m,id));
-										}
+										});
 										res.write(templates.log.compile(data));
 									}else{
 										res.statusCode = 404;
