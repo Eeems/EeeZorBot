@@ -725,17 +725,20 @@ var settings = (function(){
 												socketHost: settings.websocket.host,
 												socketPort: settings.websocket.port
 											},
-											ds = {};
-										r.forEach(function(m,i){
-											m.channel = channel.name;
-											m.server = server.name;
-											var id = m.time;
-											if(ds[id]!==undefined){
-												id = id+'-'+m.id;
-											}
-											ds[id] = true;
-											data.messages.push(html.line_json(m,id));
-										});
+											ds = {},
+											id;
+										if(r){
+											r.forEach(function(m,i){
+												m.channel = channel.name;
+												m.server = server.name;
+												id = m.time;
+												if(ds[id]!==undefined){
+													id = id+'-'+m.id;
+												}
+												ds[id] = true;
+												data.messages.push(html.line_json(m,id));
+											});
+										}
 										res.write(templates.log.compile(data));
 									}else{
 										res.statusCode = 404;

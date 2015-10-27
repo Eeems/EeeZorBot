@@ -11,9 +11,10 @@ var settings = (function(){
 		return s;
 	})(),
 	deasync = require('deasync'),
+	http = require('http'),
 	i,
 	channels = {},
-	request = require('http').request,
+	request = http.request,
 	handleConnect = function(c){
 		console.log('Websocket connected');
 		c.on('message',function(data){
@@ -68,21 +69,11 @@ var settings = (function(){
 			});
 		}
 	},
-	ws = new websocket.WebSocketServer();
-ws.on('connection',handleConnect);
-if(settings.host!==undefined&&settings.port!==undefined){
-	settings.listeners.push({
+	ws = new websocket.WebSocketServer({
 		host: settings.host,
 		port: settings.port
 	});
-}
-settings.listeners.forEach(function(l){
-	try{
-		ws.listen(l.host,l.port);
-	}catch(e){
-		log.trace(e);
-	}
-});
+ws.on('connection',handleConnect);
 pubsub.sub('log',handlePub);
 script.unload = function(){
 	pubsub.unsub('log',handlePub);

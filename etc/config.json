@@ -23,8 +23,7 @@
 		},
 		"websocket": {
 			"host": "localhost",
-			"port": 9004,
-			"listeners": []
+			"port": 9004
 		}
 	},
 	"stdin": {

@@ -28,6 +28,7 @@
 	},
 	"scripts":{
 		"test": "tape test/*.js",
-		"start": "node lib/main.js"
+		"start": "node lib/main.js",
+		"debug": "node-debug lib/main.js"
 	}
 }

@@ -154,7 +154,7 @@ server.on('servername',function(){
 					type: 'quit',
 					payload: p
 				});
-				server.debug('Logged quit for '+channels[i].name);
+				server.debug('Logged quit for '+this.user.nick+' in '+channels[i].name);
 			}
 		}
 	})
@@ -167,3 +167,6 @@ server.on('servername',function(){
 			}
 		}
 	});
+script.unload = function(){
+	// Handle unload here
+};
