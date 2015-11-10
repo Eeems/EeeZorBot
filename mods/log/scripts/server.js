@@ -139,24 +139,29 @@ server.on('servername',function(){
 		}
 	})
 	.on('quit',function(text,channels){
-		var i,p,c;
-		for(i in channels){
-			c = server.channel(channels[i].name);
-			if(c && c.active){
+		var i,p,c,r;
+		channels.filter(function(c){
+			return c.active;
+		}).forEach(function(c){
+			c = server.channel(c.name);
+			if(c){
 				p = {
 					text: text,
 					c_id: id.channel(channels[i].name),
 					u_id: id.user(this.user.nick),
 					t_id: id.type('quit')
 				};
-				db.insertSync('messages',p);
-				pubsub.pub('log',{
-					type: 'quit',
-					payload: p
-				});
-				server.debug('Logged quit for '+this.user.nick+' in '+channels[i].name);
+				r = db.querySync("SELECT COUNT(1) as num FROM messages WHERE c_id = ? AND u_id = ? AND t_id = ? AND `date` = NOW()",[p.c_id,p.u_id,p.t_id]);
+				if(0 === r.num){
+					db.insertSync('messages',p);
+					pubsub.pub('log',{
+						type: 'quit',
+						payload: p
+					});
+					server.debug('Logged quit for '+this.user.nick+' in '+channels[i].name);
+				}
 			}
-		}
+		});
 	})
 	.on('send',function(text){
 		var i,m;
