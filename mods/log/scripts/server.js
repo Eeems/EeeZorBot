@@ -139,7 +139,8 @@ server.on('servername',function(){
 		}
 	})
 	.on('quit',function(text,channels){
-		var i,p,c,r;
+		var i,p,c,r,
+			n = this.user.nick;
 		channels.filter(function(c){
 			return c.active;
 		}).forEach(function(c){
@@ -147,8 +148,8 @@ server.on('servername',function(){
 			if(c){
 				p = {
 					text: text,
-					c_id: id.channel(channels[i].name),
-					u_id: id.user(this.user.nick),
+					c_id: id.channel(c.name),
+					u_id: id.user(n),
 					t_id: id.type('quit')
 				};
 				r = db.querySync("SELECT COUNT(1) as num FROM messages WHERE c_id = ? AND u_id = ? AND t_id = ? AND `date` = NOW()",[p.c_id,p.u_id,p.t_id]);
@@ -158,7 +159,7 @@ server.on('servername',function(){
 						type: 'quit',
 						payload: p
 					});
-					server.debug('Logged quit for '+this.user.nick+' in '+channels[i].name);
+					server.debug('Logged quit for '+n+' in '+c.name);
 				}
 			}
 		});
