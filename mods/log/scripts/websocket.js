@@ -88,7 +88,8 @@ var settings = (function(){
 	},
 	ws = new websocket.WebSocketServer({
 		host: settings.host,
-		port: settings.port
+		port: settings.port,
+		id: 'log'
 	});
 ws.on('connection',handleConnect);
 pubsub.sub('log',handlePub);
