@@ -69,13 +69,32 @@ var settings = (function(){
 			});
 		}
 	},
+	handlePubWS = function(data){
+		switch(data.action){
+			case 'get':
+				switch(name){
+					case 'config':
+						return {
+							port: ws.port,
+							host: ws.host
+						};
+					break;
+					case 'id':
+						return ws.id;
+					break;
+				}
+			break;
+		}
+	},
 	ws = new websocket.WebSocketServer({
 		host: settings.host,
 		port: settings.port
 	});
 ws.on('connection',handleConnect);
 pubsub.sub('log',handlePub);
+pubsub.sub('log-ws',handlePubWS);
 script.unload = function(){
 	pubsub.unsub('log',handlePub);
+	pubsub.unsub('log-ws',handlePubWS);
 	ws.destroy();
 };

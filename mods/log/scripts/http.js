@@ -755,6 +755,17 @@ var settings = (function(){
 		}
 	}),
 	i;
+pubsub.sub('log-ws',function(data){
+	switch(data.action){
+		case 'config':
+			settings.websocket = data.data;
+		break;
+	}
+});
+pubsub.pub('log-ws',{
+	action: 'get',
+	name: 'config'
+});
 Object.observe(realdomains,function(){
 	var rn = new Listdb('realdomains'),
 		i,
