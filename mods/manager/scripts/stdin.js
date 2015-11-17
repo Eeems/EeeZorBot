@@ -1,8 +1,8 @@
 server
 	.add('owners',function(argv){
 		stdin.console('log','Owners:');
-		owners.each(function(owner){
-			stdin.console('log','  '+owner.nick);
+		owners.each(function(owner,nick){
+			stdin.console('log','  '+nick);
 		});
 	},'Displays a list of owners')
 	.add('owner',function(argv){
@@ -76,7 +76,7 @@ server
 	.add('bans',function(argv){
 		stdin.console('log','Bans:');
 		bans.each(function(ban){
-			stdin.console('log','  '+ban);
+			stdin.console('log','  '+ban.hostmask);
 		});
 	},'displays all existing bans')
 	.add('+ban',function(argv){

@@ -21,7 +21,8 @@
 		"deasync": "0.x",
 		"iconv": "x",
 		"chardet": "x",
-		"ws": "x"
+		"ws": "x",
+		"sanitize-filename": "x"
 	},
 	"devDependencies": {
 		"tape": "2.x"
