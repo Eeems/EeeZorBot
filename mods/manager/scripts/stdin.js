@@ -72,4 +72,16 @@ server
 		}else{
 			stdin.console('log','Owner '+argv[1]+" doesn't exist");
 		}
-	},'<nick> <flag(s)>\nRemoves one or more flag to an owner');
+	},'<nick> <flag(s)>\nRemoves one or more flag to an owner')
+	.add('bans',function(argv){
+		stdin.console('log','Bans:');
+		bans.each(function(ban){
+			stdin.console('log','  '+ban);
+		});
+	},'displays all existing bans')
+	.add('+ban',function(argv){
+		bans.add(argv[1]);
+	},'<hostmask>\nAdds a ban for a hostmask')
+	.add('-ban',function(argv){
+		bans.remove(argv[1]);
+	},'<hostmask>\nRemoves a ban for a hostmask');
