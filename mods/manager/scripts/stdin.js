@@ -81,7 +81,9 @@ server
 	},'displays all existing bans')
 	.add('+ban',function(argv){
 		bans.add(argv[1]);
+		stdin.console('log','Ban added');
 	},'<hostmask>\nAdds a ban for a hostmask')
 	.add('-ban',function(argv){
 		bans.remove(argv[1]);
+		stdin.console('log','Ban removed');
 	},'<hostmask>\nRemoves a ban for a hostmask');
