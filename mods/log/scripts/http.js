@@ -768,8 +768,7 @@ pubsub.pub('log-ws',{
 });
 Object.observe(realdomains,function(){
 	var rn = new Listdb('realdomains'),
-		i,
-		v;
+		v,i;
 	for(i in realdomains){
 		v = JSON.stringify({
 			domain: i,

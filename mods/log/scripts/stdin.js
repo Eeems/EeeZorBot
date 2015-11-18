@@ -1,14 +1,14 @@
 var getrd = function(){
 	var i,
 		rd = new Listdb('realdomains').all(),
-		realdomains = [],
+		realdomains = {},
 		item;
-	for(i in rd){
+	rd.forEach(function(json,i){
 		try{
-			item = JSON.parse(rd[i]);
+			item = JSON.parse(json);
 			realdomains[item.domain] = item.valid;
 		}catch(e){}
-	}
+	});
 	return realdomains;
 };
 stdin.add('dns',function(argv){
@@ -18,18 +18,16 @@ stdin.add('dns',function(argv){
 			var d;
 			for(i=1;i<argv.length;i++){
 				d = argv[i];
-				if(api.caches.realdomains[d]===undefined){
+				if(realdomains[d]===undefined){
 					stdin.console('log',d+' isdomain: '+realdomains[d]);
 				}else{
 					stdin.console('log',d+' isdomain: unknown');
 				}
 			}
 		}else{
-			var c=0;
+			var i,c=0;
 			for(i in realdomains){
-				if(realdomains[i]){
-					c++;
-				}
+				realdomains[i] && c++;
 			}
 			stdin.console('log','Cached domain dns: '+c);
 		}
@@ -37,8 +35,3 @@ stdin.add('dns',function(argv){
 	.add('dnsdump',function(){
 		stdin.console('log',getrd());
 	},'dumps the dns cache');
-script.unload = function(){
-	for(var i in servers){
-		servers[i].release(script);
-	}
-};

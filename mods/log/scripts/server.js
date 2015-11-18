@@ -100,6 +100,7 @@ server.on('servername',function(){
 		}
 	})
 	.on('message',function(text){
+		// using foreach on purpose here.
 		var i,m;
 		for(i in hooks){
 			if((m = hooks[i].regex.exec(text))){
@@ -128,15 +129,11 @@ server.on('servername',function(){
 		log('notice',this.channel.name,this.user.nick,text);
 	})
 	.on('datechange',function(){
-		var i,
-			channels = server.channels,
-			c;
-		for(i in channels){
-			c = channels[i];
+		server.channels.forEach(function(c,i){
 			if(c.active){
 				log('datechange',c.name,server.name,c.topic);
 			}
-		}
+		});
 	})
 	.on('quit',function(text,channels){
 		var i,p,c,r,
@@ -165,6 +162,7 @@ server.on('servername',function(){
 		});
 	})
 	.on('send',function(text){
+		// Using for loop on purpose
 		var i,m;
 		for(i in sendhooks){
 			if((m = sendhooks[i].regex.exec(text))){
@@ -172,7 +170,40 @@ server.on('servername',function(){
 				return;
 			}
 		}
+	})
+	.add('dns',function(){
+		if(this.user && this.user.owner && this.user.owner.flags.indexOf('q') != -1){
+			var realdomains = (function(){
+				var i,
+					rd = new Listdb('realdomains').all(),
+					realdomains = {},
+					item;
+				rd.forEach(function(json,i){
+					try{
+						item = JSON.parse(json);
+						realdomains[item.domain] = item.valid;
+					}catch(e){}
+				});
+				return realdomains;
+			})();
+			if(arguments.length>0){
+				var d,i;
+				for(i=0;i<arguments.length;i++){
+					d = arguments[i];
+					if(realdomains[d]===undefined){
+						this.user.send(d+' isdomain: '+realdomains[d]);
+					}else{
+						this.user.send(d+' isdomain: unknown');
+					}
+				}
+			}else{
+				var i,c=0;
+				for(i in realdomains){
+					realdomains[i] && c++;
+				}
+				this.user.send('Cached domain dns: '+c);
+			}
+		}else{
+			t.user.send('Not Permitted');
+		}
 	});
-script.unload = function(){
-	// Handle unload here
-};

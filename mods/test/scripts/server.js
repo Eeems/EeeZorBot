@@ -7,6 +7,3 @@ server.add('test',function(){
 	.on('topic',function(oldT,newT){
 		console.log('topic changed from '+oldT+' to '+newT);
 	});
-script.unload = function(){
-	console.log('Script unloading. Running cleanup');
-};
