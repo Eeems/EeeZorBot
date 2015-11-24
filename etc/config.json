@@ -8,7 +8,8 @@
 	"mods": [
 		"log",
 		"manager",
-		"test"
+		"test",
+		"convert"
 	],
 	"logs": {
 		"levels": {
