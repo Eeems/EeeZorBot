@@ -1,5 +1,12 @@
 var fs = require('fs'),
 	path = require('path'),
+	converting = false,
+	status = {
+		servers: [0,0],
+		channels: [0,0],
+		files: [0,0],
+		lines: [0,0]
+	},
 	id = {
 		channel: function(name,server){
 			var sid = id.server(server),
@@ -18,79 +25,141 @@ var fs = require('fs'),
 			var sid = db.querySync("select id from servers where host = ? and port = ?",[server.name,server.port])[0];
 			return sid===undefined?db.insertSync('servers',{name:server.name,host:server.name,port:server.port}):sid.id;
 		}
-	};
-function get_servers(callback){
-	var ret = [];
-	fs.readdir('data/logs/',function(e, l_servers){
-		if(e){
-			throw e;
-		}else{
-			l_servers.forEach(function(l_server){
-				if(l_server.search(/^[\w\.]+ \d{4}$/)!=-1){
-					var stats = fs.statSync('data/logs/'+l_server);
-					if(stats.isDirectory()){
-						var l_channels = fs.readdirSync('data/logs/'+l_server),
-							channels = [],
-							server = {
-								name: l_server.split(' ')[0],
-								port: l_server.split(' ')[1],
-								path: 'data/logs/'+l_server+'/',
-								channels: channels,
-								type: 'server'
-							};
-						l_channels.forEach(function(l_channel){
-							if(l_channel.search(/^\#\w+$/)!=-1){
-								channels.push({
-									name: l_channel,
-									path: 'data/logs/'+l_server+'/'+l_channel+'/',
-									type: 'channel',
-									server: server
-								});	
-							}
-						});
-						ret.push(server);
+	},
+	get_servers = function(callback){
+		var ret = [];
+		fs.readdir('data/logs/',function(e, l_servers){
+			if(e){
+				throw e;
+			}else{
+				l_servers.forEach(function(l_server){
+					if(l_server.search(/^[\w\.]+ \d{4}$/)!=-1){
+						var stats = fs.statSync('data/logs/'+l_server);
+						if(stats.isDirectory()){
+							var l_channels = fs.readdirSync('data/logs/'+l_server),
+								channels = [],
+								server = {
+									name: l_server.split(' ')[0],
+									port: l_server.split(' ')[1],
+									path: 'data/logs/'+l_server+'/',
+									channels: channels,
+									type: 'server'
+								};
+							l_channels.forEach(function(l_channel){
+								if(l_channel.search(/^\#\w+$/)!=-1){
+									channels.push({
+										name: l_channel,
+										path: 'data/logs/'+l_server+'/'+l_channel+'/',
+										type: 'channel',
+										server: server
+									});	
+								}
+							});
+							ret.push(server);
+						}
 					}
-				}
-			});
-			callback(ret);
+				});
+				callback(ret);
+			}
+		});
+	},
+	hooks = [
+		{	// MODE
+			regex: /^([\w\.]+) set \#\w+ mode (.+)$/,
+			fn: function(m,d){
+				// 1 - user
+				// 2 - flags
+				d.user = m[1];
+				d.msg = m[2];
+				d.type = 'mode';
+			}
+		},
+		{	// QUIT
+			regex: /^([\w\.]+) has quit \#\w+ \((.+)\)$/,
+			fn: function(m,d){
+				// 1 - user
+				// 2 - reason
+				d.type = 'quit';
+				d.user = m[1];
+				d.msg = m[2];
+			}
+		},{
+			regex: /([^ ]+) (.+)/,
+			fn: function(m,d){
+				// 1 - nick
+				// 2 - msg
+				d.type = 'action';
+				d.user = m[1];
+				d.msg = m[2];
+			}
 		}
-	});
-}
-function convert(obj){
-	if(obj && obj.name && obj.type && obj.path){
-		stdin.console('log','Converting '+obj.name);
-		switch(obj.type){
-			case 'server':
-				obj.channels.forEach(convert);
-			break;
-			case 'channel':
-				var passed = 0,
-					failed = 0,
-					skipped = 0;
-				fs.readdirSync(obj.path).forEach(function(l_log){
-					if(path.extname(l_log) == '.db'){
-						fs.readFileSync(obj.path+l_log,{
-								encoding: 'ascii'
-							})
-							.split("\n")
-							.forEach(function(d){
+	],
+	convert = function(obj){
+		if(obj && obj.name && obj.type && obj.path){
+			console.time(path.basename(obj.name));
+			stdin.console('log','Converting '+obj.name);
+			switch(obj.type){
+				case 'server':
+					status.channels[1] = obj.channels.length;
+					obj.channels.forEach(function(channel,i){
+						status.channels[0] = i;
+						convert(channel);
+					});
+				break;
+				case 'channel':
+					var passed = 0,
+						failed = 0,
+						skipped = 0,
+						files = fs.readdirSync(obj.path);
+					status.files[1] = files.length;
+					files.forEach(function(l_log,i){
+						if(path.extname(l_log) == '.db'){
+							status.files[0] = i;
+							var lines = fs.readFileSync(obj.path+l_log,{
+									encoding: 'ascii'
+								})
+								.split("\n");
+							status.lines[1] = lines.length;
+							lines.forEach(function(d,i){
+								status.lines[0] = i;
 								try{
 									d = JSON.parse(d.replace(/\n$/, ""));
 									if(!d.user){
 										d.user = 'server';
+										for(var i in hooks){
+											match = hooks[i].regex.exec(d.msg);
+											if(match){
+												hooks[i].fn(match,d);
+												break;
+											}
+										};
+									}else if(d.user.indexOf('> ')!=-1){
+										d.msg = d.user.substr(d.user.indexOf('> ')+2)+d.msg;
+										d.user = d.user.substr(0,d.user.indexOf('> '));
 									}
 									if(d.type){
 										d.c_id = id.channel(obj.name,obj.server);
 										d.u_id = id.user(d.user);
 										d.t_id = id.type(d.type);
 										d.date = "STR_TO_DATE("+db.escape((new Date(d.date)).toISOString())+",'%Y-%m-%dT%T.%fZ')";
-										r = db.querySync("SELECT COUNT(1) as num FROM messages WHERE c_id = ? AND u_id = ? AND t_id = ? AND `date` = "+d.date,[d.c_id,d.u_id,d.t_id]);
-										if(0 === r.num){
-											db.querySync("INSERT INTO messages SET text = ?,c_id = ?,u_id = ?, t_id = ?,date = "+d.date,[d.msg,d.c_id,d.u_id,d.t_id]);
-											passed++;
-										}else{
-											skipped++;
-										}
+										db.querySync(
+											"INSERT INTO messages (text, c_id, u_id, t_id, date) "+
+											"SELECT ?,?,?,?,"+date+" FROM DUAL "+
+											"WHERE NOT EXISTS ("+
+												"SELECT 1 "+
+												"FROM messages "+
+												"WHERE date = "+date+" "+
+												"AND c_id = ? "+
+												"AND u_id = ? "+
+												"AND t_id = ? "+
+												"AND text = ? "+
+											")",
+											[
+												d.msg, d.c_id, d.u_id, d.t_id,
+												d.c_id, d.u_id, d.t_id, d.msg
+											]
+										);
+										passed++;
 									}else{
 										failed++;
 									}
@@ -98,16 +167,16 @@ function convert(obj){
 									failed++
 								}
 							});
-					}
-				});
-				stdin.console('log',obj.name+' conversion. '+passed+' passed, '+failed+' failed, '+skipped+' skipped.');
-			break;
+						}
+					});
+					stdin.console('log',obj.name+' conversion. '+passed+' passed, '+failed+' failed, '+skipped+' skipped.');
+				break;
+			}
+			console.timeEnd(path.basename(obj.name));
+		}else{
+			stdin.console('error','Unable to convert: '+JSON.stringify(obj));
 		}
-	}else{
-		stdin.console('error','Unable to convert: '+JSON.stringify(obj));
-	}
-}
-
+	};
 stdin.add('convert',function(argv){
 	get_servers(function(l_servers){
 		var actions = {
@@ -131,15 +200,37 @@ stdin.add('convert',function(argv){
 					});
 				},
 				do: function(argv){
-					if(argv.length === 0){
-						l_servers.forEach(convert);
-					}else if(argv.length == 1){
-						convert(l_servers[argv[0]]);
-					}else if(argv.length == 2){
-						convert(l_servers[argv[0]].channels[argv[1]]);
+					if(converting){
+						stdin.console('log','Conversion already in progress');
 					}else{
-						stdin.console('log','Invalid argument length');
+						converting = true;
+						if(argv.length === 0){
+							status.servers[1] = l_servers.length;
+							l_servers.forEach(function(l_server,i){
+								status.servers[0] = i;
+								convert(l_server);
+							});
+							status.servers[0] = status.servers[1];
+						}else if(argv.length == 1){
+							status.servers = [0,1];
+							convert(l_servers[argv[0]]);
+							status.servers = [1,1];
+						}else if(argv.length == 2){
+							status.servers = [0,0];
+							status.channels = [0,1];
+							convert(l_servers[argv[0]].channels[argv[1]]);
+							status.channels[0] = 1;
+						}else{
+							stdin.console('log','Invalid argument length');
+						}
+						converting = false;
 					}
+				},
+				status: function(argv){
+					stdin.console('log','Servers '+status.servers[0]+'/'+status.servers[1]);
+					stdin.console('log','Channels '+status.channels[0]+'/'+status.channels[1]);
+					stdin.console('log','Files '+status.files[0]+'/'+status.files[1]);
+					stdin.console('log','Lines '+status.lines[0]+'/'+status.lines[1]);
 				}
 			},i;
 		if(argv.length>1){
@@ -153,3 +244,10 @@ stdin.add('convert',function(argv){
 		}
 	});
 },'Perform log conversion actions');
+script.unload = function(){
+	convert = undefined;
+	get_servers = undefined;
+	id = undefined;
+	converting = undefined;
+	hooks = undefined;
+};
