@@ -1,6 +1,9 @@
 var fs = require('fs'),
 	path = require('path'),
+	deasync = require('deasync'),
 	converting = false,
+	passed = 0,
+	failed = 0,
 	status = {
 		servers: [0,0],
 		channels: [0,0],
@@ -107,10 +110,9 @@ var fs = require('fs'),
 					});
 				break;
 				case 'channel':
-					var passed = 0,
-						failed = 0,
-						skipped = 0,
-						files = fs.readdirSync(obj.path);
+					var files = fs.readdirSync(obj.path);
+					passed = 0;
+					failed = 0;
 					status.files[1] = files.length;
 					files.forEach(function(l_log,i){
 						if(path.extname(l_log) == '.db'){
@@ -121,7 +123,6 @@ var fs = require('fs'),
 								.split("\n");
 							status.lines[1] = lines.length;
 							lines.forEach(function(d,i){
-								status.lines[0] = i;
 								try{
 									d = JSON.parse(d.replace(/\n$/, ""));
 									if(!d.user){
@@ -142,34 +143,55 @@ var fs = require('fs'),
 										d.u_id = id.user(d.user);
 										d.t_id = id.type(d.type);
 										d.date = "STR_TO_DATE("+db.escape((new Date(d.date)).toISOString())+",'%Y-%m-%dT%T.%fZ')";
-										db.querySync(
-											"INSERT INTO messages (text, c_id, u_id, t_id, date) "+
-											"SELECT ?,?,?,?,"+date+" FROM DUAL "+
+										var sql = "INSERT INTO messages (text, c_id, u_id, t_id, date) "+
+											"SELECT ?,?,?,?,"+d.date+" FROM DUAL "+
 											"WHERE NOT EXISTS ("+
 												"SELECT 1 "+
 												"FROM messages "+
-												"WHERE date = "+date+" "+
+												"WHERE date = "+d.date+" "+
 												"AND c_id = ? "+
 												"AND u_id = ? "+
 												"AND t_id = ? "+
 												"AND text = ? "+
-											")",
-											[
+											");",
+											args = [
 												d.msg, d.c_id, d.u_id, d.t_id,
 												d.c_id, d.u_id, d.t_id, d.msg
-											]
-										);
-										passed++;
+											],
+											fn = function(e,r){
+												if(e){
+													if(e.code == 'ER_LOCK_DEADLOCK'){
+														db.query(sql,args,fn);
+													}else{
+														failed++;
+														log.save('convert',JSON.stringify(e)+' '+JSON.stringify(d));
+														status.lines[0]++;
+													}
+												}else{
+													passed++;
+													status.lines[0]++;
+												}
+											};
+										db.query(sql,args,fn);
 									}else{
 										failed++;
+										log.save('convert','No type specified '+JSON.stringify(d));
+										status.lines[0]++;
 									}
 								}catch(e){
 									failed++
+									log.save('convert',JSON.stringify(e)+' '+JSON.stringify(d));
+									status.lines[0]++;
 								}
 							});
 						}
 					});
-					stdin.console('log',obj.name+' conversion. '+passed+' passed, '+failed+' failed, '+skipped+' skipped.');
+					while(status.lines[0] < status.lines[1]){
+						deasync.sleep(1);
+					}
+					stdin.console('log',obj.name+' conversion. '+passed+' passed, '+failed+' failed.');
+					passed = 0;
+					failed = 0;
 				break;
 			}
 			console.timeEnd(path.basename(obj.name));
@@ -227,10 +249,10 @@ stdin.add('convert',function(argv){
 					}
 				},
 				status: function(argv){
-					stdin.console('log','Servers '+status.servers[0]+'/'+status.servers[1]);
-					stdin.console('log','Channels '+status.channels[0]+'/'+status.channels[1]);
-					stdin.console('log','Files '+status.files[0]+'/'+status.files[1]);
-					stdin.console('log','Lines '+status.lines[0]+'/'+status.lines[1]);
+					stdin.console('log','Servers: '+status.servers[0]+'/'+status.servers[1]);
+					stdin.console('log','Channels: '+status.channels[0]+'/'+status.channels[1]);
+					stdin.console('log','Files: '+status.files[0]+'/'+status.files[1]);
+					stdin.console('log','Lines: P:'+passed+' F:'+failed+' '+status.lines[0]+'/'+status.lines[1]);
 				}
 			},i;
 		if(argv.length>1){
