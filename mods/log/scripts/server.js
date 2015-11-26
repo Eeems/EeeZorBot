@@ -29,9 +29,9 @@ var settings = require('../etc/config.json').logs.server,
 		},function(e,id){
 			if(e){
 				if(e.code == 'ER_LOCK_DEADLOCK'){
-					throw e;
-				}else{
 					log(type,channel,user,text);
+				}else{
+					throw e;
 				}
 			}
 			pubsub.pub('log',{
