@@ -121,7 +121,7 @@ var fs = require('fs'),
 									encoding: 'ascii'
 								})
 								.split("\n");
-							status.lines[1] = lines.length;
+							status.lines = [0,lines.length];
 							lines.forEach(function(d,i){
 								try{
 									d = JSON.parse(d.replace(/\n$/, ""));

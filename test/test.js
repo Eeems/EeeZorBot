@@ -11,7 +11,16 @@ var test = require('tape'),
 	debug = api.debug;
 
 test('todo',function(t){
-	t.ok(true,'todo');
+	t.ok(api,'api');
+	t.ok(api.User,'api.User');
+	t.ok(api.Channel,'api.Channel');
+	t.ok(api.Script,'api.Script');
+	t.ok(api.Server,'api.Server');
+	t.ok(api.Listdb,'api.Listdb');
+	t.ok(api.tools,'api.tools');
+	t.ok(api.stdin,'api.stdin');
+	t.ok(api.log,'api.log');
+	t.ok(api.debug,'api.debug');
 	t.end();
 	setTimeout(function(){
 		process.exit();
