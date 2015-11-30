@@ -28,7 +28,7 @@ var settings = require('../etc/config.json').logs.server,
 			t_id: id.type(type)
 		},function(e,id){
 			if(e){
-				if(e.code == 'ER_LOCK_DEADLOCK'){
+				if(['ER_LOCK_WAIT_TIMEOUT','ER_LOCK_DEADLOCK'].indexOf(e.code)!=-1){
 					log(type,channel,user,text);
 				}else{
 					throw e;

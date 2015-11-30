@@ -49,7 +49,7 @@ var fs = require('fs'),
 									type: 'server'
 								};
 							l_channels.forEach(function(l_channel){
-								if(l_channel.search(/^\#\w+$/)!=-1){
+								if(l_channel.search(/^\#[^ \#]+$/)!=-1){
 									channels.push({
 										name: l_channel,
 										path: 'data/logs/'+l_server+'/'+l_channel+'/',
@@ -160,13 +160,9 @@ var fs = require('fs'),
 											],
 											fn = function(e,r){
 												if(e){
-													if(e.code == 'ER_LOCK_DEADLOCK'){
-														db.query(sql,args,fn);
-													}else{
-														failed++;
-														log.save('convert',JSON.stringify(e)+' '+JSON.stringify(d));
-														status.lines[0]++;
-													}
+													failed++;
+													log.save('convert',JSON.stringify(e)+' '+JSON.stringify(d));
+													status.lines[0]++;
 												}else{
 													passed++;
 													status.lines[0]++;
