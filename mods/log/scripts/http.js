@@ -124,7 +124,7 @@ var settings = (function(){
 		this.line_json = function(m,id){
 			id = id===undefined?m.id:id;
 			var t = html.htmlent(m.text)
-				.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~\-]*#?[A-Za-z0-9_.\-~\-]*)\b/g,links)
+				.replace(/\b((?:\w*:?\/\/)?\w+\.\w\w+\/?[A-Za-z0-9_.-~\-&]*#?[A-Za-z0-9_.\-~\-]*)\b/g,links)
 				.replace(/[\x02\x1f\x16\x0f]|\x03(\d{0,2}(?:,\d{0,2})?)/g,html.parse)
 				.trim();
 			return {
