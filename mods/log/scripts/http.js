@@ -145,6 +145,7 @@ var settings = (function(){
 	templates = {
 		index: template(_dirname+'/../www/index.html'),
 		server: template(_dirname+'/../www/server.html'),
+		channel: template(_dirname+'/../www/channel.html'),
 		log: template(_dirname+'/../www/log.html'),
 		user: template(_dirname+'/../www/log/user.html'),
 		search: template(_dirname+'/../www/search.html'),
@@ -670,84 +671,99 @@ var settings = (function(){
 									res.end();
 								});
 							}else{
-								var d = new Date(+new Date),
-									pastDate,
-									nextDate,
-									a,
-									date,
-									controls;
+								var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
+									channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
 								if(args[2]===undefined){
-									res.writeHead(302,{
-										Location: req.url+'/'+html.ts(d)
+									db.query("\
+										SELECT	DATE_FORMAT(`date`,'%Y-%m-%d') as \"date\"\
+										FROM `messages`\
+										where c_id = ?\
+										group by year(date), month(date), day(date)\
+										order by year(date), month(date), day(date);\
+									",[args[1]],function(e,r){
+										if(e){
+											throw e;
+										}
+										res.write(templates.channel.compile({
+											dates: r,
+											c_id: args[1],
+											name: server.name+channel.name,
+											channel: channel.name
+										}));
+										res.end();
+									});
+								}else{
+									var d = new Date(+new Date),
+										pastDate,
+										nextDate,
+										a,
+										date,
+										controls;
+									a = args[2].split('-');
+									date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
+									pastDate = new Date(date.getTime()-(24*60*60*1000));
+									nextDate = new Date(date.getTime()+(24*60*60*1000));
+									d = new Date(d.getFullYear(),d.getMonth(),d.getDate());
+									db.query("\
+										SELECT	m.id,\
+												m.u_id,\
+												u.name AS user,\
+												t.name AS type,\
+												m.text,\
+												DATE_FORMAT(m.date,'%H:%i:%s') as time,\
+												DATE_FORMAT(m.date,'%Y-%m-%dT%H:%i:%sZ') as datetime\
+										FROM messages m\
+										JOIN types t\
+											ON t.id = m.t_id\
+										JOIN users u\
+											ON u.id = m.u_id\
+										WHERE m.date >= STR_TO_DATE(?,'%Y-%m-%d')\
+										AND m.date <= DATE_ADD(STR_TO_DATE(?,'%Y-%m-%d'),INTERVAL 1 DAY)\
+										AND m.c_id = ?\
+										ORDER BY m.date ASC\
+									",[args[2],args[2],args[1]],function(e,r){
+										if(e){
+											throw e;
+										}
+										if(server!==undefined&&channel!==undefined){
+											var data = {
+													s_id: args[0],
+													server: server.name,
+													c_id: args[1],
+													channel: channel.name,
+													date: args[2],
+													pastDate: html.ts(pastDate),
+													todayDate: html.ts(d),
+													thisDate: html.ts(date),
+													nextDate: html.ts(nextDate),
+													messages: [],
+													socketHost: settings.websocket.host,
+													socketPort: settings.websocket.port
+												},
+												ds = {},
+												id;
+											if(r){
+												r.forEach(function(m,i){
+													m.channel = channel.name;
+													m.server = server.name;
+													id = m.time;
+													if(ds[id]!==undefined){
+														id = id+'-'+m.id;
+													}
+													ds[id] = true;
+													data.messages.push(html.line_json(m,id));
+												});
+											}
+											res.write(templates.log.compile(data));
+										}else{
+											res.statusCode = 404;
+											res.write(templates.errors['404'].compile({
+												message: 'Channel does not exist'
+											}));
+										}
+										res.end();
 									});
 								}
-								args[2] = args[2]===undefined?html.ts(d):args[2];
-								a = args[2].split('-');
-								date = new Date(a[0],parseInt(a[1],10)-1,a[2]);
-								pastDate = new Date(date.getTime()-(24*60*60*1000));
-								nextDate = new Date(date.getTime()+(24*60*60*1000));
-								d = new Date(d.getFullYear(),d.getMonth(),d.getDate());
-								db.query("\
-									SELECT	m.id,\
-											m.u_id,\
-											u.name AS user,\
-											t.name AS type,\
-											m.text,\
-											DATE_FORMAT(m.date,'%H:%i:%s') as time,\
-											DATE_FORMAT(m.date,'%Y-%m-%dT%H:%i:%sZ') as datetime\
-									FROM messages m\
-									JOIN types t\
-										ON t.id = m.t_id\
-									JOIN users u\
-										ON u.id = m.u_id\
-									WHERE m.date >= STR_TO_DATE(?,'%Y-%m-%d')\
-									AND m.date <= DATE_ADD(STR_TO_DATE(?,'%Y-%m-%d'),INTERVAL 1 DAY)\
-									AND m.c_id = ?\
-									ORDER BY m.date ASC\
-								",[args[2],args[2],args[1]],function(e,r){
-									if(e){
-										throw e;
-									}
-									var server = db.querySync("select name from servers where id = ?",[args[0]])[0],
-										channel = db.querySync("select name from channels where id = ? and name like '#%'",[args[1]])[0];
-									if(server!==undefined&&channel!==undefined){
-										var data = {
-												s_id: args[0],
-												server: server.name,
-												c_id: args[1],
-												channel: channel.name,
-												date: args[2],
-												pastDate: html.ts(pastDate),
-												todayDate: html.ts(d),
-												thisDate: html.ts(date),
-												nextDate: html.ts(nextDate),
-												messages: [],
-												socketHost: settings.websocket.host,
-												socketPort: settings.websocket.port
-											},
-											ds = {},
-											id;
-										if(r){
-											r.forEach(function(m,i){
-												m.channel = channel.name;
-												m.server = server.name;
-												id = m.time;
-												if(ds[id]!==undefined){
-													id = id+'-'+m.id;
-												}
-												ds[id] = true;
-												data.messages.push(html.line_json(m,id));
-											});
-										}
-										res.write(templates.log.compile(data));
-									}else{
-										res.statusCode = 404;
-										res.write(templates.errors['404'].compile({
-											message: 'Channel does not exist'
-										}));
-									}
-									res.end();
-								});
 							}
 					}
 				}
