@@ -43,7 +43,7 @@ var settings = require('../etc/config.json').logs.server,
 	},
 	hooks = [
 		{	// PART
-			regex: /^\([#OC]\)([\W0-9])*\* [^ ]+ has left ([^ ]+) \((.*)\)$/i,
+			regex: /^\([#OC]\)([\W0-9])*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) has left [^ ]+ \((.*)\)$/i,
 			fn: function(m){
 				// 1 - colour
 				// 2 - nick
@@ -52,14 +52,14 @@ var settings = require('../etc/config.json').logs.server,
 			}
 		},
 		{	// JOIN
-			regex: /^\([#OC]\)[\W0-9]*\* ([^ ]+) has joined [^ ]+/i,
+			regex: /^\([#OC]\)[\W0-9]*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) has joined [^ ]+/i,
 			fn: function(m){
 				// 1 - nick
 				log('join',this.channel.name,m[1],'');
 			}
 		},
 		{	// MODE
-			regex: /^\([#OC]\)([\W0-9]*)\* ([^ ]+) set [^ ]+ mode (.+)/i,
+			regex: /^\([#OC]\)([\W0-9]*)\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+)\ set [^ ]+ mode (.+)/i,
 			fn: function(m){
 				// 1 - colour
 				// 2 - nick
@@ -68,7 +68,7 @@ var settings = require('../etc/config.json').logs.server,
 			}
 		},
 		{	// PRIVMSG
-			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<([^>]+)> (.+)$/i,
+			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<(?:\x03\d{1,2}(?:,\d{1,2})?)?([^>\x0F]+)> (.+)$/i,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text
@@ -76,7 +76,7 @@ var settings = require('../etc/config.json').logs.server,
 			}
 		},
 		{	// ACTION
-			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*\* ([^ ]+) (.+)/i,
+			regex: /^[\W0-9]*\([#OC]\)[\W0-9]*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) (.+)/i,
 			fn: function(m){
 				// 1 - nick
 				// 2 - text

@@ -35,7 +35,7 @@
 	},
 	"servers": [
 		{
-			"active": false,
+			"active": true,
 			"host": "irc.omnimaga.org",
 			"name": "NodeBotServe3.0",
 			"nick": "nodebot",
