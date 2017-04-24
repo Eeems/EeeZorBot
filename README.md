@@ -1,4 +1,6 @@
 [![build](https://travis-ci.org/Eeems/EeeZorBot.svg)](https://travis-ci.org/Eeems/EeeZorBot)
+[![NSP Status](https://nodesecurity.io/orgs/omnimaga/projects/3480df78-e007-48df-8efa-6de9da4f651e/badge)](https://nodesecurity.io/orgs/omnimaga/projects/3480df78-e007-48df-8efa-6de9da4f651e)
+
 EeeZorBot
 =========
 Version:
