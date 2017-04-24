@@ -13,7 +13,7 @@
 		"url": "https://github.com/Eeems/EeeZorBot.git"
 	},
 	"engines": {
-		"node": ">=0.6"
+		"node": ">=0.10"
 	},
 	"devDependencies": {
 		"tape": "2.x"
