@@ -3,6 +3,8 @@
 
 EeeZorBot
 =========
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Eeems/EeeZorBot.svg)](https://greenkeeper.io/)
 Version:
   0.1.1
 
