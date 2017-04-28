@@ -6,7 +6,6 @@ cache:
     - node_modules
 node_js:
   - "node"
-  - "iojs"
   - "6"
 before_script:
   - npm prune
