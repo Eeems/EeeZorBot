@@ -1,6 +1,28 @@
 sudo: false
 language: node_js
+cache:
+  yarn: true
+  directories:
+    - node_modules
 node_js:
   - "node"
   - "iojs"
   - "6"
+before_script:
+  - npm prune
+script: "yarn run test-travis"
+after_success:
+  - codacy-coverage < lcov.info
+  - yarn run semantic-release
+  - yarn run changelog
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
