@@ -55,8 +55,7 @@
     "precommit": "yarn run lint && yarn run test && yuidoc .",
     "prepush": "yarn run commit-cleanup",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect",
-    "postinstall": "yarn run synk-protect"
+    "prepublish": "yarn run snyk-protect"
   },
   "config": {
     "commitizen": {
