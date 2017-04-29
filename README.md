@@ -16,11 +16,11 @@ Install
 ```
 git clone <repo> EeeZorBot
 cd EeeZorBot
-npm install
+yarn install
 ```
 
 Run
 ===
 ```
-npm start
+yarn start
 ```

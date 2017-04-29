@@ -7,7 +7,7 @@
     "url": "http://eeems.ca"
   },
   "description": "Highly extensible Node.js bot",
-  "main": "./main.js",
+  "main": "./lib/main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Eeems/EeeZorBot.git"
@@ -22,9 +22,8 @@
     "mysql": "2.4.x",
     "node-persist": "0.0.x",
     "sanitize-filename": "x",
-    "ws": "x",
-    "yuidocjs": "^0.10.2",
-    "snyk": "^1.29.0"
+    "snyk": "^1.29.0",
+    "ws": "x"
   },
   "devDependencies": {
     "codacy-coverage": "^2.0.2",
@@ -33,29 +32,31 @@
     "husky": "^0.13.3",
     "node-inspector": "^1.1.1",
     "nyc": "^10.2.0",
+    "pkg-ok": "^1.1.0",
     "semantic-release": "^6.3.2",
     "semantic-release-cli": "^3.0.3",
     "snazzy": "^7.0.0",
     "standard": "^10.0.2",
     "standard-own": "^1.0.2",
     "tape": "2.x",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "wip": "^1.3.0",
+    "yuidocjs": "^0.10.2"
   },
   "scripts": {
-    "test": "tape test/*.js",
+    "test": "snyk test && tape test/*.js",
     "start": "node lib/main.js",
     "debug": "node --inspect-brk lib/main.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "watch": "watch wip --ignoreUnreadable --ignoreDotFiles",
-    "commit": "git cz",
+    "cz": "wip with commitizen && wip && naenae",
     "commit-cleanup": "git branch | grep wip-archive/ | xargs -r git branch -D",
     "test-travis": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "lint": "standard-own --fix --verbose | snazzy",
     "precommit": "yarn run lint && yarn run test && yuidoc . && semantic-release pre || true && git add package.json && yarn run changelog",
     "prepush": "yarn run commit-cleanup",
-    "snyk-protect": "snyk protect",
-    "prepublish": "yarn run snyk-protect"
+    "prepublish": "snyk protect && pkg-ok"
   },
   "config": {
     "commitizen": {
