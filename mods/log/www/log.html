@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{server}{channel}</title>
+		<link href="/scripts/app.css" rel="stylesheet" />
+		<script>
+			window.thisDate = '{thisDate}';
+			window.todayDate = '{todayDate}';
+			window.channel = '{channel}';
+			window.socketHost = '{socketHost}';
+			window.socketPort = '{socketPort}';
+		</script>
+		<script src="/scripts/socket.js"></script>
+		<script src="/scripts/template.js"></script>
+		<script src="/scripts/app.js"></script>
+	</head>
+	<body>
+		<div id="controls">
+			<span class="right">
+				<a href="#start">&#8679;</a>
+				<br/>
+				<a href="#end">&#8681;</a>
+			</span>
+			<span class="right">
+				<a class="reload">&#8634;</a>
+			</span>
+			<strong>
+				<a href="/stats">Stats</a>
+				<a href="/search">Search</a>
+				<a href="/">Logs</a>
+				<a href="/{s_id}">{server}</a>
+				{channel} {date}
+			</strong>
+			<br/>
+			<a href="/{s_id}/{c_id}/{pastDate}">&#8678;</a>
+			<a href="/{s_id}/{c_id}/{todayDate}#end">&#128198;</a>
+			<a href="/{s_id}/{c_id}/{nextDate}">&#8680;</a>
+		</div>
+		<div id="content" class="pre">
+			<span id="start"></span>
+			{#each messages}
+				<div class="line type-{type}" id="{id}">
+					<span class="date">[<a href="#{id}"><time datetime="{datetime}">{time}</time></a>]</span>
+					<span>{body}</span>
+				</div>
+			{/each messages}
+			<span id="end"></span>
+		</div>
+		<template id="template-message">
+			{#ignore}
+				<div class="line type-{type}" id="{id}">
+					<span class="date">[<a href="#{id}"><time datetime="{datetime}">{time}</time></a>]</span>
+					<span>{body}</span>
+				</div>
+			{/ignore}
+		</template>
+	</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/scripts/app.css" rel="stylesheet" />
+		<title>Stats</title>
+	</head>
+	<body>
+		<a href="/stats">Stats</a>
+		<a href="/search">Search</a>
+		<a href="/">Logs</a>
+		<br/>
+		<h1>Stats</h1>
+		<h2>{name}</h2>
+		<h3>Channels</h3>
+		<ul>
+			{#each channels}
+				<li>
+					<a href="/stats/channel/{id}">{name}</a>: {lines} lines, {users} users
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
+				</li>	
+			{/each channels}
+		</ul>
+		<h3>Users</h3>
+		<ul>
+			{#each users}
+				<li>
+					<a href="/stats/user/{id}">{name}</a>: {lines} lines, {channels} channels
+					{#exist online}
+						<span style="color:green;">[Online]</span>
+					{/exist online}
+				</li>	
+			{/each users}
+		</ul>
+	</body>
+</html>

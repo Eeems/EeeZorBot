@@ -1,0 +1,54 @@
+{
+	"mysql": {
+		"host": "localhost",
+		"user": "ircbot",
+		"password": "ircbot",
+		"database": "ircbot"
+	},
+	"mods": [
+		"log",
+		"manager",
+		"test",
+		"convert"
+	],
+	"logs": {
+		"levels": {
+			"in": false,
+			"out": false
+		},
+		"type": "listdb",
+		"server":{
+			"host": "localhost",
+			"port": 9003,
+			"listeners": []
+		},
+		"websocket": {
+			"host": "localhost",
+			"port": 9004
+		}
+	},
+	"stdin": {
+		"console": true,
+		"levels": {
+			"debug": true
+		}
+	},
+	"servers": [
+		{
+			"active": true,
+			"host": "irc.omnimaga.org",
+			"name": "NodeBotServe3.0",
+			"nick": "nodebot",
+			"username": "nodebot",
+			"prefix": "%",
+			"nickserv": {
+				"nick": "nodebot",
+				"password": "password"
+			},
+			"channels": [
+				"#irp"
+			],
+			"showping": false
+		}
+	]
+}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link href="/scripts/app.css" rel="stylesheet" />
+		<script src="/scripts/channel.js"></script>
+		<title>{name}</title>
+	</head>
+	<body>
+		<strong>
+			<a href="/stats">Stats</a>
+			<a href="/search">Search</a>
+			<a href="/">Logs</a>
+			{name}
+		</strong>
+		<br/>
+		<h1>Logs</h1>
+		<h2>{channel}</h2>
+		<select id="select">
+			{#each dates}
+				<option value="{date}">{date}</option>
+			{/each dates}
+		</select>
+		<button id="open" value="Open">Open</button>
+	</body>
+</html>
