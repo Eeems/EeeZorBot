@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -100,9 +103,7 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
-var User = require(&#x27;./user.js&#x27;),
-	debug = require(&#x27;./debug.js&#x27;),
-	tools = require(&#x27;./tools.js&#x27;);
+var User = require(&#x27;./user.js&#x27;);
 /**
  * Channel class
  * @module channel
@@ -112,154 +113,160 @@ var User = require(&#x27;./user.js&#x27;),
  * @param {string} name the name of the channel (ie: &quot;#irp&quot;)
  * @constructor
  */
-module.exports = function(server,name){
-	var self = this,
-		topic = null;
-	/**
-	 * Name of the channel
-	 * @type {string}
-	 * @property name
-	 */
-	self.name = name;
-	/**
-	 * Is the bot in the channel?
-	 * @type {boolean}
-	 * @property active
-	 */
-	self.active = false;
-	/**
-	 * Channel modes
-	 * @type {Array}
-	 * @property modes
-	 */
-	self.modes = [];
-	/**
-	 * Contains the topic of the channel and tries to change it if set
-	 * @type {String}
-	 * @property topic
-	 */
-	Object.defineProperty(self,&#x27;topic&#x27;,{
-		set: function(val){
-			self.server.send(&#x27;TOPIC &#x27;+self.name+&#x27; &#x27;+val);
-		},
-		get: function(){
-			return topic;
-		},
-		enumerable: true
-	});
-	/**
-	 * Interface for setting the topic internally
-	 * @property _topic
-	 * @private
-	 */
-	Object.defineProperty(self,&#x27;_topic&#x27;,{
-		set: function(val){
-			topic = val;
-		},
-		enumerable: false
-	});
-	/**
-	 * Parent server
-	 * @type {Server}
-	 * @property server
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;server&#x27;,{
-		value: server,
-		enumerable: true
-	});
-	/**
-	 * Runs a /who on the channel, refreshing user data
-	 * @method who
-	 * @chainable
-	 */
-	self.who = function(){
-		var i,
-			user;
-		while(self.users.length &gt; 0){
-			user = self.users[0];
-			user.channels.splice(user.channels.indexOf(self));
-		}
-		self.server.send(&#x27;WHO &#x27;+self.name);
-		return self;
-	};
-	/**
-	 * Returns an array of all the users in the channel
-	 * @property users
-	 * @return {Array} users
-	 */
-	Object.defineProperty(self,&#x27;users&#x27;,{
-		get: function(){
-			var users = [],
-				i,
-				user;
-			for(i=0;i&lt;server.users.length;i++){
-				user = server.users[i];
-				if(user.channels.indexOf(self) != -1){
-					users.push(user);
-				}
-			}
-			return users;
-		},
-		enumerable: true
-	});
-	/**
-	 * Sets the mode of the channel, or users in the channel
-	 * @method mode
-	 * @param {string} modes String containing the modes (ie: &quot;+o-v&quot;)
-	 * @param {Array} [users] A list of users (nick or User objects) to apply the modes to
-	 * @chainable
-	 */
-	self.mode = function(modes,users){
-		// TODO - fix
-		if(users === undefined){
-			self.server.send(&#x27;mode &#x27;+self.name+&#x27; &#x27;+modes);
-		}else{
-			var i,
-				u;
-			users = users instanceof Array?users:[users];
-			for(i=0;i&lt;users.length;i++){
-				u = users[i];
-				if(u instanceof User){
-					u = u.nick;
-				}
-				self.server.send(&#x27;mode &#x27;+self.name+&#x27; &#x27;+modes+&#x27; &#x27;+u);
-			}
-		}
-		return self;
-	};
-	/**
-	 * Leave the channel
-	 * @method part
-	 * @chainable
-	 */
-	self.part = function(){
-		self.server.send(&#x27;part &#x27;+self.name);
-		self.active = false;
-		return self;
-	};
-	/**
-	 * Join the channel
-	 * @method join
-	 * @chainable
-	 */
-	self.join = function(){
-		self.server.send(&#x27;join &#x27;+self.name);		// join channel
-		self.active = true;
-		return self;
-	};
-	/**
-	 * Send a message to the channel
-	 * @method send
-	 * @param {String} msg Message to send to the channel
-	 * @chainable
-	 */
-	self.send = function(msg){
-		self.server.send(&#x27;PRIVMSG &#x27;+self.name+&#x27; :&#x27;+msg);
-		return self;
-	};
-	return self;
+module.exports = function(server, name){
+    var self = this,
+        topic = null;
+    /**
+     * Name of the channel
+     * @type {string}
+     * @property name
+     */
+    self.name = name;
+    /**
+     * Is the bot in the channel?
+     * @type {boolean}
+     * @property active
+     */
+    self.active = false;
+    /**
+     * Channel modes
+     * @type {Array}
+     * @property modes
+     */
+    self.modes = [];
+    /**
+     * Contains the topic of the channel and tries to change it if set
+     * @type {String}
+     * @property topic
+     */
+    Object.defineProperty(self, &#x27;topic&#x27;, {
+        set: function(val){
+            self.server.send(&#x27;TOPIC &#x27; + self.name + &#x27; &#x27; + val);
+        },
+        get: function(){
+            return topic;
+        },
+        enumerable: true
+    });
+    /**
+     * Interface for setting the topic internally
+     * @property _topic
+     * @private
+     */
+    Object.defineProperty(self, &#x27;_topic&#x27;, {
+        set: function(val){
+            topic = val;
+        },
+        get: function(){
+            throw new Error(&#x27;Invalid&#x27;);
+        },
+        enumerable: false
+    });
+    /**
+     * Parent server
+     * @type {Server}
+     * @property server
+     * @static
+     */
+    Object.defineProperty(self, &#x27;server&#x27;, {
+        value: server,
+        enumerable: true
+    });
+    /**
+     * Runs a /who on the channel, refreshing user data
+     * @method who
+     * @chainable
+     */
+    self.who = function(){
+        var user;
+        while(self.users.length &gt; 0){
+            user = self.users[0];
+            user.channels.splice(user.channels.indexOf(self));
+        }
+        self.server.send(&#x27;WHO &#x27; + self.name);
+        return self;
+    };
+    /**
+     * Returns an array of all the users in the channel
+     * @property users
+     * @return {Array} users
+     */
+    Object.defineProperty(self, &#x27;users&#x27;, {
+        get: function(){
+            var users = [],
+                i,
+                user;
+            for(i = 0; i &lt; server.users.length; i++){
+                user = server.users[i];
+                if(user.channels.indexOf(self) !== -1){
+                    users.push(user);
+                }
+            }
+            return users;
+        },
+        enumerable: true
+    });
+    /**
+     * Sets the mode of the channel, or users in the channel
+     * @method mode
+     * @param {string} modes String containing the modes (ie: &quot;+o-v&quot;)
+     * @param {Array} [users] A list of users (nick or User objects) to apply the modes to
+     * @chainable
+     */
+    self.mode = function(modes, users){
+        // TODO - fix
+        if(users === undefined){
+            self.server.send(&#x27;mode &#x27; + self.name + &#x27; &#x27; + modes);
+        }else{
+            var i,
+                u;
+            users = users instanceof Array ? users : [users];
+            for(i = 0; i &lt; users.length; i++){
+                u = users[i];
+                if(u instanceof User){
+                    u = u.nick;
+                }
+                self.server.send(&#x27;mode &#x27; + self.name + &#x27; &#x27; + modes + &#x27; &#x27; + u);
+            }
+        }
+        return self;
+    };
+    /**
+     * Leave the channel
+     * @method part
+     * @chainable
+     */
+    self.part = function(){
+        self.server.send(&#x27;part &#x27; + self.name);
+        self.active = false;
+        return self;
+    };
+    /**
+     * Join the channel
+     * @method join
+     * @chainable
+     */
+    self.join = function(){
+        self.server.send(&#x27;join &#x27; + self.name);      // join channel
+        self.active = true;
+        return self;
+    };
+    /**
+     * Send a message to the channel
+     * @method send
+     * @param {String} msg Message to send to the channel
+     * @chainable
+     */
+    self.send = function(msg){
+        self.server.send(&#x27;PRIVMSG &#x27; + self.name + &#x27; :&#x27; + msg);
+        return self;
+    };
+    self.kick = function(user, msg){
+        self.server.send(&#x27;KICK &#x27; + self.name + &#x27; &#x27; + user.nick + (msg ? &#x27; &#x27; + msg : &#x27;&#x27;));
+    };
+    return self;
 };
+
     </pre>
 </div>
                     </div>

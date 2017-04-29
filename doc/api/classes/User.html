@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -298,7 +301,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_user.js.html#l61"><code>lib\user.js:61</code></a>
+        <a href="../files/lib_user.js.html#l62"><code>lib\user.js:62</code></a>
         </p>
 
 
@@ -319,232 +322,232 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_channels" class="property item">
-                        <h3 class="name"><code>channels</code></h3>
-                        <span class="type">Array</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l49"><code>lib\user.js:49</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Array of channels the user is in</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_host" class="property item">
-                        <h3 class="name"><code>host</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l27"><code>lib\user.js:27</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>User's hostname</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_hostmask" class="property item">
-                        <h3 class="name"><code>hostmask</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l70"><code>lib\user.js:70</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The current hostmask for the user</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_modes" class="property item">
-                        <h3 class="name"><code>modes</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l55"><code>lib\user.js:55</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>List of the modes applied to the user in a channel</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_nick" class="property item">
-                        <h3 class="name"><code>nick</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l15"><code>lib\user.js:15</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>User nickname</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_owner" class="property item">
-                        <h3 class="name"><code>owner</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l80"><code>lib\user.js:80</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Get the owner object for this user if it exists</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_realname" class="property item">
-                        <h3 class="name"><code>realname</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l33"><code>lib\user.js:33</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>User's real name</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_server" class="property item">
-                        <h3 class="name"><code>server</code></h3>
-                        <span class="type">Server</span>
-                    
-                    
-                    
-                    
-                            <span class="flag static">static</span>
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l39"><code>lib\user.js:39</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Server the user is on</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_username" class="property item">
-                        <h3 class="name"><code>username</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_user.js.html#l21"><code>lib\user.js:21</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>User's username</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
+<div id="property_channels" class="property item">
+    <h3 class="name"><code>channels</code></h3>
+    <span class="type">Array</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l50"><code>lib\user.js:50</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Array of channels the user is in</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_host" class="property item">
+    <h3 class="name"><code>host</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l28"><code>lib\user.js:28</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>User's hostname</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_hostmask" class="property item">
+    <h3 class="name"><code>hostmask</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l75"><code>lib\user.js:75</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>The current hostmask for the user</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_modes" class="property item">
+    <h3 class="name"><code>modes</code></h3>
+    <span class="type">Object</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l56"><code>lib\user.js:56</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>List of the modes applied to the user in a channel</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_nick" class="property item">
+    <h3 class="name"><code>nick</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l16"><code>lib\user.js:16</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>User nickname</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_owner" class="property item">
+    <h3 class="name"><code>owner</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l85"><code>lib\user.js:85</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the owner object for this user if it exists</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_realname" class="property item">
+    <h3 class="name"><code>realname</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l34"><code>lib\user.js:34</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>User's real name</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_server" class="property item">
+    <h3 class="name"><code>server</code></h3>
+    <span class="type">Server</span>
+
+
+
+
+        <span class="flag static">static</span>
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l40"><code>lib\user.js:40</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Server the user is on</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_username" class="property item">
+    <h3 class="name"><code>username</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_user.js.html#l22"><code>lib\user.js:22</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>User's username</p>
+
+    </div>
+
+
+
+</div>
             </div>
 
 

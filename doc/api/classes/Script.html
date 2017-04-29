@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -101,7 +104,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/lib_script.js.html#l4"><code>lib\script.js:4</code></a>
+            Defined in: <a href="../files/lib_script.js.html#l5"><code>lib\script.js:5</code></a>
         </div>
 
             Module: <a href="../modules/script.html">script</a>
@@ -143,7 +146,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_script.js.html#l4"><code>lib\script.js:4</code></a>
+        <a href="../files/lib_script.js.html#l5"><code>lib\script.js:5</code></a>
         </p>
 
 
@@ -271,7 +274,7 @@
 
                     <ul class="index-list events">
                             <li class="index-item event">
-                                <a href="#event_"></a>
+                                <a href="#event_unload">unload</a>
 
                             </li>
                     </ul>
@@ -297,7 +300,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_script.js.html#l102"><code>lib\script.js:102</code></a>
+        <a href="../files/lib_script.js.html#l117"><code>lib\script.js:117</code></a>
         </p>
 
 
@@ -329,7 +332,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_script.js.html#l121"><code>lib\script.js:121</code></a>
+        <a href="../files/lib_script.js.html#l136"><code>lib\script.js:136</code></a>
         </p>
 
 
@@ -361,7 +364,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_script.js.html#l86"><code>lib\script.js:86</code></a>
+        <a href="../files/lib_script.js.html#l94"><code>lib\script.js:94</code></a>
         </p>
 
 
@@ -393,7 +396,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/lib_script.js.html#l143"><code>lib\script.js:143</code></a>
+        <a href="../files/lib_script.js.html#l161"><code>lib\script.js:161</code></a>
         </p>
 
 
@@ -414,142 +417,142 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_enabled" class="property item">
-                        <h3 class="name"><code>enabled</code></h3>
-                        <span class="type">Boolean</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_script.js.html#l80"><code>lib\script.js:80</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Boolean determining if the script is currently active</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_path" class="property item">
-                        <h3 class="name"><code>path</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_script.js.html#l74"><code>lib\script.js:74</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The path to the script that is run</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_server" class="property item">
-                        <h3 class="name"><code>server</code></h3>
-                        <span class="type">Server</span>
-                    
-                    
-                    
-                    
-                            <span class="flag static">static</span>
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_script.js.html#l64"><code>lib\script.js:64</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Stores a reference to the server that this script is used on</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_sid" class="property item">
-                        <h3 class="name"><code>sid</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                    
-                    
-                            <span class="flag static">static</span>
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_script.js.html#l43"><code>lib\script.js:43</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>stores the script global identifier</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_sid" class="property item">
-                        <h3 class="name"><code>sid</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                    
-                    
-                            <span class="flag static">static</span>
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/lib_script.js.html#l54"><code>lib\script.js:54</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>stores the script identifier</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
+<div id="property_enabled" class="property item">
+    <h3 class="name"><code>enabled</code></h3>
+    <span class="type">Boolean</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_script.js.html#l87"><code>lib\script.js:87</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Boolean determining if the script is currently active</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_path" class="property item">
+    <h3 class="name"><code>path</code></h3>
+    <span class="type">String</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_script.js.html#l81"><code>lib\script.js:81</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>The path to the script that is run</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_server" class="property item">
+    <h3 class="name"><code>server</code></h3>
+    <span class="type">Server</span>
+
+
+
+
+        <span class="flag static">static</span>
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_script.js.html#l71"><code>lib\script.js:71</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Stores a reference to the server that this script is used on</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_sid" class="property item">
+    <h3 class="name"><code>sid</code></h3>
+    <span class="type">Number</span>
+
+
+
+
+        <span class="flag static">static</span>
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_script.js.html#l50"><code>lib\script.js:50</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>stores the script global identifier</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_sid" class="property item">
+    <h3 class="name"><code>sid</code></h3>
+    <span class="type">Number</span>
+
+
+
+
+        <span class="flag static">static</span>
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_script.js.html#l61"><code>lib\script.js:61</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>stores the script identifier</p>
+
+    </div>
+
+
+
+</div>
             </div>
 
 
             <div id="events" class="api-class-tabpanel">
                 <h2 class="off-left">Events</h2>
 
-                    <div id="event_" class="events item">
-                        <h3 class="name"><code></code></h3>
+                    <div id="event_unload" class="events item">
+                        <h3 class="name"><code>unload</code></h3>
                         <span class="type">Function</span>
                     
                     
@@ -559,7 +562,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/lib_script.js.html#l154"><code>lib\script.js:154</code></a>
+                            <a href="../files/lib_script.js.html#l172"><code>lib\script.js:172</code></a>
                             </p>
                     
                     

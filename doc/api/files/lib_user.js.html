@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -111,96 +114,107 @@
  * @param {string} realname
  * @constructor
  */
-var owners = require(&#x27;./owners.js&#x27;);
-module.exports = function(nick,username,host,realname,server){
-	var self = this;
-	/**
-	 * User nickname
-	 * @type {String}
-	 * @property nick
-	 */
-	self.nick = nick;
-	/**
-	 * User&#x27;s username
-	 * @type {string}
-	 * @property username
-	 */
-	self.username = username;
-	/**
-	 * User&#x27;s hostname
-	 * @type {string}
-	 * @property host
-	 */
-	self.host = host;
-	/**
-	 * User&#x27;s real name
-	 * @type {string}
-	 * @property realname
-	 */
-	self.realname = realname;
-	/**
-	 * Server the user is on
-	 * @type {Server}
-	 * @property server
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;server&#x27;,{
-		value: server,
-		enumerable: true
-	});
-	/**
-	 * Array of channels the user is in
-	 * @type {Array}
-	 * @property channels
-	 */
-	self.channels = [];
-	/**
-	 * List of the modes applied to the user in a channel
-	 * @type {Object}
-	 * @property modes
-	 */
-	self.modes = {};
-	/**
-	 * Runs a whois on the user
-	 * @method whois
-	 * @chainable
-	 */
-	self.whois = function(){
-		self.server.send(&#x27;WHOIS &#x27;+self.nick);
-		return self;
-	};
-	/**
-	 * The current hostmask for the user
-	 * @property hostmask
-	 * @type {String}
-	 */
-	Object.defineProperty(self,&#x27;hostmask&#x27;,{
-		get: function(){
-			return self.nick+&#x27;!&#x27;+self.username+&#x27;@&#x27;+self.host;
-		}
-	});
-	/**
-	 * Get the owner object for this user if it exists
-	 * @property owner
-	 * @type {String}
-	 */
-	Object.defineProperty(self,&#x27;owner&#x27;,{
-		get: function(){
-			var owner = owners.match(self.hostmask);
-			if(owner === undefined){
-				owner = {
-					nick: self.nick,
-					hostmasks: [
-						self.hostmask
-					],
-					flags: &#x27;&#x27;
-				};
-			}
-			return owner;
-		}
-	});
-	return self;
+var owners = require(&#x27;./owners.js&#x27;),
+    bans = require(&#x27;./bans.js&#x27;);
+module.exports = function(nick, username, host, realname, server){
+    var self = this;
+    /**
+     * User nickname
+     * @type {String}
+     * @property nick
+     */
+    self.nick = nick;
+    /**
+     * User&#x27;s username
+     * @type {string}
+     * @property username
+     */
+    self.username = username;
+    /**
+     * User&#x27;s hostname
+     * @type {string}
+     * @property host
+     */
+    self.host = host;
+    /**
+     * User&#x27;s real name
+     * @type {string}
+     * @property realname
+     */
+    self.realname = realname;
+    /**
+     * Server the user is on
+     * @type {Server}
+     * @property server
+     * @static
+     */
+    Object.defineProperty(self, &#x27;server&#x27;, {
+        value: server,
+        enumerable: true
+    });
+    /**
+     * Array of channels the user is in
+     * @type {Array}
+     * @property channels
+     */
+    self.channels = [];
+    /**
+     * List of the modes applied to the user in a channel
+     * @type {Object}
+     * @property modes
+     */
+    self.modes = {};
+    /**
+     * Runs a whois on the user
+     * @method whois
+     * @chainable
+     */
+    self.whois = function(){
+        self.server.send(&#x27;WHOIS &#x27; + self.nick);
+        return self;
+    };
+    self.send = function(msg){
+        self.server.send(&#x27;PRIVMSG &#x27; + self.nick + &#x27; :&#x27; + msg);
+        return self;
+    };
+    /**
+     * The current hostmask for the user
+     * @property hostmask
+     * @type {String}
+     */
+    Object.defineProperty(self, &#x27;hostmask&#x27;, {
+        get: function(){
+            return self.nick + &#x27;!&#x27; + self.username + &#x27;@&#x27; + self.host;
+        }
+    });
+    /**
+     * Get the owner object for this user if it exists
+     * @property owner
+     * @type {String}
+     */
+    Object.defineProperty(self, &#x27;owner&#x27;, {
+        get: function(){
+            var owner = owners.match(self.hostmask);
+            if(owner === undefined){
+                owner = {
+                    nick: self.nick,
+                    hostmasks: [
+                        self.hostmask
+                    ],
+                    flags: &#x27;&#x27;
+                };
+            }
+            return owner;
+        }
+    });
+    Object.defineProperty(self, &#x27;banned&#x27;, {
+        get: function(){
+            return bans.match(self.hostmask);
+        }
+    });
+    return self;
 };
+
     </pre>
 </div>
                     </div>

@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -101,8 +104,9 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 var vm = require(&#x27;vm&#x27;),
-	fs = require(&#x27;fs&#x27;),
-	log = require(&#x27;./log.js&#x27;);
+    fs = require(&#x27;fs&#x27;),
+    log = require(&#x27;./log.js&#x27;),
+    path = require(&#x27;path&#x27;);
 /**
  * Provides a script object that allows a server to handle the loaded script
  * @class Script
@@ -112,157 +116,175 @@ var vm = require(&#x27;vm&#x27;),
  * @param {number} sid The script identifier for this script
  * @constructor
  */
-module.exports = function(path,server,sid){
-	var self = this,
-		watcher = {
-			close: function(){}
-		},
-		api = function(){
-			var api =  require(&#x27;./api.js&#x27;),
-				_api = {
-					script: self,
-					require: require,
-					process: process,
-					console: console,
-					_path: self.path,
-					_dirname: require(&#x27;path&#x27;).dirname(self.path),
-					server: self.server,
-					sid: self.sid,
-					config: self.server.config
-				},
-				i;
-			for(i in api){
-				if(_api[i] === undefined){
-					_api[i] = api[i];
-				}
-			}
-			if(Object.keys(_api.stdin).length===0){
-				_api.stdin = self.server;
-			}
-			_api.api = _api;
-			return _api;
-		};
-	/**
-	 * stores the script global identifier
-	 * @property sid
-	 * @type {number}
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;suid&#x27;,{
-		get: function(){
-			return self.server.id+&#x27;-&#x27;+self.sid;
-		}
-	});
-	/**
-	 * stores the script identifier
-	 * @property sid
-	 * @type {number}
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;sid&#x27;,{
-		value: sid,
-		enumerable: true
-	});
-	/**
-	 * Stores a reference to the server that this script is used on
-	 * @property server
-	 * @type {Server}
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;server&#x27;,{
-		value: server,
-		enumerable: true
-	});
-	/**
-	 * The path to the script that is run
-	 * @property path
-	 * @type {string}
-	 */
-	self.path = path;
-	/**
-	 * Boolean determining if the script is currently active
-	 * @property enabled
-	 * @type {Boolean}
-	 */
-	self.enabled = false;
-	/**
-	 * reloads the script from the disk
-	 * @method reload
-	 * @chainable
-	 */
-	self.load = function(){
-		try{
-			d = fs.readFileSync(path);
-			vm.runInNewContext(d,api(),self.path);
-			self.enabled = true;
-		}catch(e){
-			log.debug(&#x27;Error in script: &#x27;+self.path);
-			log.trace(e);
-			self.disable(true);
-		}
-	};
-	/**
-	 * Disables the script (hooks, commands etc)
-	 * @method disable
-	 * @chainable
-	 */
-	self.disable = function(force){
-		if(force){
-			self.server.debug(&#x27;Force Disabling script &#x27;+self.suid);
-		}else if(self.enabled){
-			self.server.debug(&#x27;Disabling script &#x27;+self.suid);
-		}
-		self.server.run(self.sid,function(){
-			self.unload.call(self);
-			self.server.off();
-			self.server.remove();
-			self.enabled = false;
-		});
-		return self;
-	};
-	/**
-	 * Description
-	 * @method enable
-	 * @chainable
-	 */
-	self.enable = function(){
-		self.disable();
-		watcher = fs.watch(self.path,function(e,npath){
-			if(e == &#x27;change&#x27; &amp;&amp; self.enabled){
-				self.server.debug(&#x27;Reloading Script&#x27;);
-				self.server.debug(&#x27; |- &#x27;+npath);
-				self.server.run(self.sid,function(){
-					self.disable();
-					self.load();
-				});
-			}else if(e == &#x27;rename&#x27;){
-				self.path = npath;
-			}
-		});
-		self.load();
-		return self;
-	};
-	/**
-	 * Disables and removes the script from the server.
-	 * @method remove
-	 * @chainable
-	 */
-	self.remove = function(){
-		watcher.close();
-		self.disable();
-		self.server.scripts[self.sid-1] = null;
-		return self;
-	};
-	/**
-	 * Function to run when the script is unloaded
-	 * @property unload
-	 * @event
-	 * @type {Function}
-	 */
-	self.unload = function(){};
-	self.enable();
-	return self;
+module.exports = function(scriptpath, server, sid){
+    var self = this,
+        watcher = {
+            close: function(){}
+        },
+        api = function(){
+            var api = require(&#x27;./api.js&#x27;),
+                _api = {
+                    script: self,
+                    require: require,
+                    process: process,
+                    setInterval: setInterval,
+                    setTimeout: setTimeout,
+                    console: console,
+                    _path: self.path,
+                    _dirname: path.dirname(self.path),
+                    server: self.server,
+                    sid: self.sid,
+                    config: self.server.config,
+                    log: log,
+                    db: api.db,
+                    websocket: api.websocket
+                },
+                i;
+            for(i in api){
+                if(_api[i] === undefined){
+                    _api[i] = api[i];
+                }
+            }
+            if(!_api.stdin || Object.keys(_api.stdin).length === 0){
+                _api.stdin = self.server;
+            }
+            _api.api = _api;
+            _api.global = _api;
+            return _api;
+        };
+    /**
+     * stores the script global identifier
+     * @property sid
+     * @type {number}
+     * @static
+     */
+    Object.defineProperty(self, &#x27;suid&#x27;, {
+        get: function(){
+            return self.server.id + &#x27;-&#x27; + self.sid;
+        }
+    });
+    /**
+     * stores the script identifier
+     * @property sid
+     * @type {number}
+     * @static
+     */
+    Object.defineProperty(self, &#x27;sid&#x27;, {
+        value: sid,
+        enumerable: true
+    });
+    /**
+     * Stores a reference to the server that this script is used on
+     * @property server
+     * @type {Server}
+     * @static
+     */
+    Object.defineProperty(self, &#x27;server&#x27;, {
+        value: server,
+        enumerable: true
+    });
+    /**
+     * The path to the script that is run
+     * @property path
+     * @type {string}
+     */
+    self.path = scriptpath;
+    /**
+     * Boolean determining if the script is currently active
+     * @property enabled
+     * @type {Boolean}
+     */
+    self.enabled = false;
+    self.dirty = false;
+    /**
+     * reloads the script from the disk
+     * @method reload
+     * @chainable
+     */
+    self.load = function(){
+        try{
+            self.server.run(self.sid, function(){
+                var d = fs.readFileSync(self.path),
+                    s = new vm.Script(d, {
+                        filename: self.path,
+                        displayErrors: true
+                    });
+                s.runInNewContext(api());
+                self.enabled = true;
+                self.dirty = false;
+            });
+        }catch(e){
+            log.debug(&#x27;Error in script: &#x27; + self.path);
+            log.trace(e);
+            self.disable(true);
+        }
+    };
+    /**
+     * Disables the script (hooks, commands etc)
+     * @method disable
+     * @chainable
+     */
+    self.disable = function(force){
+        if(force){
+            self.server.debug(&#x27;Force Disabling script &#x27; + self.suid);
+        }else if(self.enabled){
+            self.server.debug(&#x27;Disabling script &#x27; + self.suid);
+        }
+        self.server.run(self.sid, function(){
+            self.unload();
+            self.server.off();
+            self.server.remove();
+            self.enabled = false;
+        });
+        return self;
+    };
+    /**
+     * Description
+     * @method enable
+     * @chainable
+     */
+    self.enable = function(){
+        self.disable();
+        watcher = fs.watch(self.path, function(e, npath){
+            if(e === &#x27;change&#x27; &amp;&amp; self.enabled &amp;&amp; !self.dirty){
+                self.server.debug(&#x27;Reloading Script&#x27;);
+                self.server.debug(&#x27; |- &#x27; + npath);
+                self.dirty = true;
+                self.server.run(self.sid, function(){
+                    self.disable();
+                    process.nextTick(function(){
+                        self.load();
+                    });
+                });
+            }else if(e === &#x27;rename&#x27;){
+                self.path = npath;
+            }
+        });
+        self.load();
+        return self;
+    };
+    /**
+     * Disables and removes the script from the server.
+     * @method remove
+     * @chainable
+     */
+    self.remove = function(){
+        watcher.close();
+        self.disable();
+        self.server.scripts[self.sid - 1] = null;
+        return self;
+    };
+    /**
+     * Function to run when the script is unloaded
+     * @property unload
+     * @event unload
+     * @type {Function}
+     */
+    self.unload = function(){};
+    self.enable();
+    return self;
 };
+
     </pre>
 </div>
                     </div>

@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -101,14 +104,13 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 var Channel = require(&#x27;./channel.js&#x27;),
-	User = require(&#x27;./user.js&#x27;),
-	owners = require(&#x27;./owners.js&#x27;),
-	Script = require(&#x27;./script.js&#x27;),
-	net = require(&#x27;net&#x27;),
-	tools = require(&#x27;./tools.js&#x27;),
-	log = require(&#x27;./log.js&#x27;),
-	stdin = require(&#x27;./stdin.js&#x27;),
-	debug = require(&#x27;./debug.js&#x27;);
+    User = require(&#x27;./user.js&#x27;),
+    owners = require(&#x27;./owners.js&#x27;),
+    Script = require(&#x27;./script.js&#x27;),
+    net = require(&#x27;net&#x27;),
+    tools = require(&#x27;./tools.js&#x27;),
+    log = require(&#x27;./log.js&#x27;),
+    debug = require(&#x27;./debug.js&#x27;);
 /**
  * IRC Server object
  * @module server
@@ -117,1174 +119,1245 @@ var Channel = require(&#x27;./channel.js&#x27;),
  * @param {object} config
  */
 module.exports = function(config){
-	var self = this,
-		date = new Date(+new Date),
-		interval,
-		defaults = {
-			host: &#x27;&#x27;,
-			port: 6667,
-			nick: &#x27;&#x27;,
-			username: &#x27;&#x27;,
-			name: &#x27;&#x27;,
-			nickserv: undefined,
-			channels: [],
-			scripts: [],
-			showping: false
-		},
-		sid = 0,
-		i,
-		ii;
-	for(i in defaults){
-		if(config[i] === undefined){
-			config[i] = defaults[i];
-		}
-	}
-	/**
-	 * stores the server identifier
-	 * @property id
-	 * @type {number}
-	 * @static
-	 */
-	Object.defineProperty(self,&#x27;id&#x27;,{
-		get: function(){
-			return require(&#x27;./api.js&#x27;).servers.indexOf(self);
-		}
-	});
-	/**
-	 * Gives the servers name
-	 * @property name
-	 * @type {string}
-	 * @static
-	 */
-	self.name = config.host;
-	/**
-	 * Array of channels on the server
-	 * @property channels
-	 * @type {Array}
-	 */
-	self.channels = [];
-	/**
-	 * Array of users on the server that are known
-	 * @property users
-	 * @type {Array}
-	 */
-	self.users = [];
-	/**
-	 * Array of all hooks installed on the server
-	 * @property hooks
-	 * @type {Array}
-	 */
-	self.hooks = [];
-	/**
-	 * Array of all the scripts installed on the server
-	 * @property scripts
-	 * @type {Array}
-	 */
-	self.scripts  = [];
-	/**
-	 * Array of all the commands on the server
-	 * @property commands
-	 * @type {Object}
-	 */
-	self.commands = {};
-	/**
-	 * Server config
-	 * @property config
-	 * @type {Object}
-	 */
-	self.config = {};
-	/**
-	 * Run function in the context of a specific script
-	 * @method run
-	 * @param {number} id Script ID to run under (0 == run as server)
-	 * @param {function} fn function to run
-	 * @chainable
-	 */
-	self.run = function(id,fn){
-		var osid = sid;
-		sid = id;
-		fn.call(self,sid);
-		sid = osid;
-		return self;
-	};
-	for(i in config){
-		switch(i){
-			case &#x27;channels&#x27;:break;
-			case &#x27;scripts&#x27;:break;
-			default:
-				self.config[i] = config[i];
-		}
-	}
-	/**
-	 * Log something in the context of the server
-	 * @method log
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.log = function(msg){
-		log.alert(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * Log something in the context of the server
-	 * @method info
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.info = function(msg){
-		log.info(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * Log something in the context of the server
-	 * @method debug
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.debug = function(msg){
-		debug.log(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * Log something in the context of the server
-	 * @method error
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.error = function(msg){
-		if(msg instanceof Error){
-			log.trace(msg);
-		}else{
-			log.error(new Error(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg));
-		}
-		return self;
-	};
-	/**
-	 * log.in something in the context of the server
-	 * @method logIn
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.logIn = function(msg){
-		log.in(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * log.out something in the context of the server
-	 * @method logOut
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.logOut = function(msg){
-		log.out(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * log.error something in the context of the server
-	 * @method logError
-	 * @param {mixed} msg Message to log
-	 * @chainable
-	 */
-	self.logError = function(msg){
-		log.error(&#x27;[&#x27;+self.config.host+&#x27;:&#x27;+self.config.port+&#x27;] &#x27;+msg);
-		return self;
-	};
-	/**
-	 * Connect to the IRC server
-	 * @method connect
-	 * @chainable
-	 */
-	self.connect = function(){
-		if(self.socket === undefined){
-			log.log(&#x27;Connecting to &#x27;+self.config.host+&#x27;:&#x27;+self.config.port);
-			self.socket = new net.Socket();
-			self.socket.setNoDelay(true);
-			//self.socket.setEncoding(&#x27;binary&#x27;);
-			self.socket.on(&#x27;connect&#x27;,function(){
-				self.connected = true;
-				self.info(&#x27;Connection established (evt)&#x27;);
-				self.fire(&#x27;connect&#x27;,arguments,self);
-				self.attempts = 0;
-			});
-			self.socket.on(&#x27;data&#x27;,function(d){
-				var args = Array.prototype.slice.call(arguments),
-					buf = tools.convert(d);
-				d = buf.toString(&#x27;UTF-16LE&#x27;);
-				self.fire(&#x27;data&#x27;,[d,buf],self);
-				var s = d.split(&quot;\r\n&quot;),
-					i,
-					ii,
-					match,
-					hook,
-					m,
-					o;
-				for(ii=0;ii&lt;s.length;ii++){
-					if(s[ii] !== &#x27;&#x27;){
-						if((m = /^PING :(.+)/i.exec(s[ii]))){
-							if(self.config.showping){
-								self.logIn(s[ii]);
-							}else{
-								o = log.config.levels.out;
-								log.config.levels.out = false;
-							}
-							self.send(&#x27;PONG :&#x27;+m[1]);
-							if(!self.config.showping){
-								log.config.levels.out = o;
-							}
-							self.fire(&#x27;ping&#x27;,arguments,self);
-						}else{
-							self.logIn(s[ii]);
-						}
-						for(i=0;i&lt;self.hooks.length;i++){
-							hook = self.hooks[i];
-							if(hook.type == &#x27;regex&#x27;){
-								match = hook.regex.exec(s[ii]);
-								if(match){
-									hook.fn.call(self,match,s[ii]);
-									if(hook.once){
-										self.hooks.splice(i,1);
-									}
-								}
-							}
-						}
-					}
-				}
-				// TODO - incoming data
-			});
-			self.socket.on(&#x27;drain&#x27;,function(){
-				self.debug(&#x27;Drain event&#x27;);
-				self.fire(&#x27;drain&#x27;,arguments,self);
-				// TODO - No more outgoing data
-			});
-			self.socket.on(&#x27;error&#x27;,function(e){
-				self.info(&#x27;Connection errored&#x27;);
-				self.connected = false;
-				self.fire(&#x27;error&#x27;,arguments,self);
-				self.error(e);
-				setTimeout(function(){
-					self.reconnect();
-				},1000);
-			});
-			self.socket.on(&#x27;timeout&#x27;,function(){
-				self.info(&#x27;Connection timed out&#x27;);
-				self.connected = false;
-				self.fire(&#x27;timeout&#x27;,arguments,self);
-				setTimeout(function(){
-					self.reconnect();
-				},1000);
-			});
-			self.socket.on(&#x27;end&#x27;,function(){
-				self.info(&#x27;Connection ended&#x27;);
-				self.connected = false;
-				self.fire(&#x27;end&#x27;,arguments,self);
-				// TODO - server closed connection
-				setTimeout(function(){
-					self.reconnect();
-				},1000);
-			});
-			self.socket.on(&#x27;close&#x27;,function(e){
-				self.connected = false;
-				if(e){
-					self.info(&#x27;Connection closed due to an error&#x27;);
-					setTimeout(function(){
-						self.reconnect();
-					},1000);
-				}else{
-					self.info(&#x27;Connection closed&#x27;);
-					self.fire(&#x27;close&#x27;,arguments,self);
-				}
-			});
-			self.socket.connect(self.config.port,self.config.host,function(){
-				self.info(&#x27;Connection established&#x27;);
-				self.send(&#x27;NICK &#x27;+self.config.nick);
-				self.send(&#x27;USER &#x27;+self.config.name+&#x27; localhost * &#x27;+self.config.name);
-			});
-		}
-		return self;
-	};
-	/**
-	 * Send a message to the IRC server
-	 * @method send
-	 * @param {string} d Message to send
-	 * @chainable
-	 */
-	self.send = function(d){
-		if(d.length &gt; 510){
-			self.fire(&#x27;error&#x27;,[new Error(&#x27;Send String too long&#x27;)],self);
-			return self;
-		}
-		try{
-			if(self.socket){
-				self.socket.write(d+&#x27;\r\n&#x27;,&#x27;ascii&#x27;,function(){
-					self.logOut(d);
-					self.fire(&#x27;send&#x27;,[d],self);
-				});
-			}
-		}catch(e){
-			self.error(e);
-			self.fire(&#x27;error&#x27;,[e],self);
-		}
-		return self;
-	};
-	/**
-	 * Install a hook on the server.
-	 * @method on
-	 * @param {string|RegExp} hook Hook to install (can be named or RegExp)
-	 * @param {function} callback Callback to run when the hook fires
-	 * @param {boolean} [once=false] Should this hook uninstall itself when it is run?
-	 * @chainable
-	 */
-	self.on = function(hook,callback,once){
-		self.debug(&#x27; |  |- Hook &#x27;+hook);
-		once = once===undefined?false:once;
-		var stack = new Error().stack.split(&quot;\n&quot;)[2];
-		if(hook instanceof RegExp){
-			self.hooks.push({
-				type: &#x27;regex&#x27;,
-				regex: hook,
-				fn: callback,
-				once: once,
-				sid: sid,
-				stack: stack
-			});
-		}else{
-			self.hooks.push({
-				type: &#x27;event&#x27;,
-				name: hook,
-				fn: callback,
-				once: once,
-				sid: sid,
-				stack: stack
-			});
-		}
-		return self;
-	};
-	/**
-	 * Uninstall a hook from the server
-	 * @method off
-	 * @param {string|RegExp} hook Hook to remove
-	 * @param {function} [callback] callback used in the hook you want to remove
-	 * @chainable
-	 */
-	self.off = function(hook,callback){
-		var i,
-			h,
-			t;
-		for(i=0;i&lt;self.hooks.length;i++){
-			h = self.hooks[i];
-			t = arguments.length === 0;
-			if(sid === h.sid){
-				if(!t){
-					if(hook instanceof RegExp &amp;&amp; h.type == &#x27;regex&#x27; &amp;&amp; h.regex === hook){
-						t = true;
-					}else if(h.type == &#x27;event&#x27; &amp;&amp; h.name === hook){
-						t = true;
-					}else if(hook === undefined){
-						t = true;
-					}
-					t = t &amp;&amp; (callback === undefined || h.fn === callback);
-				}
-				if(t){
-					self.debug(&#x27; |  |- Drop Hook &#x27;+h.name);
-					self.hooks.splice(i,1);
-				}
-			}
-		}
-		return self;
-	};
-	/**
-	 * Add a command to the server
-	 * @method add
-	 * @param {string} command Command name (used to invoke command)
-	 * @param {function} callback Callback to run when command invoked
-	 * @param {string} help Help line for the command
-	 * @chainable
-	 */
-	self.add = function(command,callback,help){
-		if(self.commands[command] === undefined){
-			self.debug(&#x27; |  |- Command &#x27;+command);
-			self.commands[command] = {
-				fn: callback,
-				sid: sid,
-				help: help
-			};
-		}
-		return self;
-	};
-	/**
-	 * Remove a command listener from the server
-	 * @method remove
-	 * @param {string} command Command you want to remove
-	 * @chainable
-	 */
-	self.remove = function(command){
-		var i,
-			n = {};
-		if(command === undefined){
-			for(i in self.commands){
-				if(self.commands[i].sid !== sid){
-					n[i] = self.commands[i];
-				}
-			}
-			self.commands = n;
-		}else{
-			for(i in self.commands){
-				if(i !== command){
-					n[i] = self.commands[i];
-				}
-			}
-			self.commands = n;
-		}
-		return self;
-	};
-	/**
-	 * Fire an event on the IRC server
-	 * @method fire
-	 * @param {string} name Name of the event to trigger
-	 * @param {array} args Arguments to provide the event callbacks
-	 * @param {mixed} scope What the event callbacks should use for the &#x27;this&#x27; keyword
-	 * @chainable
-	 */
-	self.fire = function(name,args,scope){
-		var i,
-			hook;
-		scope = scope===undefined?self:scope;
-		args = args===undefined?[]:args;
-		for(i=0;i&lt;self.hooks.length;i++){
-			hook = self.hooks[i];
-			if(hook.type == &#x27;event&#x27; &amp;&amp; hook.name == name){
-				try{
-					hook.fn.apply(scope,args);
-				}catch(e){
-					self.error(e.message);
-					self.error(hook.stack);
-				}
-			}
-		}
-		return self;
-	};
-	/**
-	 * Join a channel
-	 * @method join
-	 * @param {string} name Channel name
-	 * @chainable
-	 */
-	self.join = function(name){
-		// TODO - handle adding to channel array if it doesn&#x27;t already exist
-		var channel = self.channel(name),
-			user = self.user(self.config.nick);
-		if(!channel){
-			channel = new Channel(self,name);
-			self.channels.push(channel);
-		}
-		channel.join();
-		if(!user){
-			user = new User(self.config.nick,&#x27;&#x27;,self.config.username,self.config.name,self);
-			self.users.push(user);
-		}
-		user.channels.push(channel);
-		user.whois();
-		self.fire(&#x27;join&#x27;,[],{
-			channel: channel,
-			user: user,
-			owners: owners
-		});
-		return self;
-	};
-	/**
-	 * Leave a channel
-	 * @method part
-	 * @param {string} name Name of the channel
-	 * @chainable
-	 */
-	self.part = function(name){
-		var c = self.channel(name);
-		if(c){
-			c.part();
-		}
-		return self;
-	};
-	/**
-	 * Check if in a channel
-	 * @method in
-	 * @param {string} name Name of the channel
-	 * @return {boolean} status of server in channel
-	 */
-	self.in = function(name){
-		// TODO - detect if actually joined to channel and not just created for shits/giggles... I mean for record keeping
-		for(var i=0;i&lt;self.channels.length;i++){
-			if(self.channels[i].name == name){
-				return true;
-			}
-		}
-		return false;
-	};
-	/**
-	 * Get a channel based on it&#x27;s name
-	 * @method channel
-	 * @param {string} name Name of the channel
-	 * @return {Channel|boolean} Returns false if channel doesn&#x27;t exist. Returns the channel otherwise
-	 */
-	self.channel = function(name){
-		for(var i=0;i&lt;self.channels.length;i++){
-			if(self.channels[i].name == name){
-				return self.channels[i];
-			}
-		}
-		return false;
-	};
-	/**
-	 * Gets the user or syncs a user on the server
-	 * @method user
-	 * @param {string|User} user User object to sync or nick you want the user object for
-	 * @return {User} The user object
-	 */
-	self.user = function(user){
-		var i,
-			old;
-		if(user instanceof User){
-			for(i=0;i&lt;self.users.length;i++){
-				if(self.users[i].nick === user.nick){
-					old = self.users[i];
-				}
-			}
-			if(old !== undefined){
-				for(i in user){
-					old[i] = user[i];
-				}
-			}else{
-				old = user;
-				self.users.push(user);
-			}
-		}else{
-			for(i=0;i&lt;self.users.length;i++){
-				if(self.users[i].nick === user){
-					old = self.users[i];
-				}
-			}
-			old = old===undefined?false:old;
-		}
-		return old;
-	};
-	/**
-	 * Gets a script based on the sid
-	 * @method script
-	 * @param {number} sid
-	 * @return {boolean|Script} Returns false if script is not found, otherwise returns the script.
-	 */
-	self.script = function(sid){
-		s = self.scripts[sid-1];
-		return s===undefined||s===null?false:s;
-	};
-	/**
-	 * Reconnects to the IRC server
-	 * @method reconnect
-	 * @chainable
-	 */
-	self.reconnect = function(){
-		self.attempts++;
-		if(self.attempts&lt;10){
-			self.info(&#x27;Reconnecting (attempt &#x27;+self.attempts+&#x27;)&#x27;);
-			self.quit();
-			self.connect();
-			self.fire(&#x27;reconnect&#x27;,arguments,self);
-		}else{
-			self.info(&#x27;Too many reconnect attempts&#x27;);
-			self.quit();
-			self.fire(&#x27;stop&#x27;,arguments,self);
-		}
-		return self;
-	};
-	self.attempts = 0;
-	self.connected = false;
-	/**
-	 * Quits from the IRC server
-	 * @method quit
-	 * @param {string} [msg=string] Quit message. defaults to &quot;Bot shutting down&quot;.
-	 * @chainable
-	 */
-	self.quit = function(msg){
-		msg = msg === undefined?&#x27;Bot shutting down&#x27;:msg;
-		var user = self.user(self.config.nick),
-			i,
-			channels = self.channels.filter(function(c){
-				return c.active;
-			});
-		self.fire(&#x27;quit&#x27;,[msg,channels],{
-			user: user
-		});
-		if(!user){
-			user =  new User(self.config.nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-		}
-		if(self.connected){
-			try{
-				self.socket.write(msg+&#x27;\r\n&#x27;,&#x27;ascii&#x27;,function(){
-					self.logOut(d);
-					self.fire(&#x27;send&#x27;,&#x27;QUIT : &#x27;+msg,self);
-				});
-			}catch(e){}
-			try{
-				self.socket.end();
-			}catch(e){}
-		}
-		try{
-			self.socket.destroy();
-		}catch(e){}
-		delete self.socket;
-		return self;
-	};
-	self.destroy = function(){
-		self.info(&#x27;Removing Server&#x27;);
-		clearInterval(interval);
-		self.quit();
-		self.debug(&#x27;Disabling scripts&#x27;);
-		for(var i in self.scripts){
-			self.scripts[i].disable();
-		}
-		require(&#x27;./api.js&#x27;).servers.splice(self.id,1);
-	};
-	process.on(&#x27;exit&#x27;,function(){
-		self.destroy();
-	});
-	self.debug(&#x27;Loading server scripts&#x27;);
-	self.debug(&#x27; |- lib/server.js&#x27;);
-	self.on(&#x27;error&#x27;,function(e){
-			self.error(e);
-		})
-		// RPL_WELCOME
-		.on(/:.+ 001 .+ :.+/i,function(){
-			var i;
-			for(i=0;i&lt;config.channels.length;i++){
-				self.join(config.channels[i]);
-			}
-			if(self.config.nickserv !== undefined){
-				self.send(&#x27;PRIVMSG NickServ :identify &#x27;+self.config.nickserv.nick+&#x27; &#x27;+self.config.nickserv.password);
-			}
-		})
-		// RPL_MYINFO
-		.on(/:.+ 004 .+ (.+) .+ \w+ \w+/i,function(m){
-			// 1 - server name
-			self.name = m[1];
-			self.fire(&#x27;servername&#x27;,[],self);
-		})
-		// PRIVMSG
-		.on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sPRIVMSG\s(\#?\w+)\s:?([^\x01].+?[^\x01])$/i,function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - text
-			var i,
-				u = self.user(m[1]),
-				ch = self.channel(m[4]);
-			if(ch === false){
-				ch = new Channel(self,m[4]);
-			}
-			if(u === false){
-				u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-				u.channels.push(ch);
-				self.users.push(u);
-			}
-			self.fire(&#x27;message&#x27;,[m[5]],{
-				channel: ch,
-				user: u
-			});
-		})
-		// ACTION
-		.on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sPRIVMSG\s(\#?\w+)\s:?\x01ACTION (.+)?\x01$/i,function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - text
-			var i,
-				u = self.user(m[1]),
-				ch = self.channel(m[4]);
-			if(ch === false){
-				ch = new Channel(self,m[4]);
-			}
-			if(u === false){
-				u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-				u.channels.push(ch);
-				self.users.push(u);
-			}
-			self.fire(&#x27;action&#x27;,[m[5]],{
-				channel: ch,
-				user: u
-			});
-		})
-		// NOTICE
-		.on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sNOTICE\s(\#?\w+)\s:?(.+)$/i,function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - text
-			var i,
-				u = self.user(m[1]),
-				ch = self.channel(m[4]);
-			if(ch === false){
-				ch = new Channel(self,m[4]);
-			}
-			if(u === false){
-				u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-				u.channels.push(ch);
-				self.users.push(u);
-			}
-			self.fire(&#x27;notice&#x27;,[m[5]],{
-				channel: ch,
-				user: u
-			});
-		})
-		.on(new RegExp(&quot;^:([^ ]+)!([^ ]+)@([^ ]+)\\sPRIVMSG\\s(\\#?\\w+)\\s:?&quot;+tools.regexString(self.config.prefix)+&quot;(\\S+)\\s?(.+)?$&quot;,&#x27;i&#x27;),function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - command
-			// 6 - arguments
-			var c = self.commands[m[5]],
-				i,
-				a = m[6],
-				u = self.user(m[1]),
-				ch = self.channel(m[4]);
-			a = a===undefined?[]:a.split(&#x27; &#x27;);
-			if(ch === false){
-				ch = new Channel(self,m[4]);
-			}
-			if(u === false){
-				u = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-				u.channels.push(ch);
-				self.users.push(u);
-			}
-			if(c !== undefined){
-				c.fn.apply({
-					server: self,
-					argv: a,
-					channel: ch,
-					user: u
-				},a);
-			}
-		})
-		// RPL_ENDOFWHO
-		.on(new RegExp(&#x27;:.+ 315 .+ (\\S+) :End of \/WHO list.&#x27;,&#x27;i&#x27;),function(m){
-			// 1 - channel
-			var c = self.channel(m[1]);
-			if(!c){
-				c = new Channel(self,m[1]);
-				self.channels.push(c);
-			}
-			self.fire(&#x27;who&#x27;,[c],self);
-		})
-		// RPL_WHOREPLY
-		.on(/:.+ 352 .+ (.+) (.+) (.+) (.+) (.+) .+ :(\d+) (.+)/i,function(m){
-			// 1 - channel
-			// 2 - username
-			// 3 - host
-			// 4 - 
-			// 5 - nick
-			// 6 - 
-			// 7 - realname
-			var user = self.user(m[5]),
-				channel = self.channel(m[1]);
-			if(!channel){
-				channel = new Channel(self,m[1]);
-				self.channels.push(channel);
-			}
-			if(user){
-				if(user.channels.indexOf(channel)){
-					user.channels.push(channel);
-				}
-			}else{
-				user = new User(m[5],m[2],m[3],m[7],self);
-				user.channels.push(channel);
-				self.user(user);
-			}
-			user.whois();
-		})
-		// RPL_WHOISUSER
-		.on(/:.+ 311 \S+ (\S+) (\S+) (\S+) \* :(.+)/i,function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - realname
-			var user = self.user(m[1]),
-				owner,
-				i;
-			if(!user){
-				user = new User(m[1],m[2],m[3],m[4],self);
-				self.users.push(user);
-			}else{
-				user.username = m[2];
-				user.host = m[3];
-				user.realname = m[4];
-			}
-			owner = owners.match(user.hostmask);
-			if(owner !== undefined){
-				console.log(&#x27;Checking owner flags&#x27;);
-				if(owner.flags.indexOf(&#x27;v&#x27;) != -1){
-					for(i=0;i&lt;user.channels.length;i++){
-						user.channels[i].mode(&#x27;+v&#x27;,user.nick);
-					}
-				}
-			}
-		})
-		// RPL_WHOISCHANNELS
-		.on(/:.+ 319 .+ (\S+) :(.+)/i,function(m){
-			// 1 - Nick
-			// 2 - channels
-			var user = (function(nick){
-					var u = self.user(nick);
-					if(!u){
-						u = new User(nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-					}
-					return u;
-				})(m[1]),
-				channels = m[2].split(&#x27; &#x27;),
-				i,
-				ii,
-				channel,
-				name,
-				modes,
-				mode;
-			user.modes = {};
-			for(i=0;i &lt; channels.length;i++){
-				name = channels[i].match(/([+%@&amp;~])?([.~+!#&amp;]?.+)/);
-				if(name){
-					modes = name[1]===undefined?[]:name[1];
-					name = name[2];
-					channel = self.channel(name);
-					if(!channel){
-						channel = new Channel(self,name);
-						self.channels.push(channel);
-					}
-					if(user.channels.indexOf(channel) == -1){
-						user.channels.push(channel);
-					}
-					user.modes[channel.name] = [];
-					for(ii=0;ii &lt; modes.length;ii++){
-						mode = modes[i];
-						switch(mode){
-							case &#x27;+&#x27;:
-								mode=&#x27;v&#x27;;
-							break;
-							case &#x27;%&#x27;:
-								mode=&#x27;h&#x27;;
-							break;
-							case &#x27;@&#x27;:
-								mode=&#x27;o&#x27;;
-							break;
-							case &#x27;&amp;&#x27;:
-								mode=&#x27;a&#x27;;
-							break;
-							case &#x27;~&#x27;:
-								mode=&#x27;q&#x27;;
-							break;
-						}
-						if(mode !== undefined){
-							user.modes[channel.name].push(mode);
-						}
-					}
-				}
-			}
-		})
-		// RPL_CHANNELMODEIS
-		.on(/:.+ 324 .+ (\S+) \+(.+)/i,function(m){
-			// 1 - channel
-			// 2 - modes
-			var channel = self.channel(m[1]),
-				i,
-				modes = m[2];
-			if(!channel){
-				channel = new Channel(m[1],self);
-				self.channels.push(channel);
-			}
-			for(i in channel.modes){
-				if(!(channel.modes[i] instanceof Array)){
-					channel.modes[i] = modes.indexOf(i) !== -1;
-				}
-			}
-		})
-		// RPL_BANLIST RPL_EXCEPTLIST RPL_INVITELIST
-		.on(/:.+ (367|348|346) \S+ (\S+) (\S+) (\S+) (\d+)/i,function(m){
-			// 1 - code
-			// 2 - channel
-			// 3 - hostmask
-			// 4 - user
-			// 5 - timestamp
-			var channel = self.channel(m[1]),
-				i,
-				mode;
-			switch(m[1]){
-				case 367:mode=&#x27;b&#x27;;break;
-				case 348:mode=&#x27;e&#x27;;break;
-				case 346:mode=&#x27;I&#x27;;break;
-			}
-			if(!channel){
-				channel = new Channel(m[2],self);
-				self.channels.push(channel);
-			}
-			if(!(channel.modes[mode] instanceof Array)){
-				channel.modes[mode] = [];
-			}
-			if(channel.modes[mode].indexOf(m[3]) === -1){
-				channel.modes[mode].push(m[3]);
-			}
-		})
-		// RPL_NOTOPIC RPL_TOPIC
-		.on(/:.+ (331|332) \S+ (\S+) :(.+)/i,function(m){
-			// 1 - code
-			// 2 - channel
-			// 3 - topic
-			var channel = self.channel(m[2]),
-				user = self.user(self.name);
-			if(!channel){
-				channel = new Channel(m[2],self);
-				self.channels.push(channel);
-			}
-			if(!user){
-				user =  new User(self.name,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-			}
-			if(m[1] == 331){
-				channel._topic = [null];
-			}else{
-				channel._topic = [m[3]];
-			}
-			self.fire(&#x27;topic&#x27;,[&#x27;&#x27;,m[3]],{
-				channel: channel,
-				user: user
-			});
-		})
-		// TOPIC
-		.on(/:(\S+)\!(.+)@(.+) TOPIC (\S+) :(.+)/i,function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - topic
-			var channel = self.channel(m[4]),
-				user = self.user(m[1]);
-			if(!channel){
-				channel = new Channel(m[4],self);
-				self.channels.push(channel);
-			}
-			if(!user){
-				user =  new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-			}
-			self.fire(&#x27;topic&#x27;,[channel.topic,m[5]],{
-				channel: channel,
-				user: user
-			});
-			channel._topic = [m[5]];
-		})
-		// JOIN
-		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) JOIN :(\\S+)&#x27;,&#x27;i&#x27;),function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			var channel = (function(){
-					var c = self.channel(m[4]);
-					if(!c){
-						c = new Channel(m[4],self);
-						self.channels.push(c);
-					}
-					return c;
-				})(),
-				user,
-				owner;
-			if(m[1] == self.config.nick){
-				channel.who();							// get users
-				self.send(&#x27;MODE &#x27;+channel.name);		// get modes
-				self.send(&#x27;MODE &#x27;+channel.name+&#x27; b&#x27;);	// get bans
-				self.send(&#x27;MODE &#x27;+channel.name+&#x27; e&#x27;);	// get exceptions
-				self.send(&#x27;MODE &#x27;+channel.name+&#x27; I&#x27;);	// get invitation masks
-			}else{
-				user = self.user(m[1]);
-				if(!user){
-					user = new User(m[1],m[2],m[3],&#x27;&#x27;,self);
-					self.users.push(user);
-				}
-				user.channels.push(channel);
-				user.whois();
-				self.fire(&#x27;join&#x27;,[],{
-					channel: channel,
-					user: user,
-					owners: owners
-				});
-			}
-		})
-		// PART
-		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) PART (\\S+)&#x27;,&#x27;i&#x27;),function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			var channel = (function(){
-					var c = self.channel(m[4]);
-					if(!c){
-						c = new Channel(m[4],self);
-						self.channels.push(c);
-					}
-					return c;
-				})(),
-				user = self.user(m[1]);
-			if(user &amp;&amp; user.channels.indexOf(channel) != -1){
-				user.channels.splice(user.channels.indexOf(channel),1);
-				self.fire(&#x27;part&#x27;,[],{
-					channel: channel,
-					user: user,
-					owners: owners
-				});
-			}
-		})
-		// QUIT
-		.on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) QUIT :?(.+)&#x27;,&#x27;i&#x27;),function(m){
-			// 1 - nick
-			// 2 - username
-			// 3 - host
-			// 4 - message
-			var user = self.user(m[1]),
-				chans;
-			if(user){
-				chans = user.channels.slice(0);
-				self.fire(&#x27;quit&#x27;,[m[4],chans],{
-					user: user
-				});
-			}
-		})
-		// MODE
-		.on(/:([^ ]+)\!([^ ]+)@([^ ]+) MODE (\S+) (\S+) ?(.+)?/i,function(m){
-			// 1 - nick (doing the action)
-			// 2 - username
-			// 3 - host
-			// 4 - channel
-			// 5 - modes
-			// 6 - nick (recieving the action)
-			var guser = function(nick){
-					var user = self.user(nick); //m[6]
-					if(!user){
-						user = new User(nick===undefined?m[1]:nick,&#x27;&#x27;,&#x27;&#x27;,&#x27;&#x27;,self);
-						self.users.push(user);
-					}
-					if(user.channels.indexOf(channel) === -1){
-						user.channels.push(channel);
-					}
-					if(user.modes[channel.name] === undefined){
-						user.modes[channel.name] = [];
-					}
-					return user;
-				},
-				channel = self.channel(m[4]),
-				target,
-				value,
-				i,
-				ii = 0,
-				user,
-				state = m[5][0]==&#x27;+&#x27;,
-				mode,
-				index,
-				argv = m[6] === undefined?[]:m[6].split(&#x27; &#x27;);
-			if(!channel){
-				channel = new Channel(m[4],self);
-			}
-			for(i=1;i&lt;m[5].length;i++){
-				mode = m[5][i];
-				if(&#x27;+-&#x27;.indexOf(mode) !== -1){
-					state = mode==&#x27;+&#x27;;
-				}else{
-					if(&#x27;vhoaq&#x27;.indexOf(mode) !== -1 &amp;&amp; argv[ii] !== undefined){
-						user = guser(argv[ii]);
-						if(state){
-							if(user.modes[channel.name].indexOf(mode) === -1){
-								user.modes[channel.name].push(mode);
-							}
-						}else{
-							index = user.modes[channel.name].indexOf(mode);
-							if(index !== -1){
-								user.modes[channel.name].splice(index,1);
-							}
-						}
-						target = user;
-						value = user.nick;
-					}else if(&#x27;bdefIJklLR&#x27;.indexOf() &amp;&amp; argv[ii] !== undefined){
-						if(state){
-							if(!(channel.modes[mode] instanceof Array)){
-								channel.modes[mode] = [];
-							}
-							channel.modes[mode].push(argv[ii]);
-							target = channel;
-							value = argv[ii];
-						}else{
-							if(channel.modes[mode] instanceof Array){
-								index = channel.modes[mode].indexOf(argv[ii]);
-								if(index !== -1){
-									channel.modes[mode].splice(index,1);
-								}
-								if(channel.modes[mode].length === 0){
-									channel.modes[mode] = false;
-								}
-							}else{
-								channel.modes[mode] = false;
-							}
-							target = channel;
-							value = argv[ii]===undefined?&#x27;&#x27;:argv[ii];
-						}
-					}else{
-						channel.modes[mode] = state;
-						value = &#x27;&#x27;;
-						target = channel;
-					}
-					self.fire(&#x27;mode&#x27;,[mode,state,value],{
-						user: guser(m[1]),
-						channel: channel,
-						target: target
-					});
-					ii++;
-				}
-			}
-		})
-		.add(&#x27;help&#x27;,function(){
-			var i,a;
-			if(this.argv.length === 0){
-				var s = &#x27;Available commands: &#x27;;
-				for(i in self.commands){
-					s += i+&#x27;, &#x27;;
-				}
-				s = s.substr(0,s.length-2);
-				self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+s);
-			}else{
-				for(i in this.argv){
-					a = this.argv[i];
-					if(self.commands[a] === undefined){
-						self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: undefined&#x27;);
-					}else{
-						self.send(&#x27;PRIVMSG &#x27;+this.channel.name+&#x27; :&#x27;+a+&#x27;: &#x27;+self.commands[a].help);
-					}
-				}
-			}
-		},&#x27;Provides information on available commands&#x27;);
-	var api = require(&#x27;./api.js&#x27;),
-		fn = function(i){
-			self.scripts[ii] = new Script(&#x27;mods/&#x27;+mods[ii]+&#x27;/scripts/server.js&#x27;,self,i);
-		},
-		mods = api.mods(&#x27;server&#x27;);
-	api.servers.push(self);
-	for(ii=0;ii&lt;mods.length;ii++){
-		self.debug(&#x27; |- &#x27;+mods[ii]);
-		self.run(ii+1,fn);
-	}
-	interval = setInterval(function(){
-		if(self.socket!==undefined){
-			var d = new Date(+new Date);
-			if(d.getDate() != date.getDate()){
-				date = d;
-				self.fire(&#x27;datechange&#x27;,[],{});
-			}
-		}
-	},1000);
-	return self;
+    var self = this,
+        date = new Date(+new Date()),
+        interval,
+        defaults = {
+            host: &#x27;&#x27;,
+            port: 6667,
+            nick: &#x27;&#x27;,
+            username: &#x27;&#x27;,
+            name: &#x27;&#x27;,
+            nickserv: undefined,
+            channels: [],
+            scripts: [],
+            showping: false
+        },
+        map = [],
+        sid = 0,
+        i,
+        ii;
+    for(i in defaults){
+        if(config[i] === undefined){
+            config[i] = defaults[i];
+        }
+    }
+    /**
+     * stores the server identifier
+     * @property id
+     * @type {number}
+     * @static
+     */
+    Object.defineProperty(self, &#x27;id&#x27;, {
+        get: function(){
+            return require(&#x27;./api.js&#x27;).servers.indexOf(self);
+        }
+    });
+    /**
+     * Gives the servers name
+     * @property name
+     * @type {string}
+     * @static
+     */
+    self.name = config.host;
+    /**
+     * Array of channels on the server
+     * @property channels
+     * @type {Array}
+     */
+    self.channels = [];
+    /**
+     * Array of users on the server that are known
+     * @property users
+     * @type {Array}
+     */
+    self.users = [];
+    /**
+     * Array of all hooks installed on the server
+     * @property hooks
+     * @type {Array}
+     */
+    self.hooks = [];
+    /**
+     * Array of all the scripts installed on the server
+     * @property scripts
+     * @type {Array}
+     */
+    self.scripts = [];
+    /**
+     * Array of all the commands on the server
+     * @property commands
+     * @type {Object}
+     */
+    self.commands = {};
+    /**
+     * Server config
+     * @property config
+     * @type {Object}
+     */
+    self.config = {};
+    /**
+     * Run function in the context of a specific script
+     * @method run
+     * @param {number} id Script ID to run under (0 == run as server)
+     * @param {function} fn function to run
+     * @chainable
+     */
+    self.run = function(id, fn){
+        var osid = sid;
+        sid = id;
+        fn.call(self, sid);
+        sid = osid;
+        return self;
+    };
+    for(i in config){
+        switch(i){
+            case&#x27;channels&#x27;:break;
+            case&#x27;scripts&#x27;:break;
+            default:
+                self.config[i] = config[i];
+        }
+    }
+    /**
+     * Log something in the context of the server
+     * @method log
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.log = function(msg){
+        log.alert(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * Log something in the context of the server
+     * @method info
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.info = function(msg){
+        log.info(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * Log something in the context of the server
+     * @method debug
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.debug = function(msg){
+        debug.log(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * Log something in the context of the server
+     * @method error
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.error = function(msg){
+        if(msg instanceof Error){
+            log.trace(msg);
+        }else{
+            log.error(new Error(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg));
+        }
+        return self;
+    };
+    /**
+     * log.in something in the context of the server
+     * @method logIn
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.logIn = function(msg){
+        log.in(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * log.out something in the context of the server
+     * @method logOut
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.logOut = function(msg){
+        log.out(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * log.error something in the context of the server
+     * @method logError
+     * @param {mixed} msg Message to log
+     * @chainable
+     */
+    self.logError = function(msg){
+        log.error(&#x27;[&#x27; + self.config.host + &#x27;:&#x27; + self.config.port + &#x27;] &#x27; + msg);
+        return self;
+    };
+    /**
+     * Connect to the IRC server
+     * @method connect
+     * @chainable
+     */
+    self.connect = function(){
+        if(self.socket === undefined){
+            log.log(&#x27;Connecting to &#x27; + self.config.host + &#x27;:&#x27; + self.config.port);
+            self.socket = new net.Socket();
+            self.socket.setNoDelay(true);
+            // self.socket.setEncoding(&#x27;binary&#x27;);
+            self.socket.on(&#x27;connect&#x27;, function(){
+                self.connected = true;
+                self.info(&#x27;Connection established (evt)&#x27;);
+                self.fire(&#x27;connect&#x27;, arguments, self);
+                self.attempts = 0;
+            });
+            self.socket.on(&#x27;data&#x27;, function(d){
+                var buf = tools.convert(d);
+                d = buf.toString(&#x27;UTF-16LE&#x27;);
+                var s = d.split(&#x27;\r\n&#x27;), // eslint-disable-line one-var
+                    ii,
+                    match,
+                    m,
+                    o;
+                self.fire(&#x27;data&#x27;, [d, buf], self);
+                for(ii = 0; ii &lt; s.length; ii++){
+                    if(s[ii] !== &#x27;&#x27;){
+                        if((m = /^PING :(.+)/i.exec(s[ii]))){
+                            if(self.config.showping){
+                                self.logIn(s[ii]);
+                            }else{
+                                o = log.config.levels.out;
+                                log.config.levels.out = false;
+                            }
+                            self.send(&#x27;PONG :&#x27; + m[1]);
+                            if(!self.config.showping){
+                                log.config.levels.out = o;
+                            }
+                            self.fire(&#x27;ping&#x27;, arguments, self);
+                        }else{
+                            self.logIn(s[ii]);
+                        }
+                        self.hooks.forEach(function(hook, i){
+                            if(hook.type === &#x27;regex&#x27;){
+                                match = hook.regex.exec(s[ii]);
+                                if(match){
+                                    hook.fn.call(self, match, s[ii]);
+                                    if(hook.once){
+                                        self.hooks.splice(i, 1);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                // TODO - incoming data
+            });
+            self.socket.on(&#x27;drain&#x27;, function(){
+                self.debug(&#x27;Drain event&#x27;);
+                self.fire(&#x27;drain&#x27;, arguments, self);
+                // TODO - No more outgoing data
+            });
+            self.socket.on(&#x27;error&#x27;, function(e){
+                self.info(&#x27;Connection errored&#x27;);
+                self.connected = false;
+                self.fire(&#x27;error&#x27;, arguments, self);
+                self.error(e);
+                setTimeout(function(){
+                    self.reconnect();
+                }, 1000);
+            });
+            self.socket.on(&#x27;timeout&#x27;, function(){
+                self.info(&#x27;Connection timed out&#x27;);
+                self.connected = false;
+                self.fire(&#x27;timeout&#x27;, arguments, self);
+                setTimeout(function(){
+                    self.reconnect();
+                }, 1000);
+            });
+            self.socket.on(&#x27;end&#x27;, function(){
+                self.info(&#x27;Connection ended&#x27;);
+                self.connected = false;
+                self.fire(&#x27;end&#x27;, arguments, self);
+                // TODO - server closed connection
+                setTimeout(function(){
+                    self.reconnect();
+                }, 1000);
+            });
+            self.socket.on(&#x27;close&#x27;, function(e){
+                self.connected = false;
+                if(e){
+                    self.info(&#x27;Connection closed due to an error&#x27;);
+                    setTimeout(function(){
+                        self.reconnect();
+                    }, 1000);
+                }else{
+                    self.info(&#x27;Connection closed&#x27;);
+                    self.fire(&#x27;close&#x27;, arguments, self);
+                }
+            });
+            self.socket.connect(self.config.port, self.config.host, function(){
+                self.info(&#x27;Connection established&#x27;);
+                self.send(&#x27;NICK &#x27; + self.config.nick);
+                self.send(&#x27;USER &#x27; + self.config.name + &#x27; localhost * &#x27; + self.config.name);
+            });
+        }
+        return self;
+    };
+    /**
+     * Send a message to the IRC server
+     * @method send
+     * @param {string} d Message to send
+     * @chainable
+     */
+    self.send = function(d){
+        if(d.length &gt; 510){
+            self.fire(&#x27;error&#x27;, [new Error(&#x27;Send String too long&#x27;)], self);
+            return self;
+        }
+        try{
+            if(self.socket){
+                self.socket.write(d + &#x27;\r\n&#x27;, &#x27;ascii&#x27;, function(){
+                    self.logOut(d);
+                    self.fire(&#x27;send&#x27;, [d], self);
+                });
+            }
+        }catch(e){
+            self.error(e);
+            self.fire(&#x27;error&#x27;, [e], self);
+        }
+        return self;
+    };
+    /**
+     * Install a hook on the server.
+     * @method on
+     * @param {string|RegExp} hook Hook to install (can be named or RegExp)
+     * @param {function} callback Callback to run when the hook fires
+     * @param {boolean} [once=false] Should this hook uninstall itself when it is run?
+     * @chainable
+     */
+    self.on = function(hook, callback, once){
+        self.debug(&#x27; |  |- Hook &#x27; + hook);
+        once = once === undefined ? false : once;
+        var stack = new Error().stack.split(&#x27;\n&#x27;)[2];
+        if(hook instanceof RegExp){
+            self.hooks.push({
+                type: &#x27;regex&#x27;,
+                regex: hook,
+                fn: callback,
+                once: once,
+                sid: sid,
+                stack: stack
+            });
+        }else{
+            self.hooks.push({
+                type: &#x27;event&#x27;,
+                name: hook,
+                fn: callback,
+                once: once,
+                sid: sid,
+                stack: stack
+            });
+        }
+        return self;
+    };
+    /**
+     * Uninstall a hook from the server
+     * @method off
+     * @param {string|RegExp} hook Hook to remove
+     * @param {function} [callback] callback used in the hook you want to remove
+     * @chainable
+     */
+    self.off = function(hook, callback){
+        self.debug(&#x27; |  |- Number of hooks:&#x27; + self.hooks.length);
+        self.debug(&#x27; |  |- Current sid: &#x27; + sid);
+        if(arguments.length === 0){
+            self.scriptHooks(sid).forEach(function(h){
+                h.type = &#x27;disabled&#x27;;
+            });
+        }else{
+            self.scriptHooks(sid).forEach(function(h, i){
+                if(
+                    (
+                        (hook === undefined) ||
+                        (hook instanceof RegExp &amp;&amp; h.type === &#x27;regex&#x27; &amp;&amp; h.regex === hook) ||
+                        (h.type === &#x27;event&#x27; &amp;&amp; h.name === hook)
+                    ) &amp;&amp; (
+                        callback === undefined ||
+                        h.fn === callback
+                    )
+                ){
+                    self.debug(&#x27; |  |- Drop Hook &#x27; + h.name);
+                    h.type = &#x27;disabled&#x27;;
+                }
+            });
+        }
+        self.debug(&#x27; |  |- Number of hooks:&#x27; + self.hooks.length);
+        return self;
+    };
+    self.scriptHooks = function(sid){
+        sid = sid === undefined ? 0 : sid;
+        return self.hooks.filter(function(h){
+            return h.type !== &#x27;disabled&#x27; &amp;&amp; h.sid === sid;
+        });
+    };
+    /**
+     * Add a command to the server
+     * @method add
+     * @param {string} command Command name (used to invoke command)
+     * @param {function} callback Callback to run when command invoked
+     * @param {string} help Help line for the command
+     * @chainable
+     */
+    self.add = function(command, callback, help){
+        if(self.commands[command] === undefined){
+            self.debug(&#x27; |  |- Command &#x27; + command);
+            self.commands[command] = {
+                fn: callback,
+                sid: sid,
+                help: help
+            };
+        }
+        return self;
+    };
+    /**
+     * Remove a command listener from the server
+     * @method remove
+     * @param {string} command Command you want to remove
+     * @chainable
+     */
+    self.remove = function(command){
+        var i,
+            n = {};
+        if(command === undefined){
+            for(i in self.commands){
+                if(self.commands[i].sid !== sid){
+                    n[i] = self.commands[i];
+                }
+            }
+            self.commands = n;
+        }else{
+            for(i in self.commands){
+                if(i !== command){
+                    n[i] = self.commands[i];
+                }
+            }
+            self.commands = n;
+        }
+        return self;
+    };
+    /**
+     * Fire an event on the IRC server
+     * @method fire
+     * @param {string} name Name of the event to trigger
+     * @param {array} args Arguments to provide the event callbacks
+     * @param {mixed} scope What the event callbacks should use for the &#x27;this&#x27; keyword
+     * @chainable
+     */
+    self.fire = function(name, args, scope){
+        scope = scope === undefined ? self : scope;
+        args = args === undefined ? [] : args;
+        self.hooks.forEach(function(hook, i){
+            if(hook.type === &#x27;event&#x27; &amp;&amp; hook.name === name){
+                try{
+                    hook.fn.apply(scope, args);
+                }catch(e){
+                    self.error(e.message);
+                    self.error(hook.stack);
+                }
+            }
+        });
+        return self;
+    };
+    /**
+     * Join a channel
+     * @method join
+     * @param {string} name Channel name
+     * @chainable
+     */
+    self.join = function(name){
+        // TODO - handle adding to channel array if it doesn&#x27;t already exist
+        var channel = self.channel(name),
+            user = self.user(self.config.nick);
+        if(!channel){
+            channel = new Channel(self, name);
+            self.channels.push(channel);
+        }
+        channel.join();
+        if(!user){
+            user = new User(self.config.nick, &#x27;&#x27;, self.config.username, self.config.name, self);
+            self.users.push(user);
+        }
+        user.channels.push(channel);
+        user.whois();
+        self.fire(&#x27;join&#x27;, [], {
+            channel: channel,
+            user: user,
+            owners: owners
+        });
+        return self;
+    };
+    /**
+     * Leave a channel
+     * @method part
+     * @param {string} name Name of the channel
+     * @chainable
+     */
+    self.part = function(name){
+        var c = self.channel(name);
+        if(c){
+            c.part();
+        }
+        return self;
+    };
+    /**
+     * Check if in a channel
+     * @method in
+     * @param {string} name Name of the channel
+     * @return {boolean} status of server in channel
+     */
+    self.in = function(name){
+        // TODO - detect if actually joined to channel and not just created for shits/giggles... I mean for record keeping
+        for(var i = 0; i &lt; self.channels.length; i++){
+            if(self.channels[i].name === name){
+                return true;
+            }
+        }
+        return false;
+    };
+    /**
+     * Get a channel based on it&#x27;s name
+     * @method channel
+     * @param {string} name Name of the channel
+     * @return {Channel|boolean} Returns false if channel doesn&#x27;t exist. Returns the channel otherwise
+     */
+    self.channel = function(name){
+        for(var i = 0; i &lt; self.channels.length; i++){
+            if(self.channels[i].name === name){
+                return self.channels[i];
+            }
+        }
+        return false;
+    };
+    /**
+     * Gets the user or syncs a user on the server
+     * @method user
+     * @param {string|User} user User object to sync or nick you want the user object for
+     * @return {User} The user object
+     */
+    self.user = function(user){
+        var i,
+            old;
+        if(user instanceof User){
+            for(i = 0; i &lt; self.users.length; i++){
+                if(self.users[i].nick === user.nick){
+                    old = self.users[i];
+                }
+            }
+            if(old !== undefined){
+                for(i in user){
+                    old[i] = user[i];
+                }
+            }else{
+                old = user;
+                self.users.push(user);
+            }
+        }else{
+            for(i = 0; i &lt; self.users.length; i++){
+                if(self.users[i].nick === user){
+                    old = self.users[i];
+                }
+            }
+            old = old === undefined ? false : old;
+        }
+        return old;
+    };
+    /**
+     * Gets a script based on the sid
+     * @method script
+     * @param {number} sid
+     * @return {boolean|Script} Returns false if script is not found, otherwise returns the script.
+     */
+    self.script = function(sid){
+        var s = self.scripts[sid - 1];
+        return s === undefined || s === null ? false : s;
+    };
+    /**
+     * Reconnects to the IRC server
+     * @method reconnect
+     * @chainable
+     */
+    self.reconnect = function(){
+        self.attempts++;
+        if(self.attempts &lt; 10){
+            self.info(&#x27;Reconnecting (attempt &#x27; + self.attempts + &#x27;)&#x27;);
+            self.quit();
+            self.connect();
+            self.fire(&#x27;reconnect&#x27;, arguments, self);
+        }else{
+            self.info(&#x27;Too many reconnect attempts&#x27;);
+            self.quit();
+            self.fire(&#x27;stop&#x27;, arguments, self);
+        }
+        return self;
+    };
+    self.attempts = 0;
+    self.connected = false;
+    /**
+     * Quits from the IRC server
+     * @method quit
+     * @param {string} [msg=string] Quit message. defaults to &quot;Bot shutting down&quot;.
+     * @chainable
+     */
+    self.quit = function(msg){
+        msg = msg === undefined ? &#x27;Bot shutting down&#x27; : msg;
+        var user = self.user(self.config.nick),
+            channels = self.channels.filter(function(c){
+                return c.active;
+            });
+        self.fire(&#x27;quit&#x27;, [msg, channels], {
+            user: user
+        });
+        if(!user){
+            user = new User(self.config.nick, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;, self);
+        }
+        if(self.connected){
+            try{
+                self.socket.write(msg + &#x27;\r\n&#x27;, &#x27;ascii&#x27;, function(){
+                    self.logOut(msg);
+                    self.fire(&#x27;send&#x27;, &#x27;QUIT : &#x27; + msg, self);
+                });
+            }catch(e){}
+            try{
+                self.socket.end();
+            }catch(e){}
+        }
+        try{
+            self.socket.destroy();
+        }catch(e){}
+        delete self.socket;
+        return self;
+    };
+    self.destroy = function(){
+        self.info(&#x27;Removing Server&#x27;);
+        clearInterval(interval);
+        self.quit();
+        self.debug(&#x27;Disabling scripts&#x27;);
+        self.scripts.forEach(function(script){
+            script.disable();
+        });
+        require(&#x27;./api.js&#x27;).servers.splice(self.id, 1);
+    };
+    process.on(&#x27;exit&#x27;, function(){
+        self.info(&#x27;Server handling process exit&#x27;);
+        self.destroy();
+    });
+    self.debug(&#x27;Loading server scripts&#x27;);
+    self.debug(&#x27; |- lib/server.js&#x27;);
+    self.on(&#x27;error&#x27;, function(e){
+        self.error(e);
+    })
+        // RPL_WELCOME
+        .on(/:.+ 001 .+ :.+/i, function(){
+            var i;
+            for(i = 0; i &lt; config.channels.length; i++){
+                self.join(config.channels[i]);
+            }
+            if(self.config.nickserv !== undefined){
+                self.send(&#x27;PRIVMSG NickServ :identify &#x27; + self.config.nickserv.nick + &#x27; &#x27; + self.config.nickserv.password);
+            }
+            self.send(&#x27;MODE &#x27; + self.config.nick + &#x27; +B&#x27;);
+        })
+        // RPL_MYINFO
+        .on(/:.+ 004 .+ (.+) .+ \w+ \w+/i, function(m){
+            // 1 - server name
+            self.name = m[1];
+            self.fire(&#x27;servername&#x27;, [], self);
+            self.send(&#x27;MAP&#x27;);
+        })
+        // RPL_BOUNCE
+        .on(/:.+ 005 :Try server (.+), port (.+)/i, function(m){
+            // 1 - server
+            // 2 - port
+            self.info(&#x27;Server bounce. Trying &#x27; + m[1] + &#x27;:&#x27; + m[2]);
+            config.host = m[1];
+            config.port = m[2];
+            self.reconnect();
+        })
+        //
+        .on(/:.+ (?:006|015) .+ :([\s-_&#x60;]+)([^\s]+)\s+\((.+)\)/i, function(m){
+            // 1 - indentation
+            // 2 - server
+            // 3 - client count
+            map.push({
+                prefix: m[1],
+                name: m[2],
+                clients: m[3],
+                line: m[1] + &#x27; &#x27; + m[2] + &#x27; (&#x27; + m[3] + &#x27; clients)&#x27;
+            });
+        })
+        // RPL_MAPEND
+        .on(/:.+ (007|017) .+/i, function(m){
+            map.forEach(function(s, i){
+                self.info(s.line);
+            });
+            map = [];
+        })
+        // RPL_WHOREPLY
+        .on(/:.+ 352 .+ (.+) (.+) (.+) (.+) (.+) .+ :(\d+) (.+)/i, function(m){
+            // 1 - channel
+            // 2 - username
+            // 3 - host
+            // 4 -
+            // 5 - nick
+            // 6 -
+            // 7 - realname
+            var user = self.user(m[5]),
+                channel = self.channel(m[1]);
+            if(!channel){
+                channel = new Channel(self, m[1]);
+                self.channels.push(channel);
+            }
+            if(user){
+                if(user.channels.indexOf(channel)){
+                    user.channels.push(channel);
+                }
+            }else{
+                user = new User(m[5], m[2], m[3], m[7], self);
+                user.channels.push(channel);
+                self.user(user);
+            }
+            user.whois();
+        })
+        // RPL_WHOISUSER
+        .on(/:.+ 311 \S+ (\S+) (\S+) (\S+) \* :(.+)/i, function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - realname
+            var user = self.user(m[1]),
+                owner,
+                i;
+            if(!user){
+                user = new User(m[1], m[2], m[3], m[4], self);
+                self.users.push(user);
+            }else{
+                user.username = m[2];
+                user.host = m[3];
+                user.realname = m[4];
+            }
+            owner = owners.match(user.hostmask);
+            if(owner !== undefined){
+                if(owner.flags.indexOf(&#x27;v&#x27;) !== -1){
+                    for(i = 0; i &lt; user.channels.length; i++){
+                        user.channels[i].mode(&#x27;+v&#x27;, user.nick);
+                    }
+                }
+            }
+        })
+        // RPL_WHOISCHANNELS
+        .on(/:.+ 319 .+ (\S+) :(.+)/i, function(m){
+            // 1 - Nick
+            // 2 - channels
+            var user = (function(nick){
+                    var u = self.user(nick);
+                    if(!u){
+                        u = new User(nick, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;, self);
+                    }
+                    return u;
+                })(m[1]),
+                channels = m[2].split(&#x27; &#x27;),
+                i,
+                ii,
+                channel,
+                name,
+                modes,
+                mode;
+            user.modes = {};
+            for(i = 0; i &lt; channels.length; i++){
+                name = channels[i].match(/([+%@&amp;~])?([.~+!#&amp;]?.+)/);
+                if(name){
+                    modes = name[1] === undefined ? [] : name[1];
+                    name = name[2];
+                    channel = self.channel(name);
+                    if(!channel){
+                        channel = new Channel(self, name);
+                        self.channels.push(channel);
+                    }
+                    if(user.channels.indexOf(channel) === -1){
+                        user.channels.push(channel);
+                    }
+                    user.modes[channel.name] = [];
+                    for(ii = 0; ii &lt; modes.length; ii++){
+                        mode = modes[i];
+                        switch(mode){
+                            case&#x27;+&#x27;:
+                                mode = &#x27;v&#x27;;
+                                break;
+                            case&#x27;%&#x27;:
+                                mode = &#x27;h&#x27;;
+                                break;
+                            case&#x27;@&#x27;:
+                                mode = &#x27;o&#x27;;
+                                break;
+                            case&#x27;&amp;&#x27;:
+                                mode = &#x27;a&#x27;;
+                                break;
+                            case&#x27;~&#x27;:
+                                mode = &#x27;q&#x27;;
+                                break;
+                        }
+                        if(mode !== undefined){
+                            user.modes[channel.name].push(mode);
+                        }
+                    }
+                }
+            }
+        })
+        // RPL_CHANNELMODEIS
+        .on(/:.+ 324 .+ (\S+) \+(.+)/i, function(m){
+            // 1 - channel
+            // 2 - modes
+            var channel = self.channel(m[1]),
+                modes = m[2];
+            if(!channel){
+                channel = new Channel(m[1], self);
+                self.channels.push(channel);
+            }
+            channel.modes.forEach(function(mode, i){
+                if(!(mode instanceof Array)){
+                    channel.modes[i] = modes.indexOf(i) !== -1;
+                }
+            });
+            for(i in channel.modes){
+
+            }
+        })
+        // RPL_BANLIST RPL_EXCEPTLIST RPL_INVITELIST
+        .on(/:.+ (367|348|346) \S+ (\S+) (\S+) (\S+) (\d+)/i, function(m){
+            // 1 - code
+            // 2 - channel
+            // 3 - hostmask
+            // 4 - user
+            // 5 - timestamp
+            var channel = self.channel(m[1]),
+                mode;
+            switch(m[1]){
+                case 367:mode = &#x27;b&#x27;; break;
+                case 348:mode = &#x27;e&#x27;; break;
+                case 346:mode = &#x27;I&#x27;; break;
+            }
+            if(!channel){
+                channel = new Channel(m[2], self);
+                self.channels.push(channel);
+            }
+            if(!(channel.modes[mode] instanceof Array)){
+                channel.modes[mode] = [];
+            }
+            if(channel.modes[mode].indexOf(m[3]) === -1){
+                channel.modes[mode].push(m[3]);
+            }
+        })
+        // RPL_NOTOPIC RPL_TOPIC
+        .on(/:.+ (331|332) \S+ (\S+) :(.+)/i, function(m){
+            // 1 - code
+            // 2 - channel
+            // 3 - topic
+            var channel = self.channel(m[2]),
+                user = self.user(self.name);
+            if(!channel){
+                channel = new Channel(m[2], self);
+                self.channels.push(channel);
+            }
+            if(!user){
+                user = new User(self.name, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;, self);
+            }
+            if(m[1] === 331){
+                channel._topic = [null];
+            }else{
+                channel._topic = [m[3]];
+            }
+            self.fire(&#x27;topic&#x27;, [&#x27;&#x27;, m[3]], {
+                channel: channel,
+                user: user
+            });
+        })
+        // ERR_TOOMANYCHANNELS
+        .on(/:.+ 405 (.+) :You have joined too many channels/i, function(m){
+            // 1 - channel
+            self.channel(m[1]).active = false;
+        })
+        // ERR_NICKNAMEINUSE ERR_NICKCOLLISION
+        .on(/:.+ (433|436) \* (\S+) :(.+)/i, function(m){
+            // 1 - code
+            // 2 - nick
+            // 3 - reason
+            var n = parseInt(self.config.nick.substr(-1), 10);
+            if(isNaN(n)){
+                self.config.nick += &#x27;0&#x27;;
+            }else{
+                self.config.nick = self.config.nick.substr(0, self.config.nick.length - 1) + (++n);
+            }
+            self.send(&#x27;NICK &#x27; + self.config.nick);
+            self.info(&#x27;Unable to set nick to &#x27; + m[2] + &#x27; (&#x27; + m[1] + &#x27;)&#x27; + m[3]);
+            self.info(&#x27;Using nick &#x27; + self.config.nick + &#x27; instead&#x27;);
+        })
+        // RPL_ENDOFWHO
+        .on(new RegExp(&#x27;:.+ 315 .+ (\\S+) :End of /WHO list.&#x27;, &#x27;i&#x27;), function(m){
+            // 1 - channel
+            var c = self.channel(m[1]);
+            if(!c){
+                c = new Channel(self, m[1]);
+                self.channels.push(c);
+            }
+            self.fire(&#x27;who&#x27;, [c], self);
+        })
+        .on(/:([^ ]+) NICK ([^ ]+)/i, function(m){
+            // 1 - Old nick
+            // 2 - New Nick
+            if(self.config.nick === m[1]){
+                self.config.nick = m[2];
+            }
+            self.fire(&#x27;nick&#x27;, m[1], m[2]);
+        })
+        // PRIVMSG
+        .on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sPRIVMSG\s(#?\w+)\s:?([^\x01].+?[^\x01])$/i, function(m){ // eslint-disable-line no-control-regex
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - text
+            var u = self.user(m[1]),
+                ch = m[4] === self.config.nick ? false : self.channel(m[4]);
+            if(ch === false){
+                ch = new Channel(self, m[4] === self.config.nick ? m[1] : m[4]);
+            }
+            if(u === false){
+                u = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+                u.channels.push(ch);
+                self.users.push(u);
+            }
+            self.fire(&#x27;message&#x27;, [m[5]], {
+                channel: ch,
+                user: u
+            });
+        })
+        // ACTION
+        .on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sPRIVMSG\s(#?\w+)\s:?\x01ACTION (.+)?\x01$/i, function(m){ // eslint-disable-line no-control-regex
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - text
+            var u = self.user(m[1]),
+                ch = m[4] === self.config.nick ? false : self.channel(m[4]);
+            if(ch === false){
+                ch = new Channel(self, m[4] === self.config.nick ? m[1] : m[4]);
+            }
+            if(u === false){
+                u = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+                u.channels.push(ch);
+                self.users.push(u);
+            }
+            self.fire(&#x27;action&#x27;, [m[5]], {
+                channel: ch,
+                user: u
+            });
+        })
+        // NOTICE
+        .on(/^:([^ ]+)!([^ ]+)@([^ ]+)\sNOTICE\s(#?\w+)\s:?(.+)$/i, function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - text
+            var u = self.user(m[1]),
+                ch = m[4] === self.config.nick ? false : self.channel(m[4]);
+            if(ch === false){
+                ch = new Channel(self, m[4] === self.config.nick ? m[1] : m[4]);
+            }
+            if(u === false){
+                u = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+                u.channels.push(ch);
+                self.users.push(u);
+            }
+            self.fire(&#x27;notice&#x27;, [m[5]], {
+                channel: ch,
+                user: u
+            });
+        })
+        // Command
+        .on(new RegExp(&#x27;^:([^ ]+)!([^ ]+)@([^ ]+)\\sPRIVMSG\\s(\\#?\\w+)\\s:?&#x27; + tools.regexString(self.config.prefix) + &#x27;(\\S+)\\s?(.+)?$&#x27;, &#x27;i&#x27;), function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - command
+            // 6 - arguments
+            var c = self.commands[m[5]],
+                a = m[6],
+                u = self.user(m[1]),
+                ch = m[4] === self.config.nick ? false : self.channel(m[4]);
+            a = a === undefined ? [] : a.split(&#x27; &#x27;);
+            if(ch === false){
+                ch = new Channel(self, m[4] === self.config.nick ? m[1] : m[4]);
+            }
+            if(u === false){
+                u = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+                u.channels.push(ch);
+                self.users.push(u);
+            }
+            if(c !== undefined){
+                c.fn.apply({
+                    server: self,
+                    argv: a,
+                    channel: ch,
+                    user: u
+                }, a);
+            }
+        })
+        // TOPIC
+        .on(/:(\S+)!(.+)@(.+) TOPIC (\S+) :(.+)/i, function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - topic
+            var channel = self.channel(m[4]),
+                user = self.user(m[1]);
+            if(!channel){
+                channel = new Channel(m[4], self);
+                self.channels.push(channel);
+            }
+            if(!user){
+                user = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+            }
+            self.fire(&#x27;topic&#x27;, [channel.topic, m[5]], {
+                channel: channel,
+                user: user
+            });
+            channel._topic = [m[5]];
+        })
+        // JOIN
+        .on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) JOIN :(\\S+)&#x27;, &#x27;i&#x27;), function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            var channel = (function(){
+                    var c = self.channel(m[4]);
+                    if(!c){
+                        c = new Channel(m[4], self);
+                        self.channels.push(c);
+                    }
+                    return c;
+                })(),
+                user;
+            if(m[1] === self.config.nick){
+                channel.who();                          // get users
+                self.send(&#x27;MODE &#x27; + channel.name);      // get modes
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; b&#x27;);   // get bans
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; e&#x27;);   // get exceptions
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; I&#x27;);   // get invitation masks
+            }else{
+                user = self.user(m[1]);
+                if(!user){
+                    user = new User(m[1], m[2], m[3], &#x27;&#x27;, self);
+                    self.users.push(user);
+                }
+                user.channels.push(channel);
+                user.whois();
+                var f = function(flag, mode){ // eslint-disable-line one-var
+                    if(user.owner &amp;&amp; user.owner.flags &amp;&amp; user.owner.flags.indexOf(flag) !== -1){
+                        self.info(&#x27;Setting mode &#x27; + flag + &#x27; on owner &#x27; + user.owner.nick);
+                        channel.mode(mode, user);
+                    }
+                };
+                f(&#x27;v&#x27;, &#x27;+v&#x27;);
+                f(&#x27;h&#x27;, &#x27;+h&#x27;);
+                f(&#x27;o&#x27;, &#x27;+o&#x27;);
+                f(&#x27;a&#x27;, &#x27;+a&#x27;);
+                f(&#x27;q&#x27;, &#x27;+q&#x27;);
+                if(user.banned){
+                    self.info(&#x27;Kicking &#x27; + user.nick + &#x27; from &#x27; + channel.name);
+                    channel.mode(&#x27;+b&#x27;, user);
+                    channel.kick(user);
+                }
+                self.fire(&#x27;join&#x27;, [], {
+                    channel: channel,
+                    user: user,
+                    owners: owners
+                });
+            }
+        })
+        // PART
+        .on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) PART (\\S+)&#x27;, &#x27;i&#x27;), function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            var channel = (function(){
+                    var c = self.channel(m[4]);
+                    if(!c){
+                        c = new Channel(m[4], self);
+                        self.channels.push(c);
+                    }
+                    return c;
+                })(),
+                user = self.user(m[1]);
+            if(user &amp;&amp; user.channels.indexOf(channel) !== -1){
+                user.channels.splice(user.channels.indexOf(channel), 1);
+                self.fire(&#x27;part&#x27;, [], {
+                    channel: channel,
+                    user: user,
+                    owners: owners
+                });
+            }
+        })
+        // QUIT
+        .on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) QUIT :?(.+)&#x27;, &#x27;i&#x27;), function(m){
+            // 1 - nick
+            // 2 - username
+            // 3 - host
+            // 4 - message
+            var user = self.user(m[1]),
+                chans;
+            if(user){
+                chans = user.channels.slice(0);
+                self.fire(&#x27;quit&#x27;, [m[4], chans], {
+                    user: user
+                });
+            }
+        })
+        // MODE
+        .on(/:([^ ]+)!([^ ]+)@([^ ]+) MODE (\S+) (\S+) ?(.+)?/i, function(m){
+            // 1 - nick (doing the action)
+            // 2 - username
+            // 3 - host
+            // 4 - channel
+            // 5 - modes
+            // 6 - nick (recieving the action)
+            var guser = function(nick){
+                    var user = self.user(nick); // m[6]
+                    if(!user){
+                        user = new User(nick === undefined ? m[1] : nick, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;, self);
+                        self.users.push(user);
+                    }
+                    if(user.channels.indexOf(channel) === -1){
+                        user.channels.push(channel);
+                    }
+                    if(user.modes[channel.name] === undefined){
+                        user.modes[channel.name] = [];
+                    }
+                    return user;
+                },
+                channel = self.channel(m[4]),
+                target,
+                value,
+                i,
+                ii = 0,
+                user,
+                state = m[5][0] === &#x27;+&#x27;,
+                mode,
+                index,
+                argv = m[6] === undefined ? [] : m[6].split(&#x27; &#x27;);
+            if(!channel){
+                channel = new Channel(m[4], self);
+            }
+            for(i = 1; i &lt; m[5].length; i++){
+                mode = m[5][i];
+                if(&#x27;+-&#x27;.indexOf(mode) !== -1){
+                    state = mode === &#x27;+&#x27;;
+                }else{
+                    if(&#x27;vhoaq&#x27;.indexOf(mode) !== -1 &amp;&amp; argv[ii] !== undefined){
+                        user = guser(argv[ii]);
+                        if(state){
+                            if(user.modes[channel.name].indexOf(mode) === -1){
+                                user.modes[channel.name].push(mode);
+                            }
+                        }else{
+                            index = user.modes[channel.name].indexOf(mode);
+                            if(index !== -1){
+                                user.modes[channel.name].splice(index, 1);
+                            }
+                        }
+                        target = user;
+                        value = user.nick;
+                    }else if(&#x27;bdefIJklLR&#x27;.indexOf() &amp;&amp; argv[ii] !== undefined){
+                        if(state){
+                            if(!(channel.modes[mode] instanceof Array)){
+                                channel.modes[mode] = [];
+                            }
+                            channel.modes[mode].push(argv[ii]);
+                            target = channel;
+                            value = argv[ii];
+                        }else{
+                            if(channel.modes[mode] instanceof Array){
+                                index = channel.modes[mode].indexOf(argv[ii]);
+                                if(index !== -1){
+                                    channel.modes[mode].splice(index, 1);
+                                }
+                                if(channel.modes[mode].length === 0){
+                                    channel.modes[mode] = false;
+                                }
+                            }else{
+                                channel.modes[mode] = false;
+                            }
+                            target = channel;
+                            value = argv[ii] === undefined ? &#x27;&#x27; : argv[ii];
+                        }
+                    }else{
+                        channel.modes[mode] = state;
+                        value = &#x27;&#x27;;
+                        target = channel;
+                    }
+                    self.fire(&#x27;mode&#x27;, [mode, state, value], {
+                        user: guser(m[1]),
+                        channel: channel,
+                        target: target
+                    });
+                    ii++;
+                }
+            }
+        })
+        .add(&#x27;help&#x27;, function(){
+            var i, s, t = this;
+            if(t.argv.length === 0){
+                s = &#x27;Available commands: &#x27;;
+                for(i in self.commands){
+                    s += i + &#x27;, &#x27;;
+                }
+                s = s.substr(0, s.length - 2);
+                self.send(&#x27;PRIVMSG &#x27; + t.channel.name + &#x27; :&#x27; + s);
+            }else{
+                t.argv.forEach(function(a){
+                    if(self.commands[a] === undefined){
+                        self.send(&#x27;PRIVMSG &#x27; + t.channel.name + &#x27; :&#x27; + a + &#x27;: undefined&#x27;);
+                    }else{
+                        self.send(&#x27;PRIVMSG &#x27; + t.channel.name + &#x27; :&#x27; + a + &#x27;: &#x27; + self.commands[a].help);
+                    }
+                });
+            }
+        }, &#x27;Provides information on available commands&#x27;);
+    var api = require(&#x27;./api.js&#x27;), // eslint-disable-line one-var
+        fn = function(i){
+            self.scripts[ii] = new Script(&#x27;mods/&#x27; + mods[ii] + &#x27;/scripts/server.js&#x27;, self, i);
+        },
+        mods = api.mods(&#x27;server&#x27;);
+    api.servers.push(self);
+    for(ii = 0; ii &lt; mods.length; ii++){
+        self.debug(&#x27; |- &#x27; + mods[ii]);
+        self.run(ii + 1, fn);
+    }
+    interval = setInterval(function(){
+        if(self.socket !== undefined){
+            var d = new Date(+new Date());
+            if(d.getDate() !== date.getDate()){
+                date = d;
+                self.fire(&#x27;datechange&#x27;, [], {});
+            }
+        }
+    }, 1000);
+    return self;
 };
+
     </pre>
 </div>
                     </div>

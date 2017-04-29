@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -101,11 +104,44 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 var path = require(&#x27;path&#x27;),
-	fs = require(&#x27;fs&#x27;),
-	chardet = require(&#x27;chardet&#x27;),
-	Iconv = require(&#x27;iconv&#x27;).Iconv,
-	watch_handles = {},
-	sub_handles = {};
+    fs = require(&#x27;fs&#x27;),
+    chardet = require(&#x27;chardet&#x27;),
+    Iconv = require(&#x27;iconv&#x27;).Iconv,
+    watchHandles = {},
+    watchFolderHandles = {},
+    subHandles = {},
+    Prop = function(props){
+        for(var i in props){
+            this[i] = props[i];
+        }
+        return this;
+    };
+module.exports.Prop = Prop;
+module.exports.extend = function(self, ext){
+    var i,
+        o,
+        p,
+        fn = function(name){
+            if(o[name]){
+                p[name] = o[name];
+            }
+        };
+    for(i in ext){
+        o = ext[i];
+        if(o instanceof module.exports.Prop){
+            p = {};
+            fn(&#x27;get&#x27;);
+            fn(&#x27;set&#x27;);
+            fn(&#x27;value&#x27;);
+            fn(&#x27;enumerable&#x27;);
+            fn(&#x27;configurable&#x27;);
+            fn(&#x27;writable&#x27;);
+            Object.defineProperty(self, i, p);
+        }else{
+            self[i] = o;
+        }
+    }
+};
 /**
  * @module tools
  * @class tools
@@ -117,119 +153,182 @@ var path = require(&#x27;path&#x27;),
  * @param {string} d
  * @return {string} sanitized string
  */
-exports.sanitize = function(d){
-	if(!d){
-		return d;
-	}
-	/* Note:
-	 * 0x00 (null character) is invalid
-	 * 0x01 signals a CTCP message, which we shouldn&#x27;t ever need to do
-	 * 0x02 is bold in mIRC (and thus other GUI clients)
-	 * 0x03 precedes a color code in mIRC (and thus other GUI clients)
-	 * 0x04 thru 0x19 are invalid control codes, except for:
-	 * 0x16 is &quot;reverse&quot; (swaps fg and bg colors) in mIRC
-	 */
-	return d.replace(/\n/g, &quot;\\n&quot;).replace(/\r/g, &quot;\\r&quot;).replace(/[^\x02|\x0b|\x16|\x20-\x7e]/g,&quot;&quot;);
-};
-/**
- * Recursive mkdir
- * @method mkdirParent
- * @param {string} dirPath path to create directory structure for
- * @param {string} mode mode to create new directories with
- */
-exports.mkdirParent = function(dirPath,mode){
-	dirPath = path.normalize(dirPath);
-	var dirs = dirPath.split(path.sep).reverse(),
-		dir = &#x27;.&#x27;;
-	(function mkdir(dirs,dir){
-		if(dirs.length){
-			dir = dir+&#x27;/&#x27;+dirs.pop();
-			try{
-				fs.mkdirSync(dir,mode);
-			}catch(e){}
-			mkdir(dirs,dir);
-		}
-	})(dirs,dir);
-};
-/**
- * Makes a string safe for use in RegExp
- * @method regexString
- * @param {string} str
- * @return {string} RegExp safe string
- */
-exports.regexString = function(str){
-	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, &quot;\\$&amp;&quot;);
-};
-/**
- * Makes a string safe for use in RegExp with * converted to .+
- * @method wildcardString
- * @param {string} str
- * @return {string} RegExp safe string with * turned to .+
- */
-exports.wildcardString = function(str){
-	return str.replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g,&quot;\\$&amp;&quot;).replace(/\*/g,&#x27;.+&#x27;);
-};
+module.exports.extend(module.exports, {
+    sanitize: function(d){
+        if(!d){
+            return d;
+        }
+        /* Note:
+         * 0x00 (null character) is invalid
+         * 0x01 signals a CTCP message, which we shouldn&#x27;t ever need to do
+         * 0x02 is bold in mIRC (and thus other GUI clients)
+         * 0x03 precedes a color code in mIRC (and thus other GUI clients)
+         * 0x04 thru 0x19 are invalid control codes, except for:
+         * 0x16 is &quot;reverse&quot; (swaps fg and bg colors) in mIRC
+         */
+        return d.replace(/\n/g, &#x27;\\n&#x27;).replace(/\r/g, &#x27;\\r&#x27;).replace(/[^\x02|\x0b|\x16|\x20-\x7e]/g, &#x27;&#x27;); // eslint-disable-line no-control-regex
+    },
+    /**
+     * Recursive mkdir
+     * @method mkdirParent
+     * @param {string} dirPath path to create directory structure for
+     * @param {string} mode mode to create new directories with
+     */
+    mkdirParent: function(dirPath, mode){
+        dirPath = path.normalize(dirPath);
+        var dirs = dirPath.split(path.sep).reverse(),
+            dir = &#x27;.&#x27;;
+        (function mkdir(dirs, dir){
+            if(dirs.length){
+                dir = dir + &#x27;/&#x27; + dirs.pop();
+                try{
+                    fs.mkdirSync(dir, mode);
+                }catch(e){}
+                mkdir(dirs, dir);
+            }
+        })(dirs, dir);
+    },
+    /**
+     * Makes a string safe for use in RegExp
+     * @method regexString
+     * @param {string} str
+     * @return {string} RegExp safe string
+     */
+    regexString: function(str){
+        return str.replace(/[-[\]/{}()*+?.\\^$|]/g, &#x27;\\$&amp;&#x27;);
+    },
+    /**
+     * Makes a string safe for use in RegExp with * converted to .+
+     * @method wildcardString
+     * @param {string} str
+     * @return {string} RegExp safe string with * turned to .+
+     */
+    wildcardString: function(str){
+        return str.replace(/[-[]\/{}()+?.\\\^\$|]/g, &#x27;\\$&amp;&#x27;).replace(/\*/g, &#x27;.+&#x27;);
+    },
+    convert: function(buf){
+        var encoding = chardet.detect(buf),
+            iconv;
+        try{
+            iconv = new Iconv(encoding, &#x27;UTF-16LE//TRANSLIT//IGNORE&#x27;);
+            buf = iconv.convert(buf);
+        }catch(e){}
+        return buf;
+    },
+    mods: function(type){
+        var i,
+            dir,
+            ii,
+            config = require(&#x27;../etc/config.json&#x27;),
+            mods = [];
+        for(i = 0; i &lt; config.mods.length; i++){
+            dir = fs.readdirSync(&#x27;mods/&#x27; + config.mods[i] + &#x27;/scripts/&#x27;);
+            for(ii in dir){
+                if(type + &#x27;.js&#x27; === dir[ii]){
+                    mods.push(config.mods[i]);
+                }
+            }
+        }
+        return mods;
+    },
+    file: {
+        watch: function(filepath, callback){
+            filepath = path.normalize(filepath);
+            if(fs.existsSync(filepath)){
+                if(!watchHandles[filepath]){
+                    watchHandles[filepath] = fs.watch(filepath);
+                }
+            }else{
+                throw new Error(filepath + &#x27; does not exist&#x27;);
+            }
+            watchHandles[filepath].on(&#x27;change&#x27;, callback);
+        },
+        unwatch: function(filepath){
+            filepath = fs.normalize(filepath);
+            if(watchHandles[filepath]){
+                watchHandles[filepath].close();
+                delete watchHandles[filepath];
+            }
+        },
+        subscribe: function(filepath){
+            filepath = path.normalize(filepath);
+            if(!subHandles[filepath]){
+                subHandles[filepath] = {
+                    data: &#x27;&#x27;,
+                    path: filepath,
+                    reload: function(){
+                        subHandles[filepath].data = fs.readFileSync(filepath, {
+                            encoding: &#x27;utf8&#x27;
+                        });
+                    },
+                    unwatch: function(){
+                        exports.file.unwatch(this.filepath);
+                    }
+                };
+                this.watch(filepath, subHandles[filepath].reload);
+                subHandles[filepath].reload();
+            }
+            return subHandles[filepath];
+        }
+    },
+    folder: {
+        watch: function(folder){
+            folder = path.normalize(folder);
+            if(!watchFolderHandles[folder]){
+                watchFolderHandles[folder] = {
+                    files: {},
+                    path: folder,
+                    file: function(filepath){
+                        if(filepath.indexOf(&#x27;..&#x27;) !== -1 || path.isAbsolute(filepath)){
+                            throw new Error(&#x27;Invalid path: &#x27; + filepath);
+                        }
+                        filepath = path.normalize(filepath);
+                        if(!this.files[filepath]){
+                            this.files[filepath] = exports.file.subscribe(path.resolve(this.path, filepath));
+                        }
+                        return this.files[filepath];
+                    },
+                    unwatch: function(){
+                        exports.folder.unwatch(this.path);
+                    }
+                };
+            }
+            return watchFolderHandles[folder];
+        },
+        unwatch: function(folder){
+            folder = path.normalize(folder);
+            if(watchFolderHandles[folder]){
+                var fh = watchFolderHandles[folder],
+                    f;
+                while((f = fh.files.pop())){
+                    f.unwatch();
+                }
+                delete watchFolderHandles[folder];
+            }
+        }
+    },
+    sizeString: function(bytes){
+        var sizes = [
+                &#x27;B&#x27;,
+                &#x27;kB&#x27;,
+                &#x27;MB&#x27;,
+                &#x27;GB&#x27;,
+                &#x27;TB&#x27;,
+                &#x27;PB&#x27;,
+                &#x27;EB&#x27;,
+                &#x27;ZB&#x27;,
+                &#x27;YB&#x27;
+            ],
+            i = 0,
+            size = bytes;
+        while(size &gt; 1000){
+            size = size / 1000;
+            i++;
+        }
+        return size.toPrecision(3) + sizes[i];
+    }
+});
 
-exports.convert = function(buf){
-	var encoding = chardet.detect(buf);
-	try{
-		var iconv = new Iconv(encoding,&#x27;UTF-16LE//TRANSLIT//IGNORE&#x27;);
-		buf = iconv.convert(buf);
-	}catch(e){}
-	return buf;
-};
-exports.mods = function(type){
-	var i,
-		dir,
-		ii,
-		config = require(&#x27;../etc/config.json&#x27;),
-		mods = [];
-	for(i=0;i&lt;config.mods.length;i++){
-		dir = fs.readdirSync(&#x27;mods/&#x27;+config.mods[i]+&#x27;/scripts/&#x27;);
-		for(ii in dir){
-			if(type+&#x27;.js&#x27;==dir[ii]){
-				mods.push(config.mods[i]);
-			}
-		}
-	}
-	return mods;
-};
-exports.file = {
-	watch: function(filepath,callback){
-		filepath = path.normalize(filepath);
-		if(fs.existsSync(filepath)){
-			if(!watch_handles[filepath]){
-				watch_handles[filepath] = fs.watch(filepath);
-			}
-		}else{
-			throw new Error(filepath+&#x27; does not exist&#x27;);
-		}
-		watch_handles[filepath].on(&#x27;change&#x27;,callback);
-	},
-	unwatch: function(filepath){
-		filepath = fs.normalize(filepath);
-		if(watch_handles[filepath]){
-			watch_handles[filepath].close();
-			delete watch_handles[filepath];
-		}
-	},
-	subscribe: function(filepath){
-		filepath = path.normalize(filepath);
-		if(!sub_handles[filepath]){
-			sub_handles[filepath] = {
-				data: &#x27;&#x27;,
-				reload: function(){
-					sub_handles[filepath].data = fs.readFileSync(filepath,{
-						encoding: &#x27;utf8&#x27;
-					});
-				}
-			};
-			this.watch(filepath,sub_handles[filepath].reload);
-			sub_handles[filepath].reload();
-		}
-		return sub_handles[filepath];
-	}
-};
     </pre>
 </div>
                     </div>

@@ -22,7 +22,8 @@
 		"mysql": "2.4.x",
 		"node-persist": "0.0.x",
 		"sanitize-filename": "x",
-		"ws": "x"
+		"ws": "x",
+		"yuidocjs": "^0.10.2"
 	},
 	"devDependencies": {
 		"codacy-coverage": "^2.0.2",
@@ -50,7 +51,7 @@
 		"test-travis": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
 		"semantic-release": "semantic-release pre && npm publish && semantic-release post",
 		"lint": "standard-own --fix --verbose | snazzy",
-		"precommit": "yarn run lint && yarn run test",
+		"precommit": "yarn run lint && yarn run test && yuidoc .",
 		"prepush": "yarn run commit-cleanup"
 	},
 	"config": {

@@ -18,6 +18,17 @@
             "fors": {},
             "namespaces": {}
         },
+        "lib\\bans.js": {
+            "name": "lib\\bans.js",
+            "modules": {
+                "bans": 1
+            },
+            "classes": {
+                "bans": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "lib\\channel.js": {
             "name": "lib\\channel.js",
             "modules": {
@@ -133,6 +144,7 @@
         "api": {
             "name": "api",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "api": 1
             },
@@ -144,9 +156,25 @@
             "description": "API class, contains references to all important modules",
             "static": 1
         },
+        "bans": {
+            "name": "bans",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "bans": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "lib\\bans.js",
+            "line": 4,
+            "description": "bans class",
+            "static": 1
+        },
         "channel": {
             "name": "channel",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "Channel": 1
             },
@@ -154,7 +182,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\channel.js",
-            "line": 4,
+            "line": 2,
             "description": "Channel class",
             "itemtype": "main",
             "params": [
@@ -174,6 +202,7 @@
         "debug": {
             "name": "debug",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "debug": 1
             },
@@ -189,6 +218,7 @@
         "listdb": {
             "name": "listdb",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "Listdb": 1
             },
@@ -203,6 +233,7 @@
         "log": {
             "name": "log",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "log": 1
             },
@@ -210,7 +241,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\log.js",
-            "line": 51,
+            "line": 50,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "itemtype": "main",
             "static": 1
@@ -218,6 +249,7 @@
         "owners": {
             "name": "owners",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "owners": 1
             },
@@ -225,13 +257,14 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\owners.js",
-            "line": 6,
+            "line": 4,
             "description": "Owners class",
             "static": 1
         },
         "script": {
             "name": "script",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "Script": 1
             },
@@ -239,12 +272,13 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\script.js",
-            "line": 4,
+            "line": 5,
             "description": "Provides a script object that allows a server to handle the loaded script"
         },
         "server": {
             "name": "server",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "server": 1
             },
@@ -252,7 +286,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\server.js",
-            "line": 10,
+            "line": 9,
             "description": "IRC Server object",
             "is_constructor": 1,
             "params": [
@@ -266,6 +300,7 @@
         "stdin": {
             "name": "stdin",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "stdin": 1
             },
@@ -280,6 +315,7 @@
         "tools": {
             "name": "tools",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "tools": 1
             },
@@ -287,12 +323,13 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\tools.js",
-            "line": 7,
+            "line": 40,
             "static": 1
         },
         "user": {
             "name": "user",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "User": 1
             },
@@ -319,6 +356,20 @@
             "line": 1,
             "description": "API class, contains references to all important modules"
         },
+        "bans": {
+            "name": "bans",
+            "shortname": "bans",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "bans",
+            "namespace": "",
+            "file": "lib\\bans.js",
+            "line": 4,
+            "description": "bans class"
+        },
         "Channel": {
             "name": "Channel",
             "shortname": "Channel",
@@ -330,7 +381,7 @@
             "module": "channel",
             "namespace": "",
             "file": "lib\\channel.js",
-            "line": 4,
+            "line": 2,
             "description": "Channel class",
             "mainName": "",
             "tag": "main",
@@ -376,7 +427,7 @@
             "module": "log",
             "namespace": "",
             "file": "lib\\log.js",
-            "line": 51,
+            "line": 50,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "mainName": "",
             "tag": "main",
@@ -394,7 +445,7 @@
             "module": "owners",
             "namespace": "",
             "file": "lib\\owners.js",
-            "line": 6,
+            "line": 4,
             "description": "Owners class"
         },
         "Script": {
@@ -408,7 +459,7 @@
             "module": "script",
             "namespace": "",
             "file": "lib\\script.js",
-            "line": 4,
+            "line": 5,
             "description": "Provides a script object that allows a server to handle the loaded script",
             "params": [
                 {
@@ -440,7 +491,7 @@
             "module": "server",
             "namespace": "",
             "file": "lib\\server.js",
-            "line": 10,
+            "line": 9,
             "description": "IRC Server object"
         },
         "stdin": {
@@ -468,7 +519,7 @@
             "module": "tools",
             "namespace": "",
             "file": "lib\\tools.js",
-            "line": 7
+            "line": 40
         },
         "User": {
             "name": "User",
@@ -512,10 +563,11 @@
             "is_constructor": 1
         }
     },
+    "elements": {},
     "classitems": [
         {
             "file": "lib\\api.js",
-            "line": 9,
+            "line": 8,
             "description": "Provides the tools module",
             "static": 1,
             "itemtype": "property",
@@ -525,7 +577,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 15,
+            "line": 14,
             "description": "Provides the log module",
             "static": 1,
             "itemtype": "property",
@@ -535,40 +587,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 21,
-            "description": "Provides the Channel class",
-            "static": 1,
-            "is_constructor": 1,
-            "itemtype": "property",
-            "name": "Channel",
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 28,
-            "description": "Provides the User class",
-            "static": 1,
-            "itemtype": "property",
-            "name": "User",
-            "is_constructor": 1,
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 35,
-            "description": "Provides the Server class",
-            "static": 1,
-            "itemtype": "property",
-            "name": "Server",
-            "is_constructor": 1,
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 42,
+            "line": 20,
             "description": "Provides the Listdb class",
             "static": 1,
             "itemtype": "property",
@@ -579,7 +598,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 49,
+            "line": 27,
             "description": "Provides the db class",
             "static": 1,
             "itemtype": "property",
@@ -590,7 +609,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 56,
+            "line": 34,
             "description": "Provides the debug module",
             "static": 1,
             "itemtype": "property",
@@ -600,7 +619,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 62,
+            "line": 40,
             "description": "Provides the owners interface",
             "static": 1,
             "itemtype": "property",
@@ -611,7 +630,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 69,
+            "line": 48,
             "description": "Provides the stdin module",
             "static": 1,
             "itemtype": "property",
@@ -621,18 +640,17 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 75,
-            "description": "Provides the http interface",
+            "line": 54,
+            "description": "Provides the pubsub module",
             "static": 1,
             "itemtype": "property",
-            "name": "http",
-            "is_constructor": 1,
+            "name": "pubsub",
             "class": "api",
             "module": "api"
         },
         {
             "file": "lib\\api.js",
-            "line": 82,
+            "line": 60,
             "description": "Provides the socket interface",
             "static": 1,
             "itemtype": "property",
@@ -643,7 +661,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 89,
+            "line": 67,
             "description": "Provides the websocket interface",
             "static": 1,
             "itemtype": "property",
@@ -654,17 +672,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 96,
-            "description": "Provides a circular reference to API",
-            "static": 1,
-            "itemtype": "property",
-            "name": "api",
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 102,
+            "line": 74,
             "description": "Provides access to the global console object",
             "static": 1,
             "itemtype": "property",
@@ -674,7 +682,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 108,
+            "line": 80,
             "description": "Provides access to the global process object",
             "static": 1,
             "itemtype": "property",
@@ -684,7 +692,50 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 142,
+            "line": 87,
+            "description": "Provides the Channel class",
+            "static": 1,
+            "is_constructor": 1,
+            "itemtype": "property",
+            "name": "Channel",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 94,
+            "description": "Provides the User class",
+            "static": 1,
+            "itemtype": "property",
+            "name": "User",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 101,
+            "description": "Provides the Server class",
+            "static": 1,
+            "itemtype": "property",
+            "name": "Server",
+            "is_constructor": 1,
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 126,
+            "description": "Provides a circular reference to API",
+            "static": 1,
+            "itemtype": "property",
+            "name": "api",
+            "class": "api",
+            "module": "api"
+        },
+        {
+            "file": "lib\\api.js",
+            "line": 136,
             "description": "Provides access to all servers",
             "static": 1,
             "itemtype": "property",
@@ -694,7 +745,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 155,
+            "line": 149,
             "description": "The API version",
             "itemtype": "property",
             "name": "version",
@@ -705,8 +756,68 @@
             "module": "api"
         },
         {
+            "file": "lib\\bans.js",
+            "line": 33,
+            "description": "Adds a hostmask to a owner",
+            "itemtype": "method",
+            "name": "addHostMask",
+            "params": [
+                {
+                    "name": "nick",
+                    "description": "The nick the owner is registered under",
+                    "type": "String"
+                },
+                {
+                    "name": "hostmask",
+                    "description": "The hostmask to add to the owner",
+                    "type": "String"
+                }
+            ],
+            "chainable": 1,
+            "class": "bans",
+            "module": "bans"
+        },
+        {
+            "file": "lib\\bans.js",
+            "line": 50,
+            "description": "Remove a hostmask from a owner",
+            "params": [
+                {
+                    "name": "nick",
+                    "description": "The nick the owner is registered under",
+                    "type": "String"
+                },
+                {
+                    "name": "hostmask",
+                    "description": "The hostmask to remove from the owner",
+                    "type": "String"
+                }
+            ],
+            "chainable": 1,
+            "class": "bans",
+            "module": "bans"
+        },
+        {
+            "file": "lib\\bans.js",
+            "line": 60,
+            "description": "Returns the owner who matches the hostmask",
+            "params": [
+                {
+                    "name": "hostmask",
+                    "description": "Hostmask to search for.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "owner who matched the hostmask, undefined if none found.",
+                "type": "Object"
+            },
+            "class": "bans",
+            "module": "bans"
+        },
+        {
             "file": "lib\\channel.js",
-            "line": 16,
+            "line": 14,
             "description": "Name of the channel",
             "type": "{string}",
             "itemtype": "property",
@@ -716,7 +827,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 22,
+            "line": 20,
             "description": "Is the bot in the channel?",
             "type": "{boolean}",
             "itemtype": "property",
@@ -726,7 +837,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 28,
+            "line": 26,
             "description": "Channel modes",
             "type": "{Array}",
             "itemtype": "property",
@@ -736,7 +847,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 34,
+            "line": 32,
             "description": "Contains the topic of the channel and tries to change it if set",
             "type": "{String}",
             "itemtype": "property",
@@ -746,7 +857,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 48,
+            "line": 46,
             "description": "Interface for setting the topic internally",
             "itemtype": "property",
             "name": "_topic",
@@ -757,7 +868,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 59,
+            "line": 60,
             "description": "Parent server",
             "type": "{Server}",
             "itemtype": "property",
@@ -768,7 +879,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 69,
+            "line": 70,
             "description": "Runs a /who on the channel, refreshing user data",
             "itemtype": "method",
             "name": "who",
@@ -961,7 +1072,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 59,
+            "line": 58,
             "description": "Does an alert message (\"=> \"+message)",
             "itemtype": "method",
             "name": "alert",
@@ -978,7 +1089,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 78,
+            "line": 77,
             "description": "Outputs an log signifying that the message was sent to an external server (\"-> \"+message)",
             "itemtype": "method",
             "name": "out",
@@ -995,7 +1106,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 97,
+            "line": 96,
             "description": "Outputs an log signifying that the message was recieved from an external server (\"<- \"+message)",
             "itemtype": "method",
             "name": "in",
@@ -1012,7 +1123,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 116,
+            "line": 115,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -1029,7 +1140,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 133,
+            "line": 132,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -1046,7 +1157,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 150,
+            "line": 149,
             "description": "Log an debug message (\"debug: \"+message)",
             "itemtype": "method",
             "name": "debug",
@@ -1063,7 +1174,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 162,
+            "line": 161,
             "description": "Log an debug message (\"Info: \"+message)",
             "itemtype": "method",
             "name": "info",
@@ -1080,7 +1191,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 179,
+            "line": 178,
             "description": "Saves a line to a named log",
             "itemtype": "method",
             "name": "save",
@@ -1103,7 +1214,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 206,
+            "line": 208,
             "description": "Returns the listdb object for a specific log",
             "itemtype": "method",
             "name": "get",
@@ -1123,7 +1234,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 215,
+            "line": 217,
             "description": "Logs a message and saves the output to a log",
             "itemtype": "method",
             "name": "log",
@@ -1141,7 +1252,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 225,
+            "line": 227,
             "description": "Outputs a trace log",
             "itemtype": "method",
             "name": "trace",
@@ -1150,7 +1261,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 237,
+            "line": 239,
             "description": "log config",
             "type": "{object}",
             "itemtype": "property",
@@ -1159,169 +1270,8 @@
             "module": "log"
         },
         {
-            "file": "lib\\owners.js",
-            "line": 15,
-            "description": "Returns all the owners",
-            "itemtype": "method",
-            "name": "values",
-            "return": {
-                "description": "owners",
-                "type": "Map"
-            },
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 24,
-            "description": "The number of owners stored",
-            "type": "{Number}",
-            "itemtype": "property",
-            "name": "length",
-            "static": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 42,
-            "description": "Fetch the current state of the object",
-            "itemtype": "method",
-            "name": "fetch",
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 51,
-            "description": "Flushes changes to the object",
-            "itemtype": "method",
-            "name": "flush",
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 60,
-            "description": "Gets a owner object",
-            "params": [
-                {
-                    "name": "nick",
-                    "description": "nick that the owner is registered under",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "The owner object",
-                "type": "Map"
-            },
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 69,
-            "description": "Adds or updates a owner",
-            "itemtype": "method",
-            "name": "add",
-            "params": [
-                {
-                    "name": "nick",
-                    "description": "The nick that the owner is registered under",
-                    "type": "String"
-                },
-                {
-                    "name": "options",
-                    "description": "parameters to store on the owner",
-                    "type": "Map"
-                }
-            ],
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 94,
-            "description": "Removes a owner from the object",
-            "itemtype": "method",
-            "name": "remove",
-            "params": [
-                {
-                    "name": "nick",
-                    "description": "The nick that the owner is registered under",
-                    "type": "String"
-                }
-            ],
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 113,
-            "description": "Adds a hostmask to a owner",
-            "itemtype": "method",
-            "name": "addHostMask",
-            "params": [
-                {
-                    "name": "nick",
-                    "description": "The nick the owner is registered under",
-                    "type": "String"
-                },
-                {
-                    "name": "hostmask",
-                    "description": "The hostmask to add to the owner",
-                    "type": "String"
-                }
-            ],
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 133,
-            "description": "Remove a hostmask from a owner",
-            "params": [
-                {
-                    "name": "nick",
-                    "description": "The nick the owner is registered under",
-                    "type": "String"
-                },
-                {
-                    "name": "hostmask",
-                    "description": "The hostmask to remove from the owner",
-                    "type": "String"
-                }
-            ],
-            "chainable": 1,
-            "class": "owners",
-            "module": "owners"
-        },
-        {
-            "file": "lib\\owners.js",
-            "line": 153,
-            "description": "Returns the owner who matches the hostmask",
-            "params": [
-                {
-                    "name": "hostmask",
-                    "description": "Hostmask to search for.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "owner who matched the hostmask, undefined if none found.",
-                "type": "Object"
-            },
-            "class": "owners",
-            "module": "owners"
-        },
-        {
             "file": "lib\\script.js",
-            "line": 43,
+            "line": 50,
             "description": "stores the script global identifier",
             "itemtype": "property",
             "name": "sid",
@@ -1332,7 +1282,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 54,
+            "line": 61,
             "description": "stores the script identifier",
             "itemtype": "property",
             "name": "sid",
@@ -1343,7 +1293,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 64,
+            "line": 71,
             "description": "Stores a reference to the server that this script is used on",
             "itemtype": "property",
             "name": "server",
@@ -1354,7 +1304,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 74,
+            "line": 81,
             "description": "The path to the script that is run",
             "itemtype": "property",
             "name": "path",
@@ -1364,7 +1314,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 80,
+            "line": 87,
             "description": "Boolean determining if the script is currently active",
             "itemtype": "property",
             "name": "enabled",
@@ -1374,7 +1324,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 86,
+            "line": 94,
             "description": "reloads the script from the disk",
             "itemtype": "method",
             "name": "reload",
@@ -1384,7 +1334,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 102,
+            "line": 117,
             "description": "Disables the script (hooks, commands etc)",
             "itemtype": "method",
             "name": "disable",
@@ -1394,7 +1344,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 121,
+            "line": 136,
             "description": "Description",
             "itemtype": "method",
             "name": "enable",
@@ -1404,7 +1354,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 143,
+            "line": 161,
             "description": "Disables and removes the script from the server.",
             "itemtype": "method",
             "name": "remove",
@@ -1414,10 +1364,10 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 154,
+            "line": 172,
             "description": "Function to run when the script is unloaded",
             "itemtype": "event",
-            "name": "",
+            "name": "unload",
             "type": "{Function}",
             "class": "Script",
             "module": "script"
@@ -1657,7 +1607,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 303,
+            "line": 299,
             "description": "Send a message to the IRC server",
             "itemtype": "method",
             "name": "send",
@@ -1674,7 +1624,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 327,
+            "line": 323,
             "description": "Install a hook on the server.",
             "itemtype": "method",
             "name": "on",
@@ -1703,7 +1653,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 360,
+            "line": 356,
             "description": "Uninstall a hook from the server",
             "itemtype": "method",
             "name": "off",
@@ -1726,7 +1676,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 393,
+            "line": 396,
             "description": "Add a command to the server",
             "itemtype": "method",
             "name": "add",
@@ -1753,7 +1703,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 412,
+            "line": 415,
             "description": "Remove a command listener from the server",
             "itemtype": "method",
             "name": "remove",
@@ -1770,7 +1720,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 438,
+            "line": 441,
             "description": "Fire an event on the IRC server",
             "itemtype": "method",
             "name": "fire",
@@ -1940,7 +1890,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 47,
+            "line": 45,
             "description": "Start listening for user input",
             "itemtype": "method",
             "name": "start",
@@ -1950,7 +1900,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 59,
+            "line": 57,
             "description": "Stop waiting for user input",
             "itemtype": "method",
             "name": "stop",
@@ -1960,7 +1910,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 70,
+            "line": 68,
             "description": "Register an event listener",
             "itemtype": "method",
             "name": "on",
@@ -1982,7 +1932,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 85,
+            "line": 83,
             "description": "Adds a command to the stdin",
             "itemtype": "method",
             "name": "add",
@@ -2010,7 +1960,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 104,
+            "line": 102,
             "description": "Calls a console output method",
             "itemtype": "method",
             "name": "console",
@@ -2034,7 +1984,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 117,
+            "line": 115,
             "description": "stdin config",
             "type": "{object}",
             "itemtype": "property",
@@ -2044,7 +1994,7 @@
         },
         {
             "file": "lib\\tools.js",
-            "line": 12,
+            "line": 45,
             "description": "Sanitizes a string for sending to an IRC server",
             "itemtype": "method",
             "name": "sanitize",
@@ -2064,7 +2014,7 @@
         },
         {
             "file": "lib\\tools.js",
-            "line": 32,
+            "line": 66,
             "description": "Recursive mkdir",
             "itemtype": "method",
             "name": "mkdirParent",
@@ -2085,7 +2035,7 @@
         },
         {
             "file": "lib\\tools.js",
-            "line": 52,
+            "line": 86,
             "description": "Makes a string safe for use in RegExp",
             "itemtype": "method",
             "name": "regexString",
@@ -2105,7 +2055,7 @@
         },
         {
             "file": "lib\\tools.js",
-            "line": 61,
+            "line": 95,
             "description": "Makes a string safe for use in RegExp with * converted to .+",
             "itemtype": "method",
             "name": "wildcardString",
@@ -2125,7 +2075,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 15,
+            "line": 16,
             "description": "User nickname",
             "type": "{String}",
             "itemtype": "property",
@@ -2135,7 +2085,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 21,
+            "line": 22,
             "description": "User's username",
             "type": "{string}",
             "itemtype": "property",
@@ -2145,7 +2095,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 27,
+            "line": 28,
             "description": "User's hostname",
             "type": "{string}",
             "itemtype": "property",
@@ -2155,7 +2105,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 33,
+            "line": 34,
             "description": "User's real name",
             "type": "{string}",
             "itemtype": "property",
@@ -2165,7 +2115,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 39,
+            "line": 40,
             "description": "Server the user is on",
             "type": "{Server}",
             "itemtype": "property",
@@ -2176,7 +2126,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 49,
+            "line": 50,
             "description": "Array of channels the user is in",
             "type": "{Array}",
             "itemtype": "property",
@@ -2186,7 +2136,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 55,
+            "line": 56,
             "description": "List of the modes applied to the user in a channel",
             "type": "{Object}",
             "itemtype": "property",
@@ -2196,7 +2146,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 61,
+            "line": 62,
             "description": "Runs a whois on the user",
             "itemtype": "method",
             "name": "whois",
@@ -2206,7 +2156,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 70,
+            "line": 75,
             "description": "The current hostmask for the user",
             "itemtype": "property",
             "name": "hostmask",
@@ -2216,7 +2166,7 @@
         },
         {
             "file": "lib\\user.js",
-            "line": 80,
+            "line": 85,
             "description": "Get the owner object for this user if it exists",
             "itemtype": "property",
             "name": "owner",
@@ -2227,16 +2177,12 @@
     ],
     "warnings": [
         {
-            "message": "Missing item type\nGets a owner object",
-            "line": " lib\\owners.js:60"
-        },
-        {
             "message": "Missing item type\nRemove a hostmask from a owner",
-            "line": " lib\\owners.js:133"
+            "line": " lib\\bans.js:50"
         },
         {
             "message": "Missing item type\nReturns the owner who matches the hostmask",
-            "line": " lib\\owners.js:153"
+            "line": " lib\\bans.js:60"
         }
     ]
 }

@@ -39,6 +39,7 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/api.html">api</a></li>
+                                <li><a href="../classes/bans.html">bans</a></li>
                                 <li><a href="../classes/Channel.html">Channel</a></li>
                                 <li><a href="../classes/debug.html">debug</a></li>
                                 <li><a href="../classes/Listdb.html">Listdb</a></li>
@@ -51,8 +52,10 @@
                                 <li><a href="../classes/User.html">User</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/api.html">api</a></li>
+                                <li><a href="../modules/bans.html">bans</a></li>
                                 <li><a href="../modules/channel.html">channel</a></li>
                                 <li><a href="../modules/debug.html">debug</a></li>
                                 <li><a href="../modules/listdb.html">listdb</a></li>
@@ -101,8 +104,8 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 var fs = require(&#x27;fs&#x27;),
-	path = require(&#x27;path&#x27;),
-	tools = require(&#x27;./tools.js&#x27;);
+    path = require(&#x27;path&#x27;),
+    tools = require(&#x27;./tools.js&#x27;);
 /**
  * listdb class
  * @module listdb
@@ -110,128 +113,150 @@ var fs = require(&#x27;fs&#x27;),
  * @constructor
  */
 module.exports = function(dbName){
-	var values,
-		todo = [],
-		all = false,
-		active = false,
-		fd = &#x27;data/&#x27;+dbName+&#x27;.db&#x27;,
-		self = this;
-	/**
-	 * Returnst the name of the listdb
-	 * @method name
-	 * @return {string} Name of the listdb
-	 */
-	self.name = function(){
-		return dbName;
-	};
-	/**
-	 * Get all the values in the listdb
-	 * @method all
-	 * @return {array} Values in the listdb
-	 */
-	self.all = function(){
-		return values;
-	};
-	/**
-	 * Checks to see if the listdb has a certain value in it
-	 * @method has
-	 * @param {mixed} value value to check for
-	 * @param {boolean} [ic=false] Ignore case when searching
-	 * @return {Boolean} True if the value exists in the listdb
-	 */
-	self.has = function(value,ic){
-		var i,
-			v;
-		ic = ic||false;
-		for(i=0;i&lt;values.length;i++){
-			v = values[i];
-			if((ic?v.toUpperCase():v) == (ic?value.toUpperCase():value)){
-				return true;
-			}
-		}
-		return false;
-	};
-	/**
-	 * Adds an entry to the listdb
-	 * @method add
-	 * @param {mixed} value
-	 */
-	self.add = function (value) {
-		values.push(value);
-		todo.push(value);
-		self.flush();
-	};
-	/**
-	 * Remove a value from the listdb
-	 * @method remove
-	 * @param {mixed} value value to remove from the listdb
-	 * @param {boolean} [ignoreCase=false] Ignore case when searching to remove
-	 */
-	self.remove = function (value, ignoreCase){
-		dirty = true;
-		ignoreCase = ignoreCase || false;
-		for(var i=0; i&lt;values.length; i++) {
-			if(ignoreCase) {
-				if(values[i].toUpperCase() == value.toUpperCase()) {
-					values.splice(i,1);
-					i--;
-				}
-			} else {
-				if(values[i] == value) {
-					values.splice(i,1);
-					i--;
-				}
-			}
-		}
-		active = true;
-		fs.ftruncate(fd,buff.length,function(){
-			active = false;
-			all = true;
-		});
-	};
-	self.truncate = function(){
-		values = [];
-		fs.truncate(fd);
-	};
-	self.flush = function(){
-		if(todo.length &gt; 0){
-			if(!active &amp;&amp; !isNaN(fd)){
-				var buff;
-				if(all){
-					buff = new Buffer(values.join(&quot;\n&quot;),&#x27;ascii&#x27;);
-				}else{
-					buff = new Buffer(todo.shift()+&quot;\n&quot;,&#x27;ascii&#x27;);
-				}
-				active = true;
-				fs.write(fd,buff,0,buff.length,undefined,function(){
-					active = false;
-				});
-			}else{
-				setTimeout(self.flush,1);
-			}
-		}
-	};
-	tools.mkdirParent(path.dirname(fd));
-	try{
-		values = fs.readFileSync(fd,{
-			encoding: &#x27;ascii&#x27;
-		});
-	}catch(e){
-		console.trace(e);
-		values = [];
-	}
-	if(values &amp;&amp; values.length &gt; 0){
-		values = values.split(&#x27;\n&#x27;);
-	}else{
-		values = [];
-	}
-	fs.open(fd,&#x27;a&#x27;,function(e,f){
-		fd = f;
-		active = false;
-		self.flush();
-	});
-	return this;
+    var values,
+        todo = [],
+        all = false,
+        active = false,
+        fd = &#x27;data/&#x27; + dbName + &#x27;.db&#x27;,
+        self = this;
+    /**
+     * Returnst the name of the listdb
+     * @method name
+     * @return {string} Name of the listdb
+     */
+    self.name = function(){
+        return dbName;
+    };
+    /**
+     * Get all the values in the listdb
+     * @method all
+     * @return {array} Values in the listdb
+     */
+    self.all = function(){
+        return values;
+    };
+    /**
+     * Checks to see if the listdb has a certain value in it
+     * @method has
+     * @param {mixed} value value to check for
+     * @param {boolean} [ic=false] Ignore case when searching
+     * @return {Boolean} True if the value exists in the listdb
+     */
+    self.has = function(value, ic){
+        var i,
+            v;
+        ic = ic || false;
+        for(i = 0; i &lt; values.length; i++){
+            v = values[i];
+            if((ic ? v.toUpperCase() : v) === (ic ? value.toUpperCase() : value)){
+                return true;
+            }
+        }
+        return false;
+    };
+    /**
+     * Adds an entry to the listdb
+     * @method add
+     * @param {mixed} value
+     */
+    self.add = function(value){
+        values.push(value);
+        todo.push(value);
+        self.flush();
+    };
+    /**
+     * Remove a value from the listdb
+     * @method remove
+     * @param {mixed} value value to remove from the listdb
+     * @param {boolean} [ignoreCase=false] Ignore case when searching to remove
+     */
+    self.remove = function(value, ignoreCase){
+        ignoreCase = ignoreCase || false;
+        for(var i = 0; i &lt; values.length; i++){
+            if(ignoreCase){
+                if(values[i].toUpperCase() === value.toUpperCase()){
+                    values.splice(i, 1);
+                    i--;
+                }
+            }else{
+                if(values[i] === value){
+                    values.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+        console.log(&#x27;removing&#x27;);
+        active = true;
+        var buff = Buffer.from(values.join(&#x27;\n&#x27;), &#x27;ascii&#x27;); // eslint-disable-line one-var
+        fs.ftruncate(fd, buff.length, function(){
+            active = false;
+            all = true;
+            console.log(&#x27;done&#x27;);
+        });
+    };
+    self.truncate = function(){
+        values = [];
+        fs.truncate(fd);
+    };
+    self.flush = function(fn){
+        if(todo.length &gt; 0){
+            if(!active &amp;&amp; !isNaN(fd)){
+                var buff;
+                if(all){
+                    buff = Buffer.from(values.join(&#x27;\n&#x27;), &#x27;ascii&#x27;);
+                }else{
+                    buff = Buffer.from(todo.shift() + &#x27;\n&#x27;, &#x27;ascii&#x27;);
+                }
+                active = true;
+                fs.write(fd, buff, 0, buff.length, undefined, function(){
+                    active = false;
+                    fn !== undefined &amp;&amp; fn();
+                });
+            }else{
+                setTimeout(self.flush, 1);
+            }
+        }else{
+            fn !== undefined &amp;&amp; fn();
+        }
+    };
+    self.end = function(fn){
+        if(!isNaN(fd)){
+            self.flush(function(){
+                fs.close(fd, function(){
+                    fn !== undefined &amp;&amp; fn();
+                });
+            });
+        }else{
+            setTimeout(function(){
+                self.end(fn);
+            }, 1);
+        }
+        return self;
+    };
+    tools.mkdirParent(path.dirname(fd));
+    values = [];
+    if(fs.existsSync(fd)){
+        try{
+            values = fs.readFileSync(fd, {
+                encoding: &#x27;ascii&#x27;
+            });
+        }catch(e){
+            console.trace(e);
+        }
+    }
+    if(values &amp;&amp; values.length &gt; 0){
+        values = values.split(&#x27;\n&#x27;);
+    }else{
+        values = [];
+    }
+    fs.open(fd, &#x27;a&#x27;, function(e, f){
+        fd = f;
+        active = false;
+        self.flush();
+    });
+    return this;
 };
+
     </pre>
 </div>
                     </div>
