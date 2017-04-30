@@ -214,6 +214,8 @@ module.exports = function(dbName){
                 });
             }else if(typeof fd !== &#x27;string&#x27;){
                 process.nextTick(self.flush);
+            }else{
+                self.open();
             }
         }else{
             fn !== undefined &amp;&amp; fn();
@@ -229,6 +231,15 @@ module.exports = function(dbName){
             });
         }
         return self;
+    };
+    self.open = function(){
+        if(typeof fd === &#x27;string&#x27;){
+            fs.open(fd, &#x27;a&#x27;, function(e, f){
+                fd = f;
+                active = false;
+                self.flush();
+            });
+        }
     };
     tools.mkdirParent(path.dirname(fd));
     values = [];
@@ -246,11 +257,7 @@ module.exports = function(dbName){
     }else{
         values = [];
     }
-    fs.open(fd, &#x27;a&#x27;, function(e, f){
-        fd = f;
-        active = false;
-        self.flush();
-    });
+    self.open();
     return this;
 };
 
