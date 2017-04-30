@@ -1,13 +1,14 @@
 /* global stdin Listdb */
 var getrd = function(){
     var rd = new Listdb('realdomains').all(),
-        realdomains = {},
-        item;
+        realdomains = {};
     rd.forEach(function(json, i){
         try{
-            item = JSON.parse(json);
+            var item = JSON.parse(json);
             realdomains[item.domain] = item.valid;
-        }catch(e){}
+        }catch(e){
+            console.log('Invalid JSON in realdomains: ' + json);
+        }
     });
     return realdomains;
 };
