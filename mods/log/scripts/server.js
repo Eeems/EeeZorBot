@@ -108,7 +108,8 @@ server.on('servername', function(){
         // using foreach on purpose here.
         var i, m;
         for(i in hooks){
-            if((m = hooks[i].regex.exec(text))){
+            m = hooks[i].regex.exec(text);
+            if(m){
                 hooks[i].fn.call(this, m);
                 return;
             }
@@ -170,7 +171,8 @@ server.on('servername', function(){
         // Using for loop on purpose
         var i, m;
         for(i in sendhooks){
-            if((m = sendhooks[i].regex.exec(text))){
+            m = sendhooks[i].regex.exec(text);
+            if(m){
                 sendhooks[i].fn.call(this, m);
                 return;
             }
