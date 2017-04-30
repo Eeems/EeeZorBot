@@ -200,7 +200,7 @@ module.exports = function(dbName){
     };
     self.flush = function(fn){
         if(todo.length &gt; 0){
-            if(!active &amp;&amp; !isNaN(fd)){
+            if(!active &amp;&amp; typeof fd !== &#x27;string&#x27;){
                 var buff;
                 if(all){
                     buff = Buffer.from(values.join(&#x27;\n&#x27;), &#x27;ascii&#x27;);
@@ -212,24 +212,21 @@ module.exports = function(dbName){
                     active = false;
                     fn !== undefined &amp;&amp; fn();
                 });
-            }else{
-                setTimeout(self.flush, 1);
+            }else if(typeof fd !== &#x27;string&#x27;){
+                process.nextTick(self.flush);
             }
         }else{
             fn !== undefined &amp;&amp; fn();
         }
     };
     self.end = function(fn){
-        if(!isNaN(fd)){
+        if(typeof fd !== &#x27;string&#x27;){
             self.flush(function(){
                 fs.close(fd, function(){
+                    fd = &#x27;data/&#x27; + dbName + &#x27;.db&#x27;;
                     fn !== undefined &amp;&amp; fn();
                 });
             });
-        }else{
-            setTimeout(function(){
-                self.end(fn);
-            }, 1);
         }
         return self;
     };
