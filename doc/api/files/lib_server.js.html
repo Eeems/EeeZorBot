@@ -320,7 +320,8 @@ module.exports = function(config){
                 self.fire(&#x27;data&#x27;, [d, buf], self);
                 for(ii = 0; ii &lt; s.length; ii++){
                     if(s[ii] !== &#x27;&#x27;){
-                        if((m = /^PING :(.+)/i.exec(s[ii]))){
+                        m = /^PING :(.+)/i.exec(s[ii]);
+                        if(m){
                             if(self.config.showping){
                                 self.logIn(s[ii]);
                             }else{

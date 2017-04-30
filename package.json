@@ -55,7 +55,7 @@
     "test-travis": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "lint": "standard-own --fix --verbose | snazzy",
-    "precommit": "yarn run lint && yarn run test && yuidoc . && semantic-release pre || true && git add package.json && yarn run changelog",
+    "precommit": "yarn run lint && yarn run test && yuidoc . && git add doc/ && semantic-release pre || true && git add package.json && yarn run changelog",
     "prepush": "yarn run commit-cleanup",
     "prepublish": "snyk protect && pkg-ok"
   },

@@ -241,7 +241,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\log.js",
-            "line": 50,
+            "line": 51,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "itemtype": "main",
             "static": 1
@@ -427,7 +427,7 @@
             "module": "log",
             "namespace": "",
             "file": "lib\\log.js",
-            "line": 50,
+            "line": 51,
             "description": "Logging module to handle outputting logs with the correct format, and saving them to files",
             "mainName": "",
             "tag": "main",
@@ -1072,7 +1072,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 58,
+            "line": 59,
             "description": "Does an alert message (\"=> \"+message)",
             "itemtype": "method",
             "name": "alert",
@@ -1089,7 +1089,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 77,
+            "line": 78,
             "description": "Outputs an log signifying that the message was sent to an external server (\"-> \"+message)",
             "itemtype": "method",
             "name": "out",
@@ -1106,7 +1106,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 96,
+            "line": 97,
             "description": "Outputs an log signifying that the message was recieved from an external server (\"<- \"+message)",
             "itemtype": "method",
             "name": "in",
@@ -1123,7 +1123,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 115,
+            "line": 116,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -1140,7 +1140,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 132,
+            "line": 133,
             "description": "Log an error message (\"Error: \"+message)",
             "itemtype": "method",
             "name": "error",
@@ -1157,7 +1157,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 149,
+            "line": 150,
             "description": "Log an debug message (\"debug: \"+message)",
             "itemtype": "method",
             "name": "debug",
@@ -1174,7 +1174,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 161,
+            "line": 162,
             "description": "Log an debug message (\"Info: \"+message)",
             "itemtype": "method",
             "name": "info",
@@ -1191,7 +1191,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 178,
+            "line": 179,
             "description": "Saves a line to a named log",
             "itemtype": "method",
             "name": "save",
@@ -1214,7 +1214,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 208,
+            "line": 209,
             "description": "Returns the listdb object for a specific log",
             "itemtype": "method",
             "name": "get",
@@ -1234,7 +1234,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 217,
+            "line": 218,
             "description": "Logs a message and saves the output to a log",
             "itemtype": "method",
             "name": "log",
@@ -1252,7 +1252,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 227,
+            "line": 228,
             "description": "Outputs a trace log",
             "itemtype": "method",
             "name": "trace",
@@ -1261,7 +1261,7 @@
         },
         {
             "file": "lib\\log.js",
-            "line": 239,
+            "line": 240,
             "description": "log config",
             "type": "{object}",
             "itemtype": "property",
@@ -1607,7 +1607,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 299,
+            "line": 300,
             "description": "Send a message to the IRC server",
             "itemtype": "method",
             "name": "send",
@@ -1624,7 +1624,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 323,
+            "line": 324,
             "description": "Install a hook on the server.",
             "itemtype": "method",
             "name": "on",
@@ -1653,7 +1653,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 356,
+            "line": 357,
             "description": "Uninstall a hook from the server",
             "itemtype": "method",
             "name": "off",
@@ -1676,7 +1676,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 396,
+            "line": 397,
             "description": "Add a command to the server",
             "itemtype": "method",
             "name": "add",
@@ -1703,7 +1703,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 415,
+            "line": 416,
             "description": "Remove a command listener from the server",
             "itemtype": "method",
             "name": "remove",
@@ -1720,7 +1720,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 441,
+            "line": 442,
             "description": "Fire an event on the IRC server",
             "itemtype": "method",
             "name": "fire",
@@ -1747,7 +1747,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 464,
+            "line": 465,
             "description": "Join a channel",
             "itemtype": "method",
             "name": "join",
@@ -1764,7 +1764,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 492,
+            "line": 493,
             "description": "Leave a channel",
             "itemtype": "method",
             "name": "part",
@@ -1781,7 +1781,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 505,
+            "line": 506,
             "description": "Check if in a channel",
             "itemtype": "method",
             "name": "in",
@@ -1801,7 +1801,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 520,
+            "line": 521,
             "description": "Get a channel based on it's name",
             "itemtype": "method",
             "name": "channel",
@@ -1821,7 +1821,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 534,
+            "line": 535,
             "description": "Gets the user or syncs a user on the server",
             "itemtype": "method",
             "name": "user",
@@ -1841,7 +1841,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 567,
+            "line": 568,
             "description": "Gets a script based on the sid",
             "itemtype": "method",
             "name": "script",
@@ -1861,7 +1861,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 577,
+            "line": 578,
             "description": "Reconnects to the IRC server",
             "itemtype": "method",
             "name": "reconnect",
@@ -1871,7 +1871,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 598,
+            "line": 599,
             "description": "Quits from the IRC server",
             "itemtype": "method",
             "name": "quit",
