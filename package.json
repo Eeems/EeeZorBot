@@ -19,6 +19,7 @@
     "chardet": "x",
     "deasync": "0.x",
     "iconv": "x",
+    "msgpack5": "^3.4.1",
     "mysql": "2.4.x",
     "node-persist": "0.0.x",
     "sanitize-filename": "x",
