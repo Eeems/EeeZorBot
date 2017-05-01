@@ -181,9 +181,9 @@ module.exports.extend(module.exports, {
         (function mkdir(dirs, dir){
             if(dirs.length){
                 dir = dir + &#x27;/&#x27; + dirs.pop();
-                try{
+                if(!fs.existsSync(dir)){
                     fs.mkdirSync(dir, mode);
-                }catch(e){}
+                }
                 mkdir(dirs, dir);
             }
         })(dirs, dir);
