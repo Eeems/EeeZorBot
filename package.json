@@ -16,12 +16,11 @@
     "node": ">=0.10"
   },
   "devDependencies": {
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "snyk": "^1.36.2"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "snyk test && tape test/*.js"
   },
-  "dependencies": {
-    "socket.io": "^2.0.3"
-  }
+  "dependencies": {}
 }
