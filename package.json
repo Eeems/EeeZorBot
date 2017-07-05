@@ -1,24 +1,27 @@
 {
-	"name": "EeeZorBot",
-	"version": "0.0.1",
-	"author": {
-		"name": "Nathaniel van Diepen",
-		"email": "eeems@omnimaga.org",
-		"url": "http://eeems.ca"
-	},
-	"description": "Highly extensible Node.js bot",
-	"main": "./main.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Eeems/EeeZorBot.git"
-	},
-	"engines": {
-		"node": ">=0.10"
-	},
-	"devDependencies": {
-		"tape": "^4.6.3"
-	},
-	"scripts":{
-		"test": "tape test/*.js"
-	}
+  "name": "EeeZorBot",
+  "version": "0.0.1",
+  "author": {
+    "name": "Nathaniel van Diepen",
+    "email": "eeems@omnimaga.org",
+    "url": "http://eeems.ca"
+  },
+  "description": "Highly extensible Node.js bot",
+  "main": "./main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eeems/EeeZorBot.git"
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "devDependencies": {
+    "tape": "^4.6.3"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "dependencies": {
+    "socket.io": "^2.0.3"
+  }
 }
