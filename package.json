@@ -19,15 +19,15 @@
     "chardet": "^0.1.0",
     "deasync": "^0.1.9",
     "iconv": "^2.2.3",
-    "msgpack5": "^3.4.1",
+    "msgpack-lite": "^0.1.26",
     "mysql": "^2.4.3",
     "node-persist": "^0.0.12",
     "sanitize-filename": "^1.6.1",
-    "snyk": "^1.69.5",
     "vm2": "^3.5.2",
-    "ws": "^2.3.1"
+    "ws": "3.3.1"
   },
   "devDependencies": {
+    "bundlesize": "^0.16.0",
     "codacy-coverage": "^2.0.2",
     "conventional-changelog-cli": "^1.3.1",
     "cz-conventional-changelog": "^2.0.0",
@@ -37,6 +37,7 @@
     "semantic-release": "^6.3.2",
     "semantic-release-cli": "^3.0.3",
     "snazzy": "^7.0.0",
+    "snyk": "^1.69.5",
     "standard": "^10.0.2",
     "standard-own": "^1.0.2",
     "tape": "^2.14.1",
@@ -45,7 +46,7 @@
     "yuidocjs": "^0.10.2"
   },
   "scripts": {
-    "test": "snyk test && tape test/*.js",
+    "test": "snyk test && tape test/*.js && bundlesize",
     "start": "node lib/main.js",
     "debug": "node --inspect-brk lib/main.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
@@ -72,5 +73,24 @@
       "doc/*"
     ]
   },
-  "snyk": true
+  "snyk": true,
+  "files": [
+    "lib/*.js",
+    "mods/*/scripts/*.js",
+    "mods/*/scripts/www/*"
+  ],
+  "bundlesize": [
+    {
+      "path": "./index.js",
+      "maxSize": "200 B"
+    },
+    {
+      "path": "lib/*.js",
+      "maxSize": "8 kB"
+    },
+    {
+      "path": "mods/*/scripts/*.js",
+      "maxSize": "6 kB"
+    }
+  ]
 }
