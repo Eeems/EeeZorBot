@@ -1,9 +1,9 @@
-/* global template tools log db pubsub script _dirname */
+/* global template tools log db pubsub script _dirname _root Listdb */
 /* eslint no-multi-str: 0 */
 /* jshint multistr: true */
 // Start http server if it isn't running already
 var settings = (function(){
-        var c = JSON.parse(JSON.stringify(require('../etc/config.json'))),
+        var c = require(require('path').join(_root, 'etc/config.json')),
             s = c.logs.server,
             ss = c.logs.websocket;
         if(s.listeners === undefined){
@@ -25,7 +25,6 @@ var settings = (function(){
     url = require('url'),
     path = require('path'),
     deasync = require('deasync'),
-    Listdb = require('./listdb.js'),
     http = require('http'),
     tpl = template.template,
     html = (function(){

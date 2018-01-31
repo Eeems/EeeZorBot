@@ -1,7 +1,8 @@
-/* global pubsub websocket script */
+/* global pubsub websocket script _root */
 var settings = (function(){
-        var s = require('../etc/config.json').logs.websocket,
-            ss = require('../etc/config.json').logs.server;
+        var c = require(require('path').join(_root, 'etc/config.json')),
+            s = c.logs.websocket,
+            ss = c.logs.server;
         if(s.listeners === undefined){
             s.listeners = [];
         }
