@@ -1,7 +1,7 @@
 /* global server log bans owners */
 server.add('uptime', function(){
     var t = this;
-    if(t.user && t.user.owner && t.user.owner.flags.indexOf('v')){
+    if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('v')){
         this.user.send(process.uptime());
     }else{
         this.user.send('Not Permitted');
@@ -27,7 +27,7 @@ server.add('uptime', function(){
     .add('+ban', function(hostmask){
         var t = this;
         if(hostmask){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('b')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('b')){
                 bans.add(hostmask);
                 t.channel.send('Ban added');
             }else{
@@ -40,7 +40,7 @@ server.add('uptime', function(){
     .add('-ban', function(hostmask){
         var t = this;
         if(hostmask){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('b')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('b')){
                 bans.remove(hostmask);
                 t.channel.send('Ban removed');
             }else{
@@ -52,7 +52,7 @@ server.add('uptime', function(){
     }, 'Removes a hostmask ban')
     .add('bans', function(){
         var t = this;
-        if(t.user && t.user.owner && t.user.owner.flags.indexOf('b')){
+        if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('b')){
             if(bans.length){
                 t.user.send('Bans:');
                 bans.each(function(ban){
@@ -68,7 +68,7 @@ server.add('uptime', function(){
     .add('+owner', function(nick){
         var t = this;
         if(nick){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 owners.add(nick);
                 t.channel.send('Owner added');
             }else{
@@ -81,7 +81,7 @@ server.add('uptime', function(){
     .add('-owner', function(nick){
         var t = this;
         if(nick){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 owners.remove(nick);
                 t.channel.send('Owner removed');
             }else{
@@ -93,7 +93,7 @@ server.add('uptime', function(){
     }, 'Removes an existing owner')
     .add('owners', function(){
         var t = this;
-        if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+        if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
             if(owners.length){
                 t.user.send('Owners:');
                 owners.each(function(owner){
@@ -109,7 +109,7 @@ server.add('uptime', function(){
     .add('owner', function(nick){
         var t = this;
         if(nick){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 var owner = owners.get(nick); // eslint-disable-line one-var
                 t.user.send(' - Flags: ' + owner.flags);
                 if(owner.hostmasks.length > 0){
@@ -128,7 +128,7 @@ server.add('uptime', function(){
     .add('+host', function(nick, hostmask){
         var t = this;
         if(nick && hostmask){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 var owner = owners.get(nick); // eslint-disable-line one-var
                 if(owner){
                     owners.addHostMask(nick, hostmask);
@@ -146,7 +146,7 @@ server.add('uptime', function(){
     .add('-host', function(hostmask){
         var t = this;
         if(hostmask){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 owners.removeHostMask(hostmask);
                 t.user.send('Host mask removed');
             }else{
@@ -159,7 +159,7 @@ server.add('uptime', function(){
     .add('+flag', function(nick, flags){
         var t = this;
         if(nick && flags){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 owners.addFlags(nick, flags);
                 t.user.send('Flag(s) added');
             }else{
@@ -172,7 +172,7 @@ server.add('uptime', function(){
     .add('-flag', function(nick, flags){
         var t = this;
         if(nick && flags){
-            if(t.user && t.user.owner && t.user.owner.flags.indexOf('q')){
+            if(t.user && t.user.owner && ~t.user.owner.flags.indexOf('q')){
                 owners.removeFlags(nick, flags);
                 t.user.send('Flag(s) removed');
             }else{

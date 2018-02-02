@@ -6,17 +6,21 @@ server.add('owners', function(argv){
     });
 }, 'Displays a list of owners')
     .add('owner', function(argv){
-        var owner = owners.get(argv[1]);
-        if(owner){
-            stdin.console('log', '   Flags: ' + owner.flags);
-            if(owner.hostmasks.length > 0){
-                stdin.console('log', '   Hostmasks:');
-                owner.hostmasks.forEach(function(mask){
-                    stdin.console('log', '     ' + mask);
-                });
+        if(argv.length){
+            var owner = owners.get(argv[1]);
+            if(owner){
+                stdin.console('log', '   Flags: ' + owner.flags);
+                if(owner.hostmasks.length > 0){
+                    stdin.console('log', '   Hostmasks:');
+                    owner.hostmasks.forEach(function(mask){
+                        stdin.console('log', '     ' + mask);
+                    });
+                }
+            }else{
+                stdin.console('log', 'Owner ' + argv[1] + " doesn't exist");
             }
         }else{
-            stdin.console('log', 'Owner ' + argv[1] + " doesn't exist");
+            stdin.console('log', 'No owner name provided');
         }
     }, '<nick>\nDisplays owner information')
     .add('+owner', function(argv){

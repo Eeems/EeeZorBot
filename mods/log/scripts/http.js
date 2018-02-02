@@ -261,7 +261,7 @@ var settings = (function(){
                             throw e;
                         }
                         r.forEach(function(v, i){
-                            require('./api.js').servers.forEach(function(server, i){
+                            require('api').servers.forEach(function(server, i){
                                 if(v.name === server.name){
                                     v.online = true;
                                 }
@@ -300,7 +300,7 @@ var settings = (function(){
                                         throw e;
                                     }
                                     servers.forEach(function(v, i){
-                                        require('./api.js').servers.forEach(function(server, i){
+                                        require('api').servers.forEach(function(server, i){
                                             if(v.name === server.name){
                                                 v.online = true;
                                             }
@@ -346,7 +346,7 @@ var settings = (function(){
                                                         throw e;
                                                     }
                                                     channels.forEach(function(v, i){
-                                                        require('./api.js').servers.forEach(function(server, i){
+                                                        require('api').servers.forEach(function(server, i){
                                                             if(server.name === v.server){
                                                                 var c = server.channel(v.name);
                                                                 if(c && c.active){
@@ -393,7 +393,7 @@ var settings = (function(){
                                                     if(e){
                                                         throw e;
                                                     }
-                                                    require('./api.js').servers.forEach(function(server, i){
+                                                    require('api').servers.forEach(function(server, i){
                                                         if(server.name === channel.server){
                                                             users.forEach(function(user, i){
                                                                 var u = server.user(user.name);
@@ -440,7 +440,7 @@ var settings = (function(){
                                                         throw e;
                                                     }
                                                     channels.forEach(function(v, i){
-                                                        require('./api.js').servers.forEach(function(s, i){
+                                                        require('api').servers.forEach(function(s, i){
                                                             if(s.name === server.name){
                                                                 var c = s.channel(v.name);
                                                                 if(c && c.active){
@@ -468,7 +468,7 @@ var settings = (function(){
                                                         if(e){
                                                             throw e;
                                                         }
-                                                        require('./api.js').servers.forEach(function(s, i){
+                                                        require('api').servers.forEach(function(s, i){
                                                             if(s.name === server.name){
                                                                 users.forEach(function(user, i){
                                                                     var u = s.user(user.name);
@@ -664,7 +664,7 @@ var settings = (function(){
                                     var server = db.querySync('select name from servers where id = ?', [args[0]])[0];
                                     if(server !== undefined){
                                         r.forEach(function(v, i){
-                                            require('./api.js').servers.forEach(function(s, i){
+                                            require('api').servers.forEach(function(s, i){
                                                 if(server.name === s.name){
                                                     var c = s.channel(v.name);
                                                     if(c && c.active){
