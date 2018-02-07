@@ -10,12 +10,16 @@ db.multiQuerySync([
             id int AUTO_INCREMENT PRIMARY KEY,\
             name varchar(10) UNIQUE KEY NOT NULL\
         )\
+        CHARACTER SET utf8\
+        COLLATE utf8_general_ci\
     ',
     '\
         CREATE TABLE IF NOT EXISTS users (\
             id int AUTO_INCREMENT PRIMARY KEY,\
             name varchar(30) UNIQUE KEY NOT NULL\
         )\
+        CHARACTER SET utf8\
+        COLLATE utf8_general_ci\
     ',
     '\
         CREATE TABLE IF NOT EXISTS servers (\
@@ -24,6 +28,8 @@ db.multiQuerySync([
             host varchar(400),\
             port int\
         )\
+        CHARACTER SET utf8\
+        COLLATE utf8_general_ci\
     ',
     '\
         CREATE TABLE IF NOT EXISTS channels (\
@@ -36,6 +42,8 @@ db.multiQuerySync([
                 ON DELETE CASCADE\
                 ON UPDATE CASCADE\
         )\
+        CHARACTER SET utf8\
+        COLLATE utf8_general_ci\
     ',
     '\
         CREATE TABLE IF NOT EXISTS messages (\
@@ -62,6 +70,8 @@ db.multiQuerySync([
                 ON DELETE RESTRICT\
                 ON UPDATE CASCADE\
         )\
+        CHARACTER SET utf8\
+        COLLATE utf8_general_ci\
     ',
     '\
         CREATE OR REPLACE VIEW messages_v AS\
