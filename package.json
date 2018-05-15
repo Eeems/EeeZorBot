@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "tape": "^4.6.3",
-    "snyk": "1.80.0"
+    "snyk": "1.81.0"
   },
   "scripts": {
     "test": "snyk test && tape test/*.js"
