@@ -20,7 +20,8 @@
     "snyk": "1.82.0"
   },
   "scripts": {
-    "test": "snyk test && tape test/*.js"
+    "test": "snyk test && tape test/*.js",
+    "test-travis": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info"
   },
   "dependencies": {}
 }
