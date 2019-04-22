@@ -7,8 +7,6 @@ cache:
 node_js:
   - "node"
   - "10"
-  - "9"
-  - "8"
 script: "yarn run test-travis"
 before_script:
   - mysql -u root -e 'CREATE DATABASE ircbot;'

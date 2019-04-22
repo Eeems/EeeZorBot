@@ -13,7 +13,7 @@
     "url": "https://github.com/Eeems/EeeZorBot.git"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "dependencies": {
     "chardet": "^0.7.0",
