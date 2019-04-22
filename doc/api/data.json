@@ -753,11 +753,6 @@
             "name": "addHostMask",
             "params": [
                 {
-                    "name": "nick",
-                    "description": "The nick the owner is registered under",
-                    "type": "String"
-                },
-                {
                     "name": "hostmask",
                     "description": "The hostmask to add to the owner",
                     "type": "String"
@@ -769,14 +764,11 @@
         },
         {
             "file": "lib\\bans.js",
-            "line": 53,
+            "line": 52,
             "description": "Remove a hostmask from a owner",
+            "itemtype": "method",
+            "name": "remove",
             "params": [
-                {
-                    "name": "nick",
-                    "description": "The nick the owner is registered under",
-                    "type": "String"
-                },
                 {
                     "name": "hostmask",
                     "description": "The hostmask to remove from the owner",
@@ -789,8 +781,10 @@
         },
         {
             "file": "lib\\bans.js",
-            "line": 63,
+            "line": 62,
             "description": "Returns the owner who matches the hostmask",
+            "itemtype": "method",
+            "name": "match",
             "params": [
                 {
                     "name": "hostmask",
@@ -2165,14 +2159,5 @@
             "module": "user"
         }
     ],
-    "warnings": [
-        {
-            "message": "Missing item type\nRemove a hostmask from a owner",
-            "line": " lib\\bans.js:53"
-        },
-        {
-            "message": "Missing item type\nReturns the owner who matches the hostmask",
-            "line": " lib\\bans.js:63"
-        }
-    ]
+    "warnings": []
 }
