@@ -272,7 +272,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "lib\\script.js",
-            "line": 5,
+            "line": 6,
             "description": "Provides a script object that allows a server to handle the loaded script"
         },
         "server": {
@@ -459,7 +459,7 @@
             "module": "script",
             "namespace": "",
             "file": "lib\\script.js",
-            "line": 5,
+            "line": 6,
             "description": "Provides a script object that allows a server to handle the loaded script",
             "params": [
                 {
@@ -673,16 +673,6 @@
         {
             "file": "lib\\api.js",
             "line": 74,
-            "description": "Provides access to the global console object",
-            "static": 1,
-            "itemtype": "property",
-            "name": "console",
-            "class": "api",
-            "module": "api"
-        },
-        {
-            "file": "lib\\api.js",
-            "line": 80,
             "description": "Provides access to the global process object",
             "static": 1,
             "itemtype": "property",
@@ -692,7 +682,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 87,
+            "line": 81,
             "description": "Provides the Channel class",
             "static": 1,
             "is_constructor": 1,
@@ -703,7 +693,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 94,
+            "line": 88,
             "description": "Provides the User class",
             "static": 1,
             "itemtype": "property",
@@ -714,7 +704,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 101,
+            "line": 95,
             "description": "Provides the Server class",
             "static": 1,
             "itemtype": "property",
@@ -725,7 +715,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 126,
+            "line": 120,
             "description": "Provides a circular reference to API",
             "static": 1,
             "itemtype": "property",
@@ -735,7 +725,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 136,
+            "line": 130,
             "description": "Provides access to all servers",
             "static": 1,
             "itemtype": "property",
@@ -745,7 +735,7 @@
         },
         {
             "file": "lib\\api.js",
-            "line": 149,
+            "line": 143,
             "description": "The API version",
             "itemtype": "property",
             "name": "version",
@@ -757,7 +747,7 @@
         },
         {
             "file": "lib\\bans.js",
-            "line": 33,
+            "line": 35,
             "description": "Adds a hostmask to a owner",
             "itemtype": "method",
             "name": "addHostMask",
@@ -779,7 +769,7 @@
         },
         {
             "file": "lib\\bans.js",
-            "line": 50,
+            "line": 53,
             "description": "Remove a hostmask from a owner",
             "params": [
                 {
@@ -799,7 +789,7 @@
         },
         {
             "file": "lib\\bans.js",
-            "line": 60,
+            "line": 63,
             "description": "Returns the owner who matches the hostmask",
             "params": [
                 {
@@ -817,7 +807,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 14,
+            "line": 23,
             "description": "Name of the channel",
             "type": "{string}",
             "itemtype": "property",
@@ -827,7 +817,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 20,
+            "line": 29,
             "description": "Is the bot in the channel?",
             "type": "{boolean}",
             "itemtype": "property",
@@ -837,7 +827,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 26,
+            "line": 35,
             "description": "Channel modes",
             "type": "{Array}",
             "itemtype": "property",
@@ -847,7 +837,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 32,
+            "line": 41,
             "description": "Contains the topic of the channel and tries to change it if set",
             "type": "{String}",
             "itemtype": "property",
@@ -857,7 +847,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 46,
+            "line": 55,
             "description": "Interface for setting the topic internally",
             "itemtype": "property",
             "name": "_topic",
@@ -868,7 +858,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 60,
+            "line": 69,
             "description": "Parent server",
             "type": "{Server}",
             "itemtype": "property",
@@ -879,7 +869,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 70,
+            "line": 79,
             "description": "Runs a /who on the channel, refreshing user data",
             "itemtype": "method",
             "name": "who",
@@ -889,7 +879,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 84,
+            "line": 93,
             "description": "Returns an array of all the users in the channel",
             "itemtype": "property",
             "name": "users",
@@ -902,7 +892,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 104,
+            "line": 114,
             "description": "Sets the mode of the channel, or users in the channel",
             "itemtype": "method",
             "name": "mode",
@@ -925,7 +915,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 129,
+            "line": 139,
             "description": "Leave the channel",
             "itemtype": "method",
             "name": "part",
@@ -935,7 +925,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 139,
+            "line": 149,
             "description": "Join the channel",
             "itemtype": "method",
             "name": "join",
@@ -945,7 +935,7 @@
         },
         {
             "file": "lib\\channel.js",
-            "line": 149,
+            "line": 159,
             "description": "Send a message to the channel",
             "itemtype": "method",
             "name": "send",
@@ -1271,7 +1261,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 50,
+            "line": 47,
             "description": "stores the script global identifier",
             "itemtype": "property",
             "name": "sid",
@@ -1282,7 +1272,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 61,
+            "line": 58,
             "description": "stores the script identifier",
             "itemtype": "property",
             "name": "sid",
@@ -1293,7 +1283,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 71,
+            "line": 68,
             "description": "Stores a reference to the server that this script is used on",
             "itemtype": "property",
             "name": "server",
@@ -1304,7 +1294,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 81,
+            "line": 78,
             "description": "The path to the script that is run",
             "itemtype": "property",
             "name": "path",
@@ -1314,7 +1304,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 87,
+            "line": 84,
             "description": "Boolean determining if the script is currently active",
             "itemtype": "property",
             "name": "enabled",
@@ -1324,7 +1314,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 94,
+            "line": 91,
             "description": "reloads the script from the disk",
             "itemtype": "method",
             "name": "reload",
@@ -1334,7 +1324,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 117,
+            "line": 133,
             "description": "Disables the script (hooks, commands etc)",
             "itemtype": "method",
             "name": "disable",
@@ -1344,7 +1334,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 136,
+            "line": 152,
             "description": "Description",
             "itemtype": "method",
             "name": "enable",
@@ -1354,7 +1344,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 161,
+            "line": 177,
             "description": "Disables and removes the script from the server.",
             "itemtype": "method",
             "name": "remove",
@@ -1364,7 +1354,7 @@
         },
         {
             "file": "lib\\script.js",
-            "line": 172,
+            "line": 188,
             "description": "Function to run when the script is unloaded",
             "itemtype": "event",
             "name": "unload",
@@ -2178,11 +2168,11 @@
     "warnings": [
         {
             "message": "Missing item type\nRemove a hostmask from a owner",
-            "line": " lib\\bans.js:50"
+            "line": " lib\\bans.js:53"
         },
         {
             "message": "Missing item type\nReturns the owner who matches the hostmask",
-            "line": " lib\\bans.js:60"
+            "line": " lib\\bans.js:63"
         }
     ]
 }

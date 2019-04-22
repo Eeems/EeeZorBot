@@ -138,7 +138,7 @@ var config = (function(){
     util = require(&#x27;util&#x27;),
     fs = require(&#x27;fs&#x27;),
     Listdb = require(&#x27;./listdb.js&#x27;),
-    msgpack = require(&#x27;msgpack5&#x27;)(),
+    msgpack = require(&#x27;msgpack-lite&#x27;),
     write = function(msg, type){
         var d = new Date(), i;
         type = type === undefined ? &#x27;log&#x27; : type;

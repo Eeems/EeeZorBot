@@ -1,10 +1,4 @@
-<a name="0.1.0"></a>
-# 0.1.0 (2017-04-30)
-
-
-### Bug Fixes
-
-* **listdb.js:** Properly handle closing listdb. Properly flush listdb ([b2d21f6](https://github.com/Eeems/EeeZorBot/commit/b2d21f6))
+# 0.1.0 (2019-04-22)
 
 
 ### Features

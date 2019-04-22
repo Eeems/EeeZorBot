@@ -150,7 +150,7 @@ module.exports = function(config){
      */
     Object.defineProperty(self, &#x27;id&#x27;, {
         get: function(){
-            return require(&#x27;./api.js&#x27;).servers.indexOf(self);
+            return require(&#x27;./servers.js&#x27;).indexOf(self);
         }
     });
     /**
@@ -203,10 +203,10 @@ module.exports = function(config){
      * @param {function} fn function to run
      * @chainable
      */
-    self.run = function(id, fn){
+    self.run = async function(id, fn){
         var osid = sid;
         sid = id;
-        fn.call(self, sid);
+        await fn.call(self, sid);
         sid = osid;
         return self;
     };
@@ -336,11 +336,11 @@ module.exports = function(config){
                         }else{
                             self.logIn(s[ii]);
                         }
-                        self.hooks.forEach(function(hook, i){
+                        self.hooks.forEach(async function(hook, i){
                             if(hook.type === &#x27;regex&#x27;){
                                 match = hook.regex.exec(s[ii]);
                                 if(match){
-                                    hook.fn.call(self, match, s[ii]);
+                                    await hook.fn.call(self, match, s[ii]);
                                     if(hook.once){
                                         self.hooks.splice(i, 1);
                                     }
@@ -744,7 +744,7 @@ module.exports = function(config){
         self.scripts.forEach(function(script){
             script.disable();
         });
-        require(&#x27;./api.js&#x27;).servers.splice(self.id, 1);
+        require(&#x27;./servers.js&#x27;).splice(self.id, 1);
     };
     process.on(&#x27;exit&#x27;, function(){
         self.info(&#x27;Server handling process exit&#x27;);
@@ -828,7 +828,7 @@ module.exports = function(config){
             user.whois();
         })
         // RPL_WHOISUSER
-        .on(/:.+ 311 \S+ (\S+) (\S+) (\S+) \* :(.+)/i, function(m){
+        .on(/:.+ 311 \S+ (\S+) (\S+) (\S+) \* :(.+)/i, async function(m){
             // 1 - nick
             // 2 - username
             // 3 - host
@@ -844,7 +844,7 @@ module.exports = function(config){
                 user.host = m[3];
                 user.realname = m[4];
             }
-            owner = owners.match(user.hostmask);
+            owner = await owners.match(user.hostmask);
             if(owner !== undefined){
                 if(owner.flags.indexOf(&#x27;v&#x27;) !== -1){
                     for(i = 0; i &lt; user.channels.length; i++){
@@ -919,7 +919,7 @@ module.exports = function(config){
             var channel = self.channel(m[1]),
                 modes = m[2];
             if(!channel){
-                channel = new Channel(m[1], self);
+                channel = new Channel(self, m[1]);
                 self.channels.push(channel);
             }
             channel.modes.forEach(function(mode, i){
@@ -946,7 +946,7 @@ module.exports = function(config){
                 case 346:mode = &#x27;I&#x27;; break;
             }
             if(!channel){
-                channel = new Channel(m[2], self);
+                channel = new Channel(self, m[2]);
                 self.channels.push(channel);
             }
             if(!(channel.modes[mode] instanceof Array)){
@@ -964,7 +964,7 @@ module.exports = function(config){
             var channel = self.channel(m[2]),
                 user = self.user(self.name);
             if(!channel){
-                channel = new Channel(m[2], self);
+                channel = new Channel(self, m[2]);
                 self.channels.push(channel);
             }
             if(!user){
@@ -1124,7 +1124,7 @@ module.exports = function(config){
             var channel = self.channel(m[4]),
                 user = self.user(m[1]);
             if(!channel){
-                channel = new Channel(m[4], self);
+                channel = new Channel(self, m[4]);
                 self.channels.push(channel);
             }
             if(!user){
@@ -1137,7 +1137,7 @@ module.exports = function(config){
             channel._topic = [m[5]];
         })
         // JOIN
-        .on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) JOIN :(\\S+)&#x27;, &#x27;i&#x27;), function(m){
+        .on(new RegExp(&#x27;:(\\S+)\\!(.+)@(.+) JOIN :(\\S+)&#x27;, &#x27;i&#x27;), async function(m){
             // 1 - nick
             // 2 - username
             // 3 - host
@@ -1145,18 +1145,18 @@ module.exports = function(config){
             var channel = (function(){
                     var c = self.channel(m[4]);
                     if(!c){
-                        c = new Channel(m[4], self);
+                        c = new Channel(self, m[4]);
                         self.channels.push(c);
                     }
                     return c;
                 })(),
                 user;
             if(m[1] === self.config.nick){
-                channel.who();                          // get users
-                self.send(&#x27;MODE &#x27; + channel.name);      // get modes
-                self.send(&#x27;MODE &#x27; + channel.name + &#x27; b&#x27;);   // get bans
-                self.send(&#x27;MODE &#x27; + channel.name + &#x27; e&#x27;);   // get exceptions
-                self.send(&#x27;MODE &#x27; + channel.name + &#x27; I&#x27;);   // get invitation masks
+                channel.who(); // get users
+                self.send(&#x27;MODE &#x27; + channel.name); // get modes
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; b&#x27;); // get bans
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; e&#x27;); // get exceptions
+                self.send(&#x27;MODE &#x27; + channel.name + &#x27; I&#x27;); // get invitation masks
             }else{
                 user = self.user(m[1]);
                 if(!user){
@@ -1165,18 +1165,19 @@ module.exports = function(config){
                 }
                 user.channels.push(channel);
                 user.whois();
-                var f = function(flag, mode){ // eslint-disable-line one-var
-                    if(user.owner &amp;&amp; user.owner.flags &amp;&amp; user.owner.flags.indexOf(flag) !== -1){
-                        self.info(&#x27;Setting mode &#x27; + flag + &#x27; on owner &#x27; + user.owner.nick);
+                var f = async function(flag, mode){ // eslint-disable-line one-var
+                    var owner = await user.owner();
+                    if(owner &amp;&amp; owner.flags &amp;&amp; owner.flags.indexOf(flag) !== -1){
+                        self.info(&#x27;Setting mode &#x27; + flag + &#x27; on owner &#x27; + owner.nick);
                         channel.mode(mode, user);
                     }
                 };
-                f(&#x27;v&#x27;, &#x27;+v&#x27;);
-                f(&#x27;h&#x27;, &#x27;+h&#x27;);
-                f(&#x27;o&#x27;, &#x27;+o&#x27;);
-                f(&#x27;a&#x27;, &#x27;+a&#x27;);
-                f(&#x27;q&#x27;, &#x27;+q&#x27;);
-                if(user.banned){
+                await f(&#x27;v&#x27;, &#x27;+v&#x27;);
+                await f(&#x27;h&#x27;, &#x27;+h&#x27;);
+                await f(&#x27;o&#x27;, &#x27;+o&#x27;);
+                await f(&#x27;a&#x27;, &#x27;+a&#x27;);
+                await f(&#x27;q&#x27;, &#x27;+q&#x27;);
+                if(await user.banned()){
                     self.info(&#x27;Kicking &#x27; + user.nick + &#x27; from &#x27; + channel.name);
                     channel.mode(&#x27;+b&#x27;, user);
                     channel.kick(user);
@@ -1197,7 +1198,7 @@ module.exports = function(config){
             var channel = (function(){
                     var c = self.channel(m[4]);
                     if(!c){
-                        c = new Channel(m[4], self);
+                        c = new Channel(self, m[4]);
                         self.channels.push(c);
                     }
                     return c;
@@ -1260,7 +1261,7 @@ module.exports = function(config){
                 index,
                 argv = m[6] === undefined ? [] : m[6].split(&#x27; &#x27;);
             if(!channel){
-                channel = new Channel(m[4], self);
+                channel = new Channel(self, m[4]);
             }
             for(i = 1; i &lt; m[5].length; i++){
                 mode = m[5][i];
@@ -1343,10 +1344,12 @@ module.exports = function(config){
         },
         mods = api.mods(&#x27;server&#x27;);
     api.servers.push(self);
-    for(ii = 0; ii &lt; mods.length; ii++){
-        self.debug(&#x27; |- &#x27; + mods[ii]);
-        self.run(ii + 1, fn);
-    }
+    (async function(){
+        for(ii = 0; ii &lt; mods.length; ii++){
+            self.debug(&#x27; |- &#x27; + mods[ii]);
+            await self.run(ii + 1, fn);
+        }
+    })();
     interval = setInterval(function(){
         if(self.socket !== undefined){
             var d = new Date(+new Date());

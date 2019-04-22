@@ -192,26 +192,22 @@ module.exports = function(nick, username, host, realname, server){
      * @property owner
      * @type {String}
      */
-    Object.defineProperty(self, &#x27;owner&#x27;, {
-        get: function(){
-            var owner = owners.match(self.hostmask);
-            if(owner === undefined){
-                owner = {
-                    nick: self.nick,
-                    hostmasks: [
-                        self.hostmask
-                    ],
-                    flags: &#x27;&#x27;
-                };
-            }
-            return owner;
+    self.owner = async function(){
+        var owner = await owners.match(self.hostmask);
+        if(owner === undefined){
+            owner = {
+                nick: self.nick,
+                hostmasks: [
+                    self.hostmask
+                ],
+                flags: &#x27;&#x27;
+            };
         }
-    });
-    Object.defineProperty(self, &#x27;banned&#x27;, {
-        get: function(){
-            return bans.match(self.hostmask);
-        }
-    });
+        return owner;
+    };
+    self.banned = async function(){
+        return bans.match(self.hostmask);
+    };
     return self;
 };
 

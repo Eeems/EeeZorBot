@@ -114,32 +114,33 @@ var storage = require(&#x27;node-persist&#x27;),
  */
 module.exports = (function(){
     var self = {},
-        db = storage.create({
-            dir: &#x27;owners/&#x27;
-        });
-    db.initSync();
-    Object.defineProperty(self, &#x27;values&#x27;, {
-        get: function(){
-            return db.values();
-        }
-    });
-
-    self.each = function(callback){
-        db.forEach(function(key, value){
-            callback.call(value, value, key);
+        _db,
+        getDb = async function(){
+            if(!_db){
+                _db = storage.create({
+                    dir: &#x27;data/owners/&#x27;
+                });
+                await _db.init();
+            }
+            return _db;
+        };
+    self.values = async function(){
+        return (await getDb()).values();
+    };
+    self.each = async function(callback){
+        await (await getDb()).forEach(async function(item){
+            var value = item.value;
+            await callback.call(value, value, item.key);
         });
     };
-    Object.defineProperty(self, &#x27;length&#x27;, {
-        enumerable: true,
-        get: function(){
-            return db.length();
-        }
-    });
-    self.get = function(nick){
-        return db.getItem(s(nick));
+    self.length = async function(){
+        return (await getDb()).length();
     };
-    self.add = function(nick, options){
-        var owner = db.getItem(s(nick)),
+    self.get = async function(nick){
+        return nick ? (await getDb()).getItem(s(nick)) : null;
+    };
+    self.add = async function(nick, options){
+        var owner = await (await getDb()).getItem(s(nick)),
             i;
         if(owner === undefined){
             owner = {
@@ -154,26 +155,26 @@ module.exports = (function(){
         self.update(owner);
         return self;
     };
-    self.remove = function(nick){
-        db.removeItem(s(nick));
+    self.remove = async function(nick){
+        await (await getDb()).removeItem(s(nick));
         return self;
     };
-    self.update = function(owner){
-        db.setItem(s(owner.nick), owner);
+    self.update = async function(owner){
+        await (await getDb()).setItem(s(owner.nick), owner);
     };
-    self.addHostMask = function(nick, hostmask){
-        if(self.match(hostmask) === undefined){
-            var owner = self.get(nick);
+    self.addHostMask = async function(nick, hostmask){
+        if(await self.match(hostmask) === undefined){
+            var owner = await self.get(nick);
             if(owner === undefined){
-                self.add(nick);
-                owner = self.get(nick);
+                await self.add(nick);
+                owner = await self.get(nick);
             }
             owner.hostmasks.push(hostmask);
-            self.update(owner);
+            await self.update(owner);
         }
         return self;
     };
-    self.removeHostMask = function(hostmask){
+    self.removeHostMask = async function(hostmask){
         var owner = self.match(hostmask),
             i;
         if(owner !== undefined){
@@ -182,39 +183,39 @@ module.exports = (function(){
                     owner.hostmasks.splice(i, 1);
                 }
             }
-            self.update(owner);
+            await self.update(owner);
         }
         return self;
     };
-    self.addFlags = function(nick, flags){
-        var owner = self.get(nick);
+    self.addFlags = async function(nick, flags){
+        var owner = await self.get(nick);
         if(owner){
             flags.split(&#x27;&#x27;).forEach(function(f){
                 if(owner.flags.indexOf(f) === -1){
                     owner.flags += f;
                 }
             });
-            self.update(owner);
+            await self.update(owner);
         }
         // TODO - handle flag sync across channels
         return self;
     };
-    self.removeFlags = function(nick, flags){
-        var owner = self.get(nick);
+    self.removeFlags = async function(nick, flags){
+        var owner = await self.get(nick);
         if(owner){
             flags.split(&#x27;&#x27;).forEach(function(f){
                 if(owner.flags.indexOf(f) !== -1){
                     owner.flags = owner.flags.replace(f, &#x27;&#x27;);
                 }
             });
-            self.update(owner);
+            await self.update(owner);
         }
         // TODO - handle flag sync across channels
         return self;
     };
-    self.match = function(hostmask){
+    self.match = async function(hostmask){
         var ret;
-        self.each(function(owner){
+        await self.each(function(owner){
             var i, h, s;
             for(i = 0; i &lt; owner.hostmasks.length; i++){
                 h = owner.hostmasks[i];

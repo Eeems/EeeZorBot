@@ -114,6 +114,15 @@ var User = require(&#x27;./user.js&#x27;);
  * @constructor
  */
 module.exports = function(server, name){
+    if(!server){
+        throw new Error(&#x27;Argument &quot;server&quot; must be defined&#x27;);
+    }
+    if(!server.send){
+        throw new Error(&#x27;Argument &quot;server&quot; must be an instance of Server. &#x27; + (typeof server));
+    }
+    if(!name){
+        throw new Error(&#x27;Agument &quot;name&quot; must be defined&#x27;);
+    }
     var self = this,
         topic = null;
     /**
@@ -195,8 +204,9 @@ module.exports = function(server, name){
         get: function(){
             var users = [],
                 i,
-                user;
-            for(i = 0; i &lt; server.users.length; i++){
+                user,
+                sUsers = server.users || [];
+            for(i = 0; i &lt; sUsers.length; i++){
                 user = server.users[i];
                 if(user.channels.indexOf(self) !== -1){
                     users.push(user);
@@ -247,7 +257,7 @@ module.exports = function(server, name){
      * @chainable
      */
     self.join = function(){
-        self.server.send(&#x27;join &#x27; + self.name);      // join channel
+        self.server.send(&#x27;join &#x27; + self.name); // join channel
         self.active = true;
         return self;
     };

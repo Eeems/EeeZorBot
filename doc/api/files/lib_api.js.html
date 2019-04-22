@@ -177,12 +177,6 @@ var api = {
          */
         websocket: require(&#x27;./websocket.js&#x27;),
         /**
-         * Provides access to the global console object
-         * @static
-         * @property console
-         */
-        console: console,
-        /**
          * Provides access to the global process object
          * @static
          * @property process
@@ -215,7 +209,7 @@ var api = {
         },
         template: require(&#x27;./template.js&#x27;)
     },
-    servers = [];
+    servers = require(&#x27;./servers.js&#x27;);
 Object.defineProperty(api, &#x27;config&#x27;, {
     readonly: true,
     value: require(&#x27;../etc/config.json&#x27;)

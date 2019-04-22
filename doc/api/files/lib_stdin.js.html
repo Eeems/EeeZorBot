@@ -178,7 +178,7 @@ var tools = require(&#x27;./tools.js&#x27;),
          * @chainable
          */
         on: function(event, callback){
-            process.stdin.on(event, function(){
+            process.stdin.on(event, async function(){
                 if(config.console){
                     return callback.apply(this, arguments);
                 }
@@ -298,11 +298,11 @@ stdin.add(&#x27;help&#x27;, function(argv){
     }, &#x27;Starts the debugger&#x27;)
     .add(&#x27;raw&#x27;, function(argv){
         argv.shift();
-        require(&#x27;./api.js&#x27;).servers[argv.shift()].send(argv.join(&#x27; &#x27;));
+        require(&#x27;./servers.js&#x27;)[argv.shift()].send(argv.join(&#x27; &#x27;));
     }, &#x27;Runs a command on a server.&#x27;)
     .add(&#x27;reconnect&#x27;, function(argv){
         if(argv.length &gt; 1){
-            var servers = require(&#x27;./api.js&#x27;).servers,
+            var servers = require(&#x27;./servers.js&#x27;),
                 id = argv[1];
             if(isNaN(argv[1]) || servers.length &lt; id || id &lt; 0){
                 stdin.console(&#x27;log&#x27;, &#x27;Invalid server id&#x27;);
@@ -348,7 +348,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
         }
     }, &#x27;Displays and changes stdin config information&#x27;)
     .add(&#x27;info&#x27;, function(argv){
-        var servers = require(&#x27;./api.js&#x27;).servers,
+        var servers = require(&#x27;./servers.js&#x27;),
             i, server;
         if(argv.length &gt; 1){
             switch(argv[1]){
@@ -508,7 +508,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
             }
         }
     },
-        &#x27;[&lt;type&gt; &lt;id&gt; [&lt;arg&gt;]]\n&#x27; +
+    &#x27;[&lt;type&gt; &lt;id&gt; [&lt;arg&gt;]]\n&#x27; +
         &#x27;  types:\n&#x27; +
         &#x27;    irc: information about an irc server\n&#x27; +
         &#x27;    ws: information about a websocket server\n&#x27; +

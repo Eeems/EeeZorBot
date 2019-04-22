@@ -114,27 +114,29 @@ var storage = require(&#x27;node-persist&#x27;),
  */
 module.exports = (function(){
     var self = {},
-        db = storage.create({
-            dir: &#x27;bans/&#x27;
-        });
-    db.initSync();
-    Object.defineProperty(self, &#x27;values&#x27;, {
-        enumerable: true,
-        get: function(){
-            return db.values();
-        }
-    });
-    self.each = function(callback){
-        db.forEach(function(key, value){
-            callback(value, value, key);
+        _db,
+        getDb = async function(){
+            if(!_db){
+                _db = storage.create({
+                    continuous: true,
+                    dir: &#x27;data/bans/&#x27;
+                });
+                await _db.init();
+            }
+            return _db;
+        };
+    self.values = async function(){
+        return (await getDb()).values();
+    };
+    self.each = async function(callback){
+        await (await getDb()).forEach(function(item){
+            var value = item.value;
+            callback(value, value, item.key);
         });
     };
-    Object.defineProperty(self, &#x27;length&#x27;, {
-        enumerable: true,
-        get: function(){
-            return db.length();
-        }
-    });
+    self.length = async function(){
+        return (await getDb()).length();
+    };
     /**
      * Adds a hostmask to a owner
      * @method addHostMask
@@ -142,10 +144,11 @@ module.exports = (function(){
      * @param {String} hostmask The hostmask to add to the owner
      * @chainable
      */
-    self.add = function(hostmask){
-        var k = s(hostmask);
-        if(!db.getItem(k)){
-            db.setItem(k, {
+    self.add = async function(hostmask){
+        var k = s(hostmask),
+            db = await getDb();
+        if(!await db.getItem(k)){
+            await db.setItem(k, {
                 hostmask: hostmask,
                 regex: tools.wildcardString(hostmask)
             });
@@ -158,8 +161,8 @@ module.exports = (function(){
      * @param  {String} hostmask The hostmask to remove from the owner
      * @chainable
      */
-    self.remove = function(hostmask){
-        db.removeItem(s(hostmask));
+    self.remove = async function(hostmask){
+        await (await getDb()).removeItem(s(hostmask));
         return self;
     };
     /**
@@ -167,10 +170,10 @@ module.exports = (function(){
      * @param  {String} hostmask Hostmask to search for.
      * @return {Object}          owner who matched the hostmask, undefined if none found.
      */
-    self.match = function(hostmask){
+    self.match = async function(hostmask){
         var ret;
-        self.each(function(ban){
-            if(ban.hostmask.indexOf(&#x27;*&#x27;) !== -1){
+        await self.each(function(ban){
+            if(~ban.hostmask.indexOf(&#x27;*&#x27;)){
                 if(hostmask.search(new RegExp(ban.regex)) !== -1){
                     ret = ban;
                 }

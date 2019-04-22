@@ -43,7 +43,7 @@ var id = {
         });
     },
     hooks = [
-        {   // PART
+        { // PART
             regex: /^\([#OC]\)([\W0-9])*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) has left [^ ]+ \((.*)\)$/i,
             fn: function(m){
                 // 1 - colour
@@ -52,14 +52,14 @@ var id = {
                 log('part', this.channel.name, m[2], m[1] + m[3]);
             }
         },
-        {   // JOIN
+        { // JOIN
             regex: /^\([#OC]\)[\W0-9]*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) has joined [^ ]+/i,
             fn: function(m){
                 // 1 - nick
                 log('join', this.channel.name, m[1], '');
             }
         },
-        {   // MODE
+        { // MODE
             regex: /^\([#OC]\)([\W0-9]*)\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+)\\ set [^ ]+ mode (.+)/i,
             fn: function(m){
                 // 1 - colour
@@ -68,7 +68,7 @@ var id = {
                 log('mode', this.channel.name, m[2], m[1] + m[3]);
             }
         },
-        {   // PRIVMSG
+        { // PRIVMSG
             regex: /^[\W0-9]*\([#OC]\)[\W0-9]*<(?:\x03\d{1,2}(?:,\d{1,2})?)?([^>\x0F]+)> (.+)$/i,
             fn: function(m){
                 // 1 - nick
@@ -76,7 +76,7 @@ var id = {
                 log('message', this.channel.name, m[1], m[2]);
             }
         },
-        {   // ACTION
+        { // ACTION
             regex: /^[\W0-9]*\([#OC]\)[\W0-9]*\* (?:\x03\d{1,2}(?:,\d{1,2})?)?([^ \x0F]+) (.+)/i,
             fn: function(m){
                 // 1 - nick
@@ -178,8 +178,8 @@ server.on('servername', function(){
             }
         }
     })
-    .add('dns', function(){
-        if(this.user && this.user.owner && this.user.owner.flags.indexOf('q') !== -1){
+    .add('dns', async function(){
+        if(this.user && await this.user.owner() && (await this.user.owner()).flags.indexOf('q') !== -1){
             var realdomains = (function(){
                     var rd = new Listdb('realdomains').all(),
                         realdomains = {},

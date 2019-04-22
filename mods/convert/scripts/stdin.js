@@ -68,7 +68,7 @@ var fs = require('fs'),
         });
     },
     hooks = [
-        {   // MODE
+        { // MODE
             regex: /^([\w.]+) set #\w+ mode (.+)$/,
             fn: function(m, d){
                 // 1 - user
@@ -78,7 +78,7 @@ var fs = require('fs'),
                 d.type = 'mode';
             }
         },
-        {   // QUIT
+        { // QUIT
             regex: /^([\w.]+) has quit #\w+ \((.+)\)$/,
             fn: function(m, d){
                 // 1 - user
