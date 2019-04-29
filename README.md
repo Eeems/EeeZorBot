@@ -1,6 +1,5 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4a6b7eb91f8941599cf621147bda64dc)](https://www.codacy.com/app/Eeems/EeeZorBot?utm_source=github.com&utm_medium=referral&utm_content=Eeems/EeeZorBot&utm_campaign=badger)
 [![build](https://travis-ci.org/Eeems/EeeZorBot.svg?branch=master)](https://travis-ci.org/Eeems/EeeZorBot.svg?branch=master)
-[![NSP Status](https://nodesecurity.io/orgs/omnimaga/projects/3480df78-e007-48df-8efa-6de9da4f651e/badge)](https://nodesecurity.io/orgs/omnimaga/projects/3480df78-e007-48df-8efa-6de9da4f651e)
 [![Greenkeeper badge](https://badges.greenkeeper.io/Eeems/EeeZorBot.svg)](https://greenkeeper.io/)
 
 EeeZorBot
