@@ -112,6 +112,7 @@
 var tools = require(&#x27;./tools.js&#x27;),
     Script = require(&#x27;./script.js&#x27;),
     mods = tools.mods(&#x27;stdin&#x27;),
+    started = false,
     commands = [],
     i,
     path,
@@ -153,6 +154,67 @@ var tools = require(&#x27;./tools.js&#x27;),
          * @chainable
          */
         start: function(){
+            if(!started){
+                started = true;
+                for(i = 0; i &lt; mods.length; i++){
+                    try{
+                        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/stdin.js&#x27;;
+                        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
+                        stdin.scripts[i] = new Script(path, stdin, i);
+                    }catch(e){
+                        stdin.console(&#x27;trace&#x27;);
+                        stdin.console(&#x27;error&#x27;, e);
+                    }
+                }
+                stdin.console(&#x27;info&#x27;, &#x27;Loading db scripts&#x27;);
+                mods = tools.mods(&#x27;db&#x27;);
+                for(i = 0; i &lt; mods.length; i++){
+                    try{
+                        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/db.js&#x27;;
+                        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
+                        stdin.scripts[i] = new Script(path, stdin, i);
+                    }catch(e){
+                        stdin.console(&#x27;trace&#x27;);
+                        stdin.console(&#x27;error&#x27;, e);
+                    }
+                }
+                stdin.console(&#x27;info&#x27;, &#x27;Loading socket scripts&#x27;);
+                mods = tools.mods(&#x27;socket&#x27;);
+                for(i = 0; i &lt; mods.length; i++){
+                    try{
+                        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/socket.js&#x27;;
+                        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
+                        stdin.scripts[i] = new Script(path, stdin, i);
+                    }catch(e){
+                        stdin.console(&#x27;trace&#x27;);
+                        stdin.console(&#x27;error&#x27;, e);
+                    }
+                }
+                stdin.console(&#x27;info&#x27;, &#x27;Loading http scripts&#x27;);
+                mods = tools.mods(&#x27;http&#x27;);
+                for(i = 0; i &lt; mods.length; i++){
+                    try{
+                        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/http.js&#x27;;
+                        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
+                        stdin.scripts[i] = new Script(path, stdin, i);
+                    }catch(e){
+                        stdin.console(&#x27;trace&#x27;);
+                        stdin.console(&#x27;error&#x27;, e);
+                    }
+                }
+                stdin.console(&#x27;info&#x27;, &#x27;Loading websocket scripts&#x27;);
+                mods = tools.mods(&#x27;websocket&#x27;);
+                for(i = 0; i &lt; mods.length; i++){
+                    try{
+                        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/websocket.js&#x27;;
+                        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
+                        stdin.scripts[i] = new Script(path, stdin, i);
+                    }catch(e){
+                        stdin.console(&#x27;trace&#x27;);
+                        stdin.console(&#x27;error&#x27;, e);
+                    }
+                }
+            }
             if(config.console){
                 process.stdin.resume();
                 process.stdin.setEncoding(&#x27;utf8&#x27;);
@@ -281,6 +343,10 @@ stdin.add(&#x27;help&#x27;, function(argv){
     }
 }, &#x27;Lists all help topics, or lists information on a specific topic&#x27;)
     .add(&#x27;exit&#x27;, function(){
+        process.listeners(&#x27;exit&#x27;).forEach(function(fn){
+            fn();
+        });
+        process.removeAllListeners(&#x27;exit&#x27;);
         process.exit();
     }, &#x27;Quits the bot&#x27;)
     .add(&#x27;debug&#x27;, function(){
@@ -517,64 +583,6 @@ stdin.add(&#x27;help&#x27;, function(argv){
         &#x27;    socket: information about a socket server\n&#x27; +
         &#x27;    memory: Displays memory usage\n&#x27;
     );
-for(i = 0; i &lt; mods.length; i++){
-    try{
-        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/stdin.js&#x27;;
-        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
-        stdin.scripts[i] = new Script(path, stdin, i);
-    }catch(e){
-        stdin.console(&#x27;trace&#x27;);
-        stdin.console(&#x27;error&#x27;, e);
-    }
-}
-stdin.console(&#x27;info&#x27;, &#x27;Loading db scripts&#x27;);
-mods = tools.mods(&#x27;db&#x27;);
-for(i = 0; i &lt; mods.length; i++){
-    try{
-        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/db.js&#x27;;
-        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
-        stdin.scripts[i] = new Script(path, stdin, i);
-    }catch(e){
-        stdin.console(&#x27;trace&#x27;);
-        stdin.console(&#x27;error&#x27;, e);
-    }
-}
-stdin.console(&#x27;info&#x27;, &#x27;Loading socket scripts&#x27;);
-mods = tools.mods(&#x27;socket&#x27;);
-for(i = 0; i &lt; mods.length; i++){
-    try{
-        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/socket.js&#x27;;
-        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
-        stdin.scripts[i] = new Script(path, stdin, i);
-    }catch(e){
-        stdin.console(&#x27;trace&#x27;);
-        stdin.console(&#x27;error&#x27;, e);
-    }
-}
-stdin.console(&#x27;info&#x27;, &#x27;Loading http scripts&#x27;);
-mods = tools.mods(&#x27;http&#x27;);
-for(i = 0; i &lt; mods.length; i++){
-    try{
-        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/http.js&#x27;;
-        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
-        stdin.scripts[i] = new Script(path, stdin, i);
-    }catch(e){
-        stdin.console(&#x27;trace&#x27;);
-        stdin.console(&#x27;error&#x27;, e);
-    }
-}
-stdin.console(&#x27;info&#x27;, &#x27;Loading websocket scripts&#x27;);
-mods = tools.mods(&#x27;websocket&#x27;);
-for(i = 0; i &lt; mods.length; i++){
-    try{
-        path = &#x27;mods/&#x27; + mods[i] + &#x27;/scripts/websocket.js&#x27;;
-        stdin.console(&#x27;info&#x27;, &#x27; |- &#x27; + path);
-        stdin.scripts[i] = new Script(path, stdin, i);
-    }catch(e){
-        stdin.console(&#x27;trace&#x27;);
-        stdin.console(&#x27;error&#x27;, e);
-    }
-}
 
     </pre>
 </div>

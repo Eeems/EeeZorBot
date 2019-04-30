@@ -1874,7 +1874,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 45,
+            "line": 46,
             "description": "Start listening for user input",
             "itemtype": "method",
             "name": "start",
@@ -1884,7 +1884,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 57,
+            "line": 119,
             "description": "Stop waiting for user input",
             "itemtype": "method",
             "name": "stop",
@@ -1894,7 +1894,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 68,
+            "line": 130,
             "description": "Register an event listener",
             "itemtype": "method",
             "name": "on",
@@ -1916,7 +1916,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 83,
+            "line": 145,
             "description": "Adds a command to the stdin",
             "itemtype": "method",
             "name": "add",
@@ -1944,7 +1944,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 102,
+            "line": 164,
             "description": "Calls a console output method",
             "itemtype": "method",
             "name": "console",
@@ -1968,7 +1968,7 @@
         },
         {
             "file": "lib\\stdin.js",
-            "line": 115,
+            "line": 177,
             "description": "stdin config",
             "type": "{object}",
             "itemtype": "property",
