@@ -475,7 +475,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
                     break;
                 case&#x27;memory&#x27;:
                     var mem = mem = process.memoryUsage(); // eslint-disable-line one-var
-                    stdin.console(&#x27;log&#x27;, &#x27;Memory usage: &#x27; + tools.sizeString(mem.heapUsed) + &#x27;/&#x27; + tools.sizeString(mem.heapTotal));
+                    stdin.console(&#x27;log&#x27;, &#x27;Memory usage (used/heap/total): &#x27; + tools.sizeString(mem.heapUsed) + &#x27;/&#x27; + tools.sizeString(mem.heapTotal) + &#x27;/&#x27; + tools.sizeString(mem.rss));
                     break;
                 default:
                     stdin.console(&#x27;log&#x27;, &#x27;Invalid info type&#x27;);
@@ -484,7 +484,8 @@ stdin.add(&#x27;help&#x27;, function(argv){
             var serv, // eslint-disable-line one-var
                 api = require(&#x27;./api.js&#x27;),
                 socket = api.socket,
-                websocket = api.websocket;
+                websocket = api.websocket,
+                mem = mem = process.memoryUsage(); // eslint-disable-line no-redeclare
             if(servers.length &gt; 0){
                 stdin.console(&#x27;log&#x27;, &#x27;IRC Servers:&#x27;);
                 for(i = 0; i &lt; servers.length; i++){
@@ -506,6 +507,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
                     stdin.console(&#x27;log&#x27;, &#x27;  &#x27; + i + &#x27;) &#x27; + serv.id + &#x27; - &#x27; + serv.host + &#x27;:&#x27; + serv.port);
                 }
             }
+            stdin.console(&#x27;log&#x27;, &#x27;Memory usage (used/heap/total): &#x27; + tools.sizeString(mem.heapUsed) + &#x27;/&#x27; + tools.sizeString(mem.heapTotal) + &#x27;/&#x27; + tools.sizeString(mem.rss));
         }
     },
     &#x27;[&lt;type&gt; &lt;id&gt; [&lt;arg&gt;]]\n&#x27; +

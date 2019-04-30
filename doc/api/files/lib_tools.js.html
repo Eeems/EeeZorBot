@@ -222,11 +222,15 @@ module.exports.extend(module.exports, {
             config = require(&#x27;../etc/config.json&#x27;),
             mods = [];
         for(i = 0; i &lt; config.mods.length; i++){
-            dir = fs.readdirSync(&#x27;mods/&#x27; + config.mods[i] + &#x27;/scripts/&#x27;);
-            for(ii in dir){
-                if(type + &#x27;.js&#x27; === dir[ii]){
-                    mods.push(config.mods[i]);
+            if(fs.existsSync(&#x27;mods/&#x27; + config.mods[i] + &#x27;/scripts/&#x27;)){
+                dir = fs.readdirSync(&#x27;mods/&#x27; + config.mods[i] + &#x27;/scripts/&#x27;);
+                for(ii in dir){
+                    if(type + &#x27;.js&#x27; === dir[ii]){
+                        mods.push(config.mods[i]);
+                    }
                 }
+            }else{
+                throw Error(&#x60;Unable to load mode ${config.mods[i]}. Scripts are missing.&#x60;);
             }
         }
         return mods;
