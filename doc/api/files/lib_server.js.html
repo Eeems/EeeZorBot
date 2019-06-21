@@ -313,10 +313,18 @@ module.exports = function(config){
                 var buf = tools.convert(d);
                 d = buf.toString(&#x27;UTF-16LE&#x27;);
                 var s = d.split(&#x27;\r\n&#x27;), // eslint-disable-line one-var
-                    ii,
-                    match,
-                    m,
-                    o;
+                    ii, m, o,
+                    callHook = async function(hook, i){
+                        if(hook.type === &#x27;regex&#x27;){
+                            var match = hook.regex.exec(s[ii]);
+                            if(match){
+                                await hook.fn.call(self, match, s[ii]);
+                                if(hook.once){
+                                    self.hooks.splice(i, 1);
+                                }
+                            }
+                        }
+                    };
                 self.fire(&#x27;data&#x27;, [d, buf], self);
                 for(ii = 0; ii &lt; s.length; ii++){
                     if(s[ii] !== &#x27;&#x27;){
@@ -336,17 +344,7 @@ module.exports = function(config){
                         }else{
                             self.logIn(s[ii]);
                         }
-                        self.hooks.forEach(async function(hook, i){
-                            if(hook.type === &#x27;regex&#x27;){
-                                match = hook.regex.exec(s[ii]);
-                                if(match){
-                                    await hook.fn.call(self, match, s[ii]);
-                                    if(hook.once){
-                                        self.hooks.splice(i, 1);
-                                    }
-                                }
-                            }
-                        });
+                        self.hooks.forEach(callHook);
                     }
                 }
                 // TODO - incoming data

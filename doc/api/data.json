@@ -1591,7 +1591,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 300,
+            "line": 298,
             "description": "Send a message to the IRC server",
             "itemtype": "method",
             "name": "send",
@@ -1608,7 +1608,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 324,
+            "line": 322,
             "description": "Install a hook on the server.",
             "itemtype": "method",
             "name": "on",
@@ -1637,7 +1637,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 357,
+            "line": 355,
             "description": "Uninstall a hook from the server",
             "itemtype": "method",
             "name": "off",
@@ -1660,7 +1660,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 397,
+            "line": 395,
             "description": "Add a command to the server",
             "itemtype": "method",
             "name": "add",
@@ -1687,7 +1687,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 416,
+            "line": 414,
             "description": "Remove a command listener from the server",
             "itemtype": "method",
             "name": "remove",
@@ -1704,7 +1704,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 442,
+            "line": 440,
             "description": "Fire an event on the IRC server",
             "itemtype": "method",
             "name": "fire",
@@ -1731,7 +1731,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 465,
+            "line": 463,
             "description": "Join a channel",
             "itemtype": "method",
             "name": "join",
@@ -1748,7 +1748,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 493,
+            "line": 491,
             "description": "Leave a channel",
             "itemtype": "method",
             "name": "part",
@@ -1765,7 +1765,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 506,
+            "line": 504,
             "description": "Check if in a channel",
             "itemtype": "method",
             "name": "in",
@@ -1785,7 +1785,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 521,
+            "line": 519,
             "description": "Get a channel based on it's name",
             "itemtype": "method",
             "name": "channel",
@@ -1805,7 +1805,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 535,
+            "line": 533,
             "description": "Gets the user or syncs a user on the server",
             "itemtype": "method",
             "name": "user",
@@ -1825,7 +1825,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 568,
+            "line": 566,
             "description": "Gets a script based on the sid",
             "itemtype": "method",
             "name": "script",
@@ -1845,7 +1845,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 578,
+            "line": 576,
             "description": "Reconnects to the IRC server",
             "itemtype": "method",
             "name": "reconnect",
@@ -1855,7 +1855,7 @@
         },
         {
             "file": "lib\\server.js",
-            "line": 599,
+            "line": 597,
             "description": "Quits from the IRC server",
             "itemtype": "method",
             "name": "quit",
