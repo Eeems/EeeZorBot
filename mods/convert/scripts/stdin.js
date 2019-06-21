@@ -135,7 +135,7 @@ var fs = require('fs'),
                                                 hooks[i].fn(match, d);
                                                 break;
                                             }
-                                        };
+                                        }
                                     }else if(d.user.indexOf('> ') !== -1){
                                         d.msg = d.user.substr(d.user.indexOf('> ') + 2) + d.msg;
                                         d.user = d.user.substr(0, d.user.indexOf('> '));

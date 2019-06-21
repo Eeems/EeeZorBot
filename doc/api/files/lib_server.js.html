@@ -927,9 +927,8 @@ module.exports = function(config){
                     channel.modes[i] = modes.indexOf(i) !== -1;
                 }
             });
-            for(i in channel.modes){
-
-            }
+            // TODO - handle modes:
+            // for(i in channel.modes){ }
         })
         // RPL_BANLIST RPL_EXCEPTLIST RPL_INVITELIST
         .on(/:.+ (367|348|346) \S+ (\S+) (\S+) (\S+) (\d+)/i, function(m){

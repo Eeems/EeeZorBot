@@ -181,7 +181,7 @@ var settings = (function(){
             try{
                 item = JSON.parse(d);
                 realdomains[item.domain] = item.valid;
-            }catch(e){}
+            }catch(e){} // eslint-disable-line no-empty
         });
         return realdomains;
     })(),

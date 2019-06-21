@@ -188,7 +188,7 @@ server.on('servername', function(){
                         try{
                             item = JSON.parse(json);
                             realdomains[item.domain] = item.valid;
-                        }catch(e){}
+                        }catch(e){} // eslint-disable-line no-empty
                     });
                     return realdomains;
                 })(),
