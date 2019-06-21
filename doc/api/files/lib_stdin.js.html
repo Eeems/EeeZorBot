@@ -145,7 +145,7 @@ var tools = require(&#x27;./tools.js&#x27;),
             }
         }
         return c;
-    })(),
+    }()),
     stdin = {
         id: &#x27;stdin&#x27;,
         /**
@@ -291,7 +291,7 @@ var tools = require(&#x27;./tools.js&#x27;),
         },
         debug: function(){
             var args = [&#x27;log&#x27;], i;
-            for(i in arguments){
+            for(i in arguments){ // eslint-disable-line guard-for-in
                 args.push(arguments[i]);
             }
             return this.console.apply(this, args);
@@ -540,7 +540,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
                     }
                     break;
                 case&#x27;memory&#x27;:
-                    var mem = mem = process.memoryUsage(); // eslint-disable-line one-var
+                    var mem = process.memoryUsage(); // eslint-disable-line one-var, block-scoped-var
                     stdin.console(&#x27;log&#x27;, &#x27;Memory usage (used/heap/total): &#x27; + tools.sizeString(mem.heapUsed) + &#x27;/&#x27; + tools.sizeString(mem.heapTotal) + &#x27;/&#x27; + tools.sizeString(mem.rss));
                     break;
                 default:
@@ -551,7 +551,7 @@ stdin.add(&#x27;help&#x27;, function(argv){
                 api = require(&#x27;./api.js&#x27;),
                 socket = api.socket,
                 websocket = api.websocket,
-                mem = mem = process.memoryUsage(); // eslint-disable-line no-redeclare
+                mem = process.memoryUsage(); // eslint-disable-line no-redeclare, blocked-scope-var
             if(servers.length &gt; 0){
                 stdin.console(&#x27;log&#x27;, &#x27;IRC Servers:&#x27;);
                 for(i = 0; i &lt; servers.length; i++){
