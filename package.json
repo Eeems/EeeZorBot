@@ -58,8 +58,6 @@
     "test-travis": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "lint": "standard-own --fix --verbose | snazzy",
-    "precommit": "yarn run lint && yarn run test && yuidoc . && git add doc/ && semantic-release --prepare || true && git add package.json && yarn run changelog",
-    "prepush": "yarn run commit-cleanup",
     "prepublish": "snyk protect && pkg-ok"
   },
   "config": {
@@ -94,5 +92,11 @@
       "path": "mods/*/scripts/*.js",
       "maxSize": "6 kB"
     }
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run lint && yarn run test && yuidoc . && git add doc/ && semantic-release --prepare || true && git add package.json && yarn run changelog",
+      "pre-push": "yarn run commit-cleanup"
+    }
+  }
 }
