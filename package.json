@@ -98,5 +98,13 @@
       "pre-commit": "yarn run lint && yarn run test && yuidoc . && git add doc/ && semantic-release --prepare || true && git add package.json && yarn run changelog",
       "pre-push": "yarn run commit-cleanup"
     }
+  },
+  "greenkeeper": {
+    "commitMessages": {
+      "dependencyUpdate": "chore(dependencies): Update ${dependency} to version ${version}",
+      "devDependencyUpdate": "chore(dependencies): Update ${dependency} to version ${version}",
+      "dependencyPin": "fix(dependencies): Pin ${dependency} to ${oldVersion}",
+      "devDependencyPin": "fix(dependencies): Pin ${dependency} to ${oldVersion}"
+    }
   }
 }
