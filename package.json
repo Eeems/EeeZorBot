@@ -28,10 +28,10 @@
   "dependencies": {},
   "greenkeeper": {
     "commitMessages": {
-      "dependencyUpdate": "chore(dependencies): Update ${dependency} to version ${version}",
-      "devDependencyUpdate": "chore(dependencies): Update ${dependency} to version ${version}",
-      "dependencyPin": "fix(dependencies): Pin ${dependency} to ${oldVersion}",
-      "devDependencyPin": "fix(dependencies): Pin ${dependency} to ${oldVersion}"
+      "dependencyUpdate": "chore(dependencies): update ${dependency} to version ${version}",
+      "devDependencyUpdate": "chore(dependencies): update ${dependency} to version ${version}",
+      "dependencyPin": "fix(dependencies): pin ${dependency} to ${oldVersion}",
+      "devDependencyPin": "fix(dependencies): pin ${dependency} to ${oldVersion}"
     }
   }
 }
