@@ -57,6 +57,7 @@ db.multiQuerySync([
             INDEX i_logs_t_id(t_id),\
             INDEX i_logs_c_id(c_id),\
             INDEX i_logs_u_id(u_id),\
+            INDEX i_logs_all_id(date, c_id, u_id, t_id),\
             FOREIGN KEY (t_id)\
                 REFERENCES types(id)\
                 ON DELETE RESTRICT\

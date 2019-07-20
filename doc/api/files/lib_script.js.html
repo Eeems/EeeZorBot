@@ -296,7 +296,7 @@ module.exports = function(scriptpath, server, sid){
      * @event unload
      * @type {Function}
      */
-    self.unload = function(){};
+    self.unload = () =&gt; self.server.debug(&#x27;No unload script set&#x27;);
     self.enable();
     return self;
 };

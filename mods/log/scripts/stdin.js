@@ -1,4 +1,4 @@
-/* global stdin Listdb */
+/* global stdin Listdb script */
 var getrd = function(){
     var rd = new Listdb('realdomains').all(),
         realdomains = {};
@@ -36,3 +36,8 @@ stdin.add('dns', function(argv){
     .add('dnsdump', function(){
         stdin.console('log', getrd());
     }, 'dumps the dns cache');
+
+script.unload = () => {
+    stdin.remove('dns');
+    stdin.remove('dnsdump');
+};

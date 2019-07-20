@@ -297,7 +297,11 @@ var tools = require(&#x27;./tools.js&#x27;),
             return this.console.apply(this, args);
         },
         off: function(id){},
-        remove: function(id){}
+        remove: function(name){
+            if(name){
+                commands = commands.filter((command) =&gt; command.name !== name);
+            }
+        }
     };
 module.exports = stdin;
 process.stdin.on(&#x27;data&#x27;, function(d){

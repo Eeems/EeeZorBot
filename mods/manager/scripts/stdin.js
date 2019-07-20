@@ -1,5 +1,5 @@
-/* global server stdin owners bans */
-server.add('owners', async function(argv){
+/* global stdin owners bans script */
+stdin.add('owners', async function(argv){
     stdin.console('log', 'Owners:');
     await owners.each(function(owner, nick){
         stdin.console('log', '  ' + nick);
@@ -91,3 +91,17 @@ server.add('owners', async function(argv){
         await bans.remove(argv[1]);
         stdin.console('log', 'Ban removed');
     }, '<hostmask>\nRemoves a ban for a hostmask');
+script.unload = () => {
+    stdin.remove('owners');
+    stdin.remove('owner');
+    stdin.remove('+owner');
+    stdin.remove('-owner');
+    stdin.remove('+host');
+    stdin.remove('-host');
+    stdin.remove('match');
+    stdin.remove('+flag');
+    stdin.remove('-flag');
+    stdin.remove('bans');
+    stdin.remove('+ban');
+    stdin.remove('-ban');
+};
