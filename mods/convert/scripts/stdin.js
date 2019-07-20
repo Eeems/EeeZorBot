@@ -15,7 +15,7 @@ var fs = require('fs'),
     id = {
         channel: function(name, server){
             var sid = id.server(server),
-                cid = db.querySync('select id from channels where name = ? and s_id = ?', [name, sid])[0];
+                cid = db.querySync('select id from channels where lower(name) = lower(?) and s_id = ?', [name, sid])[0];
             return cid === undefined ? db.insertSync('channels', {name: name, s_id: sid}) : cid.id;
         },
         user: function(nick){
@@ -113,7 +113,7 @@ var fs = require('fs'),
             switch(obj.type){
                 case'server':
                     status.channels[1] = obj.channels.length;
-                    obj.channels.forEach(async (channel, i) => {
+                    obj.channels.forEach(async(channel, i) => {
                         status.channels[0] = i;
                         await convert(channel);
                     });
@@ -130,7 +130,7 @@ var fs = require('fs'),
                                 encoding: 'ascii'
                             }).split('\n');
                             status.lines = [0, lines.length];
-                            lines.forEach(async (d) => {
+                            lines.forEach(async(d) => {
                                 try{
                                     d = JSON.parse(d.replace(/\n$/, ''));
                                     if(!d.user){
@@ -249,7 +249,7 @@ stdin.add('convert', function(argv){
                     converting = true;
                     if(argv.length === 0){
                         status.servers[1] = l_servers.length;
-                        l_servers.forEach(async (l_server, i) => { // eslint-disable-line camelcase
+                        l_servers.forEach(async(l_server, i) => { // eslint-disable-line camelcase
                             status.servers[0] = i;
                             await convert(l_server);
                         });

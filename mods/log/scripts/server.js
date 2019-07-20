@@ -5,7 +5,7 @@
 var id = {
         channel: function(name){
             var sid = id.server(),
-                cid = db.querySync('select id from channels where name = ? and s_id = ?', [name, sid])[0];
+                cid = db.querySync('select id from channels where lower(name) = lower(?) and s_id = ?', [name, sid])[0];
             return cid === undefined ? db.insertSync('channels', {name: name, s_id: sid}) : cid.id;
         },
         user: function(nick){
@@ -34,12 +34,13 @@ var id = {
                 }else{
                     throw e;
                 }
+            }else{
+                pubsub.pub('log', {
+                    type: type,
+                    channel: channel,
+                    id: id
+                });
             }
-            pubsub.pub('log', {
-                type: type,
-                channel: channel,
-                id: id
-            });
         });
     },
     hooks = [
