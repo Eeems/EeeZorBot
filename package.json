@@ -25,13 +25,5 @@
     "test": "snyk test && tape test/*.js",
     "test-travis": "nyc npm test && nyc report --reporter=text-lcov > lcov.info"
   },
-  "dependencies": {},
-  "greenkeeper": {
-    "commitMessages": {
-      "dependencyUpdate": "chore(dependencies): update ${dependency} to version ${version}",
-      "devDependencyUpdate": "chore(dependencies): update ${dependency} to version ${version}",
-      "dependencyPin": "fix(dependencies): pin ${dependency} to ${oldVersion}",
-      "devDependencyPin": "fix(dependencies): pin ${dependency} to ${oldVersion}"
-    }
-  }
+  "dependencies": {}
 }
